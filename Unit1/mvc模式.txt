@@ -1,0 +1,4 @@
+mvc ,M 就是 Model模型指資料 ,V 就是view 視圖也就是介面,C表 Controller 控制 M 和 V 的關聯
+View 及 Model 發生變化會通知 Controller 去處理
+
+MVC 模式如 M 資料來源 如database , C 如 Adapter , V 如各種元件

@@ -1,0 +1,11 @@
+開發人員可使用traceview檢視程式中方法的執行效率
+
+TraceView 是效能最佳化的圖形化程式
+使用traceview 前使用
+Debug.startMethodTracing("test") 產生一個trace file
+
+在 Activity.onDestroy寫入
+Debug.stopMethodTracing();
+
+
+執行 traceview 檔名.trace 將會看到 追蹤檔案的 呼叫時間,執行時間及被呼叫的次數
