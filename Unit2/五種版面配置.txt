@@ -1,0 +1,46 @@
+FrameLayout(框架版面配置),LinearLayout(線性配置),RelativeLayout(相對版面配置),TableLayout(表格版面配置) and AbsoluteLayout(絕對版面配置)
+
+FrameLayout 中的View 會以層疊方式顯示類似photoshop,如需兩張影像疊加在一起形成一張影像就可使用FrameLayout
+LinearLayout 可將多個View 水平或垂直排列 , android:orientation 屬性 horizontal View 會水平排列 ,vertical view 會垂直排列
+RelativeLayout 可透過兩個或多個元件的相對位置來擺放元件,相關屬性 : android:Layout_toLeftOf , android:Layout_toRightOf , android:Layout_below , android:layout_above 此四個屬性必需指定id
+TableLayout 版面配置可將View 按照表格排列
+AbsoluteLayout 可設定View 的絕對作標(不建議使用)
+
+
+View 上下左右 置中 對齊可使用 android:layout_gravity ,FrameLayout 最容易實現
+View 的 android:layout_gravity 屬性只有在垂直(bottom,center_vertical)才有作用 
+
+
+在Java 得到View 的位置,使用View.getLocationOnScreen();
+
+
+將版面存影像 : View.setDrawingCacheEnabled 和 View.getDrawingCache 兩個方法
+
+在呼叫 View.getDrawingCache 前需呼叫measure 和 layout 方法才可成功取得版面配置的Bitmap物件
+
+
+
+
+設定漸層背景 : 
+
+GradientDrawable 類別,再使用 getWindow().setBackgroundDrawable();
+
+android:layout_weight 設定元件於空間的比例,比重越多,值越低
+
+
+android:padding 和 android:layout_margin 
+
+android:padding 是View 內容離 View 邊緣的距離
+android:layout_margin 是 View 離其他View 或 父View 的距離
+
+
+view 位置使用dp , 文字使用sp
+
+android:Gravity : View 中內容(文字,影像)的位置
+android:layout_gravity 指目前View 在父View 位置
+
+
+
+
+
+
