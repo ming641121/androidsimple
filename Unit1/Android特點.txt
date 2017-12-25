@@ -1,0 +1,12 @@
+1.2.1
+Android 特點 : 支援4大元件 Activity,Broadcast receiver,content provider and Service.
+JVM 基於 堆疊 , Dalvik 基於 暫存器
+Android 內建Webkit 核心瀏覽器 支援 HTML5 等新Web 標準
+支援 OpenGL ES 2.0
+支援 Light 級SQLite database
+支援 硬體感測器 如方向感測器 , 重力感測器,光學感測器 和壓力感測器等 硬體如藍牙,3G,Wifi ,Camera,GPS ..等
+更新韌體容易
+開放式原始碼的OS , 研發成本低
+
+
+
