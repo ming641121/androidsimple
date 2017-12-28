@@ -1,0 +1,21 @@
+logMsg("uart tes, num:%d, str:%s, ptr:%p\r\n",    Number, pString, pDev, 0,0,0);
+
+
+
+
+b logMsg
+
+
+sp uartTest
+
+
+
+>> Break at ...
+
+
+c 
+
+
+c
+
+c

@@ -1,0 +1,54 @@
+#Entry type: usmUserEntry
+#Format:  usmUserEngineID  (octetString)
+#         usmUserName  (text)
+#         usmUserAuthProtocol  (OID)
+#         usmUserPrivProtocol  (OID)
+#         usmUserStorageType  (nonVolatile, permanent, readOnly)
+#         usmTargetTag  (text)
+#         AuthKey  (octetString)
+#         PrivKey  (octetString)
+#
+#  The following entries corresponds to the entries in v1c3-full.cnf
+#  Note the passwords are omitted for security reasons.  To make
+#  utilities and BRASS clients bypass password prompts, put locallized
+#  passwords with proper snmpEngineIDs here.
+#
+usmUserEntry  localSnmpID root usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID Administrator usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID public usmNoAuthProtocol \
+    usmNoPrivProtocol nonVolatile - - -
+#
+#  Various role-based users
+#
+usmUserEntry  localSnmpID DayShiftSupervisor usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID EveningShiftSupervisor usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID NightShiftSupervisor usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID DayOperator usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID EveningOperator usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID NightOperator usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID NetworkAdministrator usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID NetworkAdministratorAES usmHMACSHAAuthProtocol \
+    usmAESCfb128PrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID HelpDesk usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID NetView usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID OpenView usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID Spectrum usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID EnterPol usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+usmUserEntry  localSnmpID SNMPv3ConfigWizard usmHMACMD5AuthProtocol \
+    usmDESPrivProtocol nonVolatile - - -
+#
+#

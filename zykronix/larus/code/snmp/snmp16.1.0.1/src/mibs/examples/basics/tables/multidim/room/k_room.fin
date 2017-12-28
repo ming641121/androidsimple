@@ -1,0 +1,324 @@
+/*
+ *
+ * Copyright (C) 1992-2003 by SNMP Research, Incorporated.
+ *
+ * This software is furnished under a license and may be used and copied
+ * only in accordance with the terms of such license and with the
+ * inclusion of the above copyright notice. This software or any other
+ * copies thereof may not be provided or otherwise made available to any
+ * other person. No title to and ownership of the software is hereby
+ * transferred.
+ *
+ * The information in this software is subject to change without notice
+ * and should not be construed as a commitment by SNMP Research, Incorporated.
+ *
+ * Restricted Rights Legend:
+ *  Use, duplication, or disclosure by the Government is subject to
+ *  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+ *  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+ *  subparagraphs (c)(4) and (d) of the Commercial Computer
+ *  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+ *  clauses in the NASA FAR Supplement and other corresponding
+ *  governmental regulations.
+ *
+ */
+
+/*
+ *                PROPRIETARY NOTICE
+ *
+ * This software is an unpublished work subject to a confidentiality agreement
+ * and is protected by copyright and trade secret law.  Unauthorized copying,
+ * redistribution or other use of this work is prohibited.
+ *
+ * The above notice of copyright on this source code product does not indicate
+ * any actual or intended publication of such source code.
+ */
+
+
+/*
+ * Arguments used to create this file:
+ * -agent -o room 
+ */
+
+#include "sr_conf.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "sr_snmp.h"
+#include "comunity.h"
+#include "v2clssc.h"
+#include "sr_trans.h"
+#include "context.h"
+#include "method.h"
+#include "mibout.h"
+
+
+#define CHECK_MOTION_DETECTOR() ((rand() % (2) != 0) ? \
+	D_roomDetectorMotion_no_movement : \
+	D_roomDetectorMotion_movement )
+
+#define CHECK_SMOKE_DETECTOR() ((rand() % (20) != 0) ? \
+	D_roomDetectorSmoke_no_smoke : \
+	D_roomDetectorSmoke_smoke )
+
+#define CHECK_GAS_DETECTOR() 0
+
+#define FLOORS 10
+#define HALLS  8
+#define ROOMS  7
+
+char building[FLOORS][HALLS][ROOMS][11];  /* 11=strlen(LONGEST_ROOM_NAME)+1 */
+
+int detector_present(char *location, int type);
+
+int
+detector_present(location, type)
+   char *location;
+   int type;
+{
+    /*
+     * Define the location of detectors in this building.
+     *
+     * Not all rooms have all types of detectors; i.e., not all of
+     * the columns in a row are necessarily valid.  Therefore, this
+     * table is sparce, and not all indices identify a valid piece of
+     * information.
+     */
+
+    /* motion detectors only in corridors */
+    if (type == I_roomDetectorMotion) {
+	if (strcmp(location, "Corridor")) {
+	    return 0;
+	}
+    }
+
+    /* gas detector only in machine room */
+    if (type == I_roomDetectorGas) {
+	if (strcmp(location, "Machinery")) {
+	    return 0;
+	}
+    }
+
+    /* all other detectors installed and functional */
+    return 1;
+}
+
+int
+#ifndef PER_FILE_INIT
+k_initialize()
+#else /* PER_FILE_INIT */
+k_room_initialize()
+#endif /* PER_FILE_INIT */
+{
+    int floor, hall, room, roomnum;
+
+    /*
+     * Define the position of rooms in this building.
+     *
+     * Rooms are different sizes, so some occupy more than one "cell"
+     * in a conceptual uniformly square MIB table.  Therefore, this
+     * table is sparce, and not all indices identify a valid piece of
+     * information.
+     */
+
+    for (floor = 1; floor < FLOORS; floor++) {
+	roomnum = floor * 100;
+	for (hall = 0; hall < HALLS; hall++) {
+	    if (floor == FLOORS-1) {
+		if (hall < 2) {
+		    sprintf(building[floor][0][0], "Machinery");
+		    sprintf(building[floor][1][0], "Elevator");
+		    hall = 2;
+		}
+	    }
+	    if (hall % 3 == 0) {
+		sprintf(building[floor][hall][0], "Corridor");
+	    }
+	    else for (room = 0; room < ROOMS; room++) {
+		if (hall % 4 == 0 && room == 4) {
+		    if (floor % 2 == 0) {
+			sprintf(building[floor][hall][room], "Vending");
+		    }
+		    else {
+			sprintf(building[floor][hall][room], "Ice");
+		    }
+		}
+		else {
+		    sprintf(building[floor][hall][room], "Room %d", ++roomnum);
+		}
+	    }
+	}
+	sprintf(building[floor][0][ROOMS-1], "Janitor");
+    }
+    sprintf(building[0][0][0], "Restaurant");
+    sprintf(building[0][0][1], "Bar");
+    sprintf(building[0][0][2], "Gift Shop");
+    sprintf(building[0][1][0], "Lobby");
+    sprintf(building[0][2][0], "Pool");
+    sprintf(building[0][2][1], "Gymnasium");
+    sprintf(building[0][3][0], "Offices");
+    sprintf(building[0][4][0], "Security");
+    sprintf(building[0][4][1], "Janitor");
+    return 1;
+}
+
+int
+#ifndef PER_FILE_INIT
+k_terminate()
+#else /* PER_FILE_INIT */
+k_room_terminate()
+#endif /* PER_FILE_INIT */
+{
+    return 1;
+}
+
+roomDetectorEntry_t *
+k_roomDetectorEntry_get(serialNum, contextInfo, nominator, searchType, roomDetectorFloorIndex, roomDetectorHallIndex, roomDetectorRoomIndex)
+   int serialNum;
+   ContextInfo *contextInfo;
+   int nominator;
+   int searchType;
+   SR_INT32 roomDetectorFloorIndex;
+   SR_INT32 roomDetectorHallIndex;
+   SR_INT32 roomDetectorRoomIndex;
+{
+    static roomDetectorEntry_t roomDetectorEntryData;
+    int floor, hall, room;
+
+
+    /*
+     * Clear values from the static data structure which were
+     * set in the last invocation of k_roomDetectorEntry_get()
+     */
+
+    if (roomDetectorEntryData.roomDetectorRoomName != NULL) {
+	FreeOctetString(roomDetectorEntryData.roomDetectorRoomName);
+	roomDetectorEntryData.roomDetectorRoomName = NULL;
+    }
+    ZERO_VALID(roomDetectorEntryData.valid);
+
+
+    /*
+     * Set starting point for search.  The search variables are
+     * initialized to one less than the incoming indices, because
+     * C arrays start at index=0 and conceptual MIB tables start
+     * at index=1
+     */
+
+    floor = roomDetectorFloorIndex-1;
+    if (floor < 0) { floor = 0; }
+
+    hall = roomDetectorHallIndex-1;
+    if (hall < 0) { hall = 0; }
+
+    room = roomDetectorRoomIndex-1;
+    if (room < 0) { room = 0; }
+
+
+    /*
+     * Determine which type of search is requested, then carry
+     * out the search
+     */
+
+    if (searchType == EXACT) {
+
+	/*
+	 * The indices must exactly match an existing row in
+	 * the table, else fail
+	 */
+
+	if (strlen(building[floor][hall][room]) > 0) {
+	    /*
+	     * possible match...check to make sure that
+	     * the specific column instance is available
+	     */
+
+	    if (detector_present(building[floor][hall][room], nominator)) {
+	        goto found;
+	    }
+	}
+    }
+    else {
+	if (searchType == NEXT) {
+
+	    /*
+	     * Perform a greater-than-or-equal-to search.
+	     */
+
+	    for (; floor < FLOORS; floor++) {
+		for (; hall < HALLS; hall++) {
+		    for (; room < ROOMS; room++) {
+			if (strlen(building[floor][hall][room]) > 0) {
+
+			    /*
+			     * possible match...check to make sure that
+			     * the specific column instance is available
+			     */
+
+			    if (detector_present(building[floor][hall][room],
+				    nominator)) {
+			        goto found;
+			    }
+			}
+		    }
+		    room = 0;  /* search all rooms in the NEXT hall */
+	        }
+	        hall = 0;  /* search all halls on the NEXT floor */
+	    }
+	}
+    }
+
+    return NULL;  /* not found */
+
+
+    /*
+     * If a row was found by either search method, copy the data
+     * into the internal MIB data structure and set the valid bits
+     */
+
+    found:
+
+    roomDetectorEntryData.roomDetectorFloorIndex = floor + 1;
+    SET_VALID(I_roomDetectorFloorIndex, roomDetectorEntryData.valid);
+
+    roomDetectorEntryData.roomDetectorHallIndex = hall + 1;
+    SET_VALID(I_roomDetectorHallIndex, roomDetectorEntryData.valid);
+
+    roomDetectorEntryData.roomDetectorRoomIndex = room + 1;
+    SET_VALID(I_roomDetectorRoomIndex, roomDetectorEntryData.valid);
+
+    roomDetectorEntryData.roomDetectorRoomName =
+	MakeOctetStringFromText(building[floor][hall][room]);
+    if (roomDetectorEntryData.roomDetectorRoomName == NULL) {
+	/*
+	 * This value could not be supplied (memory allocation failure?)
+	 * If this value was explicitly requested, then we must fail
+	 */
+
+	 if (nominator == I_roomDetectorRoomName) {
+	     return NULL;
+	 }
+    }
+    else {
+	SET_VALID(I_roomDetectorRoomName, roomDetectorEntryData.valid);
+    }
+
+    if (detector_present(building[floor][hall][room], I_roomDetectorMotion)) {
+	roomDetectorEntryData.roomDetectorMotion = CHECK_MOTION_DETECTOR();
+	SET_VALID(I_roomDetectorMotion, roomDetectorEntryData.valid);
+    }
+
+    if (detector_present(building[floor][hall][room], I_roomDetectorSmoke)) {
+	roomDetectorEntryData.roomDetectorSmoke = CHECK_SMOKE_DETECTOR();
+	SET_VALID(I_roomDetectorSmoke, roomDetectorEntryData.valid);
+    }
+
+    if (detector_present(building[floor][hall][room], I_roomDetectorGas)) {
+	roomDetectorEntryData.roomDetectorGas = CHECK_GAS_DETECTOR();
+	SET_VALID(I_roomDetectorGas, roomDetectorEntryData.valid);
+    }
+
+    return(&roomDetectorEntryData);
+}
+

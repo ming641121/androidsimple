@@ -1,0 +1,111 @@
+--
+--
+-- Copyright (C) 1992-2003 by SNMP Research, Incorporated.
+--
+-- This software is furnished under a license and may be used and copied
+-- only in accordance with the terms of such license and with the
+-- inclusion of the above copyright notice. This software or any other
+-- copies thereof may not be provided or otherwise made available to any
+-- other person. No title to and ownership of the software is hereby
+-- transferred.
+--
+-- The information in this software is subject to change without notice
+-- and should not be construed as a commitment by SNMP Research, Incorporated.
+--
+-- Restricted Rights Legend:
+--  Use, duplication, or disclosure by the Government is subject to
+--  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+--  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+--  subparagraphs (c)(4) and (d) of the Commercial Computer
+--  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+--  clauses in the NASA FAR Supplement and other corresponding
+--  governmental regulations.
+--
+--
+
+--
+--                PROPRIETARY NOTICE
+--
+-- This software is an unpublished work subject to a confidentiality agreement
+-- and is protected by copyright and trade secret law.  Unauthorized copying,
+-- redistribution or other use of this work is prohibited.
+--
+-- The above notice of copyright on this source code product does not indicate
+-- any actual or intended publication of such source code.
+--
+--
+
+
+   NOTE-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       OBJECT-TYPE
+           FROM RFC-1155;
+
+   snmpResearch                OBJECT IDENTIFIER ::= { enterprises 99 }
+
+   snmpResearchMIBs            OBJECT IDENTIFIER ::= { snmpResearch 12 }
+
+   srExamples                  OBJECT IDENTIFIER ::= { snmpResearchMIBs 19 }
+
+   srOldStuff                  OBJECT IDENTIFIER ::= { srExamples 3 }
+
+   srAccess                    OBJECT IDENTIFIER ::= { srOldStuff 2 }
+
+
+   --  ORGANIZATION "SNMP Research"
+   --  CONTACT-INFO
+   --         "         Technical Support
+   --
+   --           Postal: SNMP Research
+   --                   3001 Kimberlin Heights Road
+   --                   Knoxville, TN  37920-9716
+   --
+   --              Tel: +1 865 573 1434
+   --              Fax: +1 865 573 9197
+   --
+   --           E-mail: support@snmp.com
+   --              WWW: http://www.snmp.com"
+   --  DESCRIPTION
+   --          "An example MIB module to demonstrate how SNMP
+   --           Research products deal with the SNMPv1 write-only
+   --           ACCESS clause.
+   --   
+   --           The NOTE-MIB provides a way to deliver a confidential
+   --           note to a user on a remote machine.  Both objects must
+   --           be set in the same PDU for a message to be delivered
+   --           successfully.  The information is write-only so that
+   --           the receipient and note text remains confidential."
+
+
+   note                        OBJECT IDENTIFIER ::= { srAccess 1 }
+
+
+   noteRecipient OBJECT-TYPE
+       SYNTAX  DisplayString (SIZE(0..127))
+       ACCESS  write-only
+       STATUS  mandatory
+       DESCRIPTION
+               "The intended recipient of the confidential note."
+       ::= { note 1 }
+
+   noteBody OBJECT-TYPE
+       SYNTAX  DisplayString (SIZE(0..255))
+       ACCESS  write-only
+       STATUS  mandatory
+       DESCRIPTION
+               "The text of the confidential note."
+       ::= { note 2 }
+
+   noteNumber OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+               "The total number of messages delivered.  This
+               information is not confidential and is therefore
+	       read-only."
+       ::= { note 3 }
+
+END
+

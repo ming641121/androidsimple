@@ -1,0 +1,244 @@
+--
+--
+-- Copyright (C) 1992-2003 by SNMP Research, Incorporated.
+--
+-- This software is furnished under a license and may be used and copied
+-- only in accordance with the terms of such license and with the
+-- inclusion of the above copyright notice. This software or any other
+-- copies thereof may not be provided or otherwise made available to any
+-- other person. No title to and ownership of the software is hereby
+-- transferred.
+--
+-- The information in this software is subject to change without notice
+-- and should not be construed as a commitment by SNMP Research, Incorporated.
+--
+-- Restricted Rights Legend:
+--  Use, duplication, or disclosure by the Government is subject to
+--  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+--  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+--  subparagraphs (c)(4) and (d) of the Commercial Computer
+--  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+--  clauses in the NASA FAR Supplement and other corresponding
+--  governmental regulations.
+--
+--
+
+--
+--                PROPRIETARY NOTICE
+--
+-- This software is an unpublished work subject to a confidentiality agreement
+-- and is protected by copyright and trade secret law.  Unauthorized copying,
+-- redistribution or other use of this work is prohibited.
+--
+-- The above notice of copyright on this source code product does not indicate
+-- any actual or intended publication of such source code.
+--
+--
+
+
+   MIRROR-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE
+           FROM SNMPv2-SMI;
+
+   snmpResearch                OBJECT IDENTIFIER ::= { enterprises 99 }
+
+   snmpResearchMIBs            OBJECT IDENTIFIER ::= { snmpResearch 12 }
+
+   srExamples                  OBJECT IDENTIFIER ::= { snmpResearchMIBs 19 }
+
+   srProductFeatures           OBJECT IDENTIFIER ::= { srExamples 2 }
+
+   srGetVar                    OBJECT IDENTIFIER ::= { srProductFeatures 1 }
+
+   mirror MODULE-IDENTITY
+       LAST-UPDATED "9510050000Z"
+       ORGANIZATION "SNMP Research"
+       CONTACT-INFO
+              "         Technical Support
+
+                Postal: SNMP Research
+                        1434 Kimberlin Heights Road
+                        Knoxville, TN  37920-9716
+
+                   Tel: +1 615 573 1434
+                   Fax: +1 615 573 9197
+
+                E-mail: support@snmp.com"
+       DESCRIPTION
+               "An example MIB module to demonstrate the SNMP
+               Research agent function GetVar().  One of the
+               variables in the Mirror MIB contains the value
+               of the variable selected by the target OID.  The
+               type of the variable indicated by the target OID
+               determines which Mirror MIB object contains the
+               value of the mirrored variable, because the types
+               must be equivalent."
+       ::= { srGetVar 1 }
+
+
+   -- groups in mirror
+
+   mirrorLoopbackTargetBefore  OBJECT IDENTIFIER ::= { mirror 1 }
+
+   mirrorSource                OBJECT IDENTIFIER ::= { mirror 2 }
+
+   mirrorLoopbackTargetAfter   OBJECT IDENTIFIER ::= { mirror 3 }
+
+
+   -- the mirrorLoopbackTargetBefore group
+
+   -- Implementation of the mirrorLoopbackTargetBefore group is not
+   -- mandatory for mirror agents.  These objects can be used to verify
+   -- that GetVar() correctly retrieves variables from the same MIB.
+
+   mirrorLoopbackInteger1 OBJECT-TYPE
+       SYNTAX  INTEGER (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "An example of an integer."
+       ::= { mirrorLoopbackTargetBefore 1 }
+
+   mirrorLoopbackOctetString1 OBJECT-TYPE
+       SYNTAX  OCTET STRING (SIZE (0..255))
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "An example of an octet string."
+       ::= { mirrorLoopbackTargetBefore 2 }
+
+   mirrorLoopbackOID1 OBJECT-TYPE
+       SYNTAX  OBJECT IDENTIFIER
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "An example of an object identifier."
+       ::= { mirrorLoopbackTargetBefore 3 }
+
+
+   -- the mirrorSource group
+ 
+   -- Implementation of the mirrorSource group is mandatory for
+   -- all mirror agents.
+
+   mirrorTarget OBJECT-TYPE
+       SYNTAX  OBJECT IDENTIFIER
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "The OID of the MIB Object to mirrored.  The agent will
+                call function GetVar() with this OID to retrieve a value
+                for one of the other variables in the mirrorSource group.
+		If the OID is 0.0, no value will be mirrored and the
+		agent will not call function GetVar().  The value of
+		this Object OID be set to an OID from the mirrorSource
+		group."
+       ::= { mirrorSource 1 }
+
+   mirrorGetVarSearchType OBJECT-TYPE
+       SYNTAX  INTEGER { exact(1), next(2) }
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "The type of search to be performed by GetVar()."
+       ::= { mirrorSource 2 }
+
+   mirrorGetVarResult OBJECT-TYPE
+       SYNTAX  OBJECT IDENTIFIER
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "The OID of the actual object retrieved by GetVar().
+		If GetVar() fails, the value of this object is 0.0."
+       ::= { mirrorSource 3 }
+
+   mirrorGetVarStatus OBJECT-TYPE
+       SYNTAX  INTEGER { other(1),
+			 not-attempted(2),
+			 endless-loop-detected(3),
+			 no-such-object-execption(5),
+			 no-such-instance-exception(6),
+			 end-of-mib-exception(7),
+			 integer-type(10),
+			 octet-prim-type(11),
+			 object-id-type(12),
+                         counter-type(13),
+			 gauge-type(14),
+			 time-ticks-type(15),
+			 ip-addr-prim-type(16),
+			 opaque-prim-type(17),
+			 null-type(18),
+			 nasp-addr-type(19),
+			 u-integer-32-type(20),
+			 counter64-type(21),
+			 bit-string-type(22) }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "The status of GetVar() upon return.  The value indicates
+		either the type of variable retrieved or the error
+		condition."
+       ::= { mirrorSource 4 }
+
+   mirrorInteger OBJECT-TYPE
+       SYNTAX  INTEGER (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "The value of the mirrored MIB Object, if the type is
+                integer."
+       ::= { mirrorSource 5 }
+
+   mirrorOctetString OBJECT-TYPE
+       SYNTAX  OCTET STRING (SIZE (0..255))
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "The value of the mirrored MIB Object, if the type is
+                octet string."
+       ::= { mirrorSource 6 }
+
+   mirrorOID OBJECT-TYPE
+       SYNTAX  OBJECT IDENTIFIER
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "The value of the mirrored MIB Object, if the type is
+                object identifier."
+       ::= { mirrorSource 7 }
+
+
+   -- the mirrorLoopbackTargetAfter group
+
+   -- Implementation of the mirrorLoopbackTargetAfter group is not
+   -- mandatory for mirror agents.  These objects can be used to verify
+   -- that GetVar() correctly retrieves variables from the same MIB.
+
+   mirrorLoopbackInteger2 OBJECT-TYPE
+       SYNTAX  INTEGER (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "An example of an integer."
+       ::= { mirrorLoopbackTargetAfter 1 }
+
+   mirrorLoopbackOctetString2 OBJECT-TYPE
+       SYNTAX  OCTET STRING (SIZE (0..255))
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "An example of an octet string."
+       ::= { mirrorLoopbackTargetAfter 2 }
+
+   mirrorLoopbackOID2 OBJECT-TYPE
+       SYNTAX  OBJECT IDENTIFIER
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "An example of an object identifier."
+       ::= { mirrorLoopbackTargetAfter 3 }
+
+END
+

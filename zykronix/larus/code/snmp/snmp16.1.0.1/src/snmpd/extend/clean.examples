@@ -1,0 +1,50 @@
+#! /bin/csh
+
+if ($#argv < 1) then
+  echo 'usage: ' $0 ' OS'
+  exit
+endif
+
+set MAKEFILE = Makefile.${1}
+
+cd examples
+  echo examples
+  foreach dir(log mirror note thrm thst tmon type)
+    cd ${dir}
+    echo ${dir}
+    make -f $MAKEFILE startover
+    cd ..
+  end
+if (($1 != vrtx) && ($1 != vxworks) && ($1 != psos) && ($1 != chorus) && ($1 != ose)) then
+  foreach dir(chro)
+    cd ${dir}
+    echo ${dir}
+    make -f $MAKEFILE startover
+    cd ..
+  end
+endif # !vrtx && !vxworks && !psos && !chorus && !ose
+  foreach dir(vcr)
+    cd ${dir}
+    echo ${dir}
+    foreach sub(auto byhand)
+      if (($dir == surg) && ($sub == auto)) continue
+      cd ${sub}
+      echo ${sub}
+      make -f $MAKEFILE startover
+      cd ..
+    end
+    cd ..
+  end
+cd ..
+
+cd combo
+  echo combo
+  foreach dir(thrmthst)
+    cd ${dir}
+    echo ${dir}
+    make -f $MAKEFILE startover
+    cd ..
+  end
+cd ..
+
+find . -name 'make*.out' -exec rm {} \;

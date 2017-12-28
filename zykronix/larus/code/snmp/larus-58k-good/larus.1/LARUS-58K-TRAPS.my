@@ -1,0 +1,697 @@
+-- *****************************************************************
+-- LARUS-58K-TRAPS-MIB
+--
+-- 
+--
+--************************************************************
+
+LARUS-58k-TRAPS-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+  
+        NOTIFICATION-TYPE  FROM SNMPv2-SMI
+
+	larus58kMib FROM LARUS-58k-MIB
+ 
+               sts58kSystemId,
+               sts58kSystemMgmtIpOption,
+               sts58kSystemMgmtIpAddress,
+               sts58kSystemMgmtIpSubnetMask,
+               sts58kSystemMgmtIpGatewayAddress,
+               sts58kSystemSntpIpOption,
+               sts58kSystemSntpIpAddress,
+               sts58kSystemSntpIpSubnetMask,
+               sts58kSystemSntpIpGatewayAddress,
+               sts58kSystemTime,
+               sts58kSystemTimeZone,
+               sts58kSystemMgmtIpSubnetMask,
+               sts58kSystemAlarmAcoMode,
+               sts58kSystemAlarmAcoCutOff,
+               sts58kSystemAlarmEscalatingTime,
+               sts58kSystemWarmReset,
+               sts58kSystemColdReset,
+               sts58kSystemConfigReset,
+               sts58kSystemIntegratedAlarm,
+               sts58kSystemAlarmAcoLed,
+               sts58kSystemMinorLED,
+               sts58kSystemMajorLED,
+               sts58kSystemCriticalLED,
+               sts58kSystemCurrentSWVersion,
+               sts58kClockInputManualSelect,
+               sts58kClockInputOperMode,
+               sts58kClockInputProtectedPri,
+               sts58kClockInputSetSlip,
+               sts58kClockInputSSMSelect,
+               sts58kClockInputType,
+               sts58kTopSourceIpOption,
+               sts58kTopSourceIpAddress,
+               sts58kTopSourceIpSubnetMask,
+               sts58kTopSourceIpGatewayAddress,
+               sts58kTopPacketRate,
+               sts58kTopInputSelect,
+               sts58kTopDestNumber,
+               sts58kTopDestIp,
+               sts58kTopDestUdpPort,
+	           sts58kTopDestVlanId,
+               sts58kClockInputStatusIndex,
+               sts58kClockInputState,
+               sts58kClockInputSSMIndex,
+               sts58kClockInputSSMType,
+               sts58kClockInputSSMValue,
+               sts58kCardShelf,
+               sts58kCardIndex,
+               sts58kCardType,
+               sts58kCardOperStatus,
+               sts58kOscillatorIndex,
+               sts58kOscillatorModuleType,
+               sts58kOscillatorStatus,
+               sts58kGpsIndex,
+               sts58kGpsSPOS,
+               sts58kGpsTRMO,
+               sts58kGpsStatus,
+               sts58kLinkIndex,
+               sts58kLinkType,
+               sts58kLinkEnable,
+               sts58kLinkLineCode,
+               sts58kLinkFMT,
+               sts58kLinkTermination,
+               sts58kLinkMFCHK,
+               sts58kLinkId,
+               sts58kAlarmThresholdCurrentMon,
+               sts58kAlarmThresholdType,
+               sts58kAlarmThresholdValue,
+               sts58kAlarmThresholdTimeInterval,
+               sts58kLinkAlarmSettingLinkType,
+               sts58kLinkAlarmSettingType,
+               sts58kLinkAlarmSettingSevirity,
+               sts58kLinkAlarmSevirity,
+               sts58kOscillatorAlarmSettingClock,
+               sts58kOscillatorAlarmSettingType,
+               sts58kOscillatorAlarmSettingSeverity,
+               sts58kOscillatorAlarmSeverity,
+               sts58ksPwrAlarmSettingShelf,
+               sts58kOsPwrAlarmSettingOsPwr,
+               sts58kOsPwrAlarmSettingSeverity,
+               sts58kOsPwrAlarmSeverity,
+               sts58kOutputAlarmSettingShelf,
+               sts58kOutputAlarmSettingSlot,
+               sts58kOutputAlarmSettingPort,
+               sts58kOutputAlarmSettingType,
+               sts58kOutputAlarmSettingSeverity,
+               sts58kOutputAlarmSeverity,
+	         sts58kOutputTiuSettingShelf,
+	         sts58kOutputTiuSettingSlot,
+               sts58kOutputTiuSettingPort,
+               sts58kOutputTiuSettingLineCoding,
+               sts58kOutputTiuSettingFMT,
+               sts58kOutputTiuSettingTermination,
+               sts58kAlarmSource,
+               sts58kAlarmSourceType,
+               sts58kAlarmSeverity,
+               sts58kAlarmSrvEff,
+               sts58kOutputShelf,
+               sts58kOutputSlot,
+               sts58kOutputRedState,
+               sts58kOutputCRCCHK,
+               sts58kOutputCAS,
+               sts58kOutputSSM,
+               sts58kOutputSSMValue,
+               sts58kOutputTimingFormat,
+               sts58kEmmShelf,
+               sts58kEmmUnitId,
+               sts58kEmmSensorType,
+               sts58kEmmAlarmStatus,
+               sts58kEmmSensorReading,
+               sts58kEmmShelf,
+               sts58kEmmUnitId,
+               sts58kEmmSensorType,
+               sts58kEmmMajorAlmHiThresh,
+               sts58kEmmMajorAlmLoThresh,
+               sts58kEmmMinorAlmHiThresh,
+               sts58kEmmMinorAlmLoThresh,
+               sts58kAntIndex,
+               sts58kAntStatus,
+               sts58kTrapRegMgrNumber,
+               sts58kTrapRegMgrIp,
+               sts58kTrapRegMgrUdpPort,
+               sts58kTrapRegCommunityStr,
+               sts58kTrapRegState  FROM LARUS-58k-MIB;              
+
+
+sts58kTrap MODULE-IDENTITY
+	LAST-UPDATED "0307300000Z"  -- Oct 28, 2005
+	ORGANIZATION 
+  		"CXR LARUS"
+	CONTACT-INFO
+		"CXR Larus
+		A Subsidiary of EMRISE CORPORATION
+		894 Faulstich Court,
+		San Jose, CA 95112
+		Tel: +1 408-200-2561
+		LARUS, Inc.
+		"
+	DESCRIPTION
+    	"The LARUS STS58k Enterprise MIB.
+    	"
+		::= { larus58kMib 101 }   
+
+
+sts58kSystemIpConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kSystemMgmtIpOption,
+               sts58kSystemMgmtIpAddress,
+               sts58kSystemMgmtIpSubnetMask,
+               sts58kSystemMgmtIpGatewayAddress,
+               sts58kSystemSntpIpOption,
+               sts58kSystemSntpIpAddress,
+               sts58kSystemSntpIpSubnetMask,
+               sts58kSystemSntpIpGatewayAddress
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when IP address configurations were changed
+          .
+         "
+
+     ::= { sts58kTrap 1001 }
+
+sts58kSystemConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kSystemTime,
+               sts58kSystemTimeZone,
+               sts58kSystemMgmtIpSubnetMask,
+               sts58kSystemAlarmAcoMode,
+               sts58kSystemAlarmAcoCutOff,
+               sts58kSystemAlarmEscalatingTime
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when system configurations were changed
+          .
+         "
+
+     ::= { sts58kTrap 1002 }
+
+sts58kSystemReset NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kSystemWarmReset,
+               sts58kSystemColdReset,
+               sts58kSystemConfigReset
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when system was reset. From the values of the reset types
+          indicating it was warm, cold or config reset - reset(2). noAction(1) means not
+          this reset type.
+          .
+         "
+
+     ::= { sts58kTrap 1003 }
+
+sts58kSystemAlarmStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kSystemIntegratedAlarm,
+               sts58kSystemAlarmAcoLed,
+               sts58kSystemMinorLED,
+               sts58kSystemMajorLED,
+               sts58kSystemCriticalLED
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when system alarm status was changed
+          .
+         "
+
+     ::= { sts58kTrap 1004 }
+
+sts58kSystemSWVersionChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kSystemCurrentSWVersion
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when system software image was changed
+          .
+         "
+
+     ::= { sts58kTrap 1005 }
+
+
+sts58kClockInputChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kClockInputManualSelect,
+               sts58kClockInputOperMode,
+               sts58kClockInputProtectedPri,
+               sts58kClockInputSetSlip,
+               sts58kClockInputSSMSelect,
+               sts58kClockInputType
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when clock input configuration was changed
+          .
+         "
+
+     ::= { sts58kTrap 1101 }
+
+sts58kClockInputStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kClockInputStatusIndex,
+               sts58kClockInputState
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when clock input state was changed
+          .
+         "
+
+     ::= { sts58kTrap 1102 }
+
+
+sts58kClockInputSSMConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kClockInputSSMIndex,
+               sts58kClockInputSSMType,
+               sts58kClockInputSSMValue
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when clock input SSM configuration was changed
+          .
+         "
+
+     ::= { sts58kTrap 1103 }
+
+sts58kTopConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kTopSourceIpOption,
+               sts58kTopSourceIpAddress,
+               sts58kTopSourceIpSubnetMask ,
+               sts58kTopSourceIpGatewayAddress,
+               sts58kTopPacketRate,
+               sts58kTopInputSelect
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when TOP configuration was changed
+          .
+         "
+
+     ::= { sts58kTrap 1104 }
+
+
+sts58kTopDestConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kTopDestNumber,
+               sts58kTopDestIp,
+               sts58kTopDestUdpPort,
+	         sts58kTopDestVlanId
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when a TOP destination configuration was changed.
+          .
+         "
+
+     ::= { sts58kTrap 1105 }
+
+sts58kCardStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kCardShelf,
+               sts58kCardIndex,
+               sts58kCardType,
+               sts58kCardOperStatus
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when a card (module) operational status was changed
+          .
+         "
+
+     ::= { sts58kTrap 1201 }
+
+sts58kOscillatorStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kOscillatorIndex,
+               sts58kOscillatorModuleType,
+               sts58kOscillatorStatus
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when an oscillator operational status was changed
+          .
+         "
+
+     ::= { sts58kTrap 1301 }
+
+sts58kGpsStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kGpsIndex,
+               sts58kGpsSPOS,
+               sts58kGpsTRMO,
+               sts58kGpsStatus
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when an GPS operational status was changed
+          .
+         "
+
+     ::= { sts58kTrap 1401 }
+
+
+sts58kLinkConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kLinkIndex,
+               sts58kLinkType,
+               sts58kLinkEnable,
+               sts58kLinkLineCode,
+               sts58kLinkFMT,
+               sts58kLinkTermination,
+               sts58kLinkMFCHK,
+               sts58kLinkId
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when a link's configuration was changed
+          .
+         "
+
+     ::= { sts58kTrap 1501 }
+
+sts58kAlarmThresholdConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kAlarmThresholdCurrentMon,
+               sts58kAlarmThresholdType,
+               sts58kAlarmThresholdValue,
+               sts58kAlarmThresholdTimeInterval
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when monitor alarm threshold configuration was changed
+          .
+         "
+
+     ::= { sts58kTrap 1601 }
+
+
+sts58kLinkAlarmSettingConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kLinkAlarmSettingLinkType,
+               sts58kLinkAlarmSettingType,
+               sts58kLinkAlarmSettingSevirity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when link alarm severity setting configuration was changed
+          .
+         "
+
+     ::= { sts58kTrap 1701 }
+
+sts58kLinkAlarmStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kLinkAlarmSettingLinkType,
+               sts58kLinkAlarmSettingType,
+               sts58kLinkAlarmSevirity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when link alarm severity status was changed
+          .
+         "
+
+     ::= { sts58kTrap 1702 }
+
+sts58kOscillatorAlarmSettingConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kOscillatorAlarmSettingClock,
+               sts58kOscillatorAlarmSettingType,
+               sts58kOscillatorAlarmSettingSeverity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when oscillator alarm severity setting configuration was changed
+          .
+         "
+
+     ::= { sts58kTrap 1801 }
+
+sts58kOscillatorAlarmStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kOscillatorAlarmSettingClock,
+               sts58kOscillatorAlarmSettingType,
+               sts58kOscillatorAlarmSeverity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when oscillator alarm severity status was changed
+          .
+         "
+
+     ::= { sts58kTrap 1802 }
+
+sts58kOsPwrAlarmSettingConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58ksPwrAlarmSettingShelf,
+               sts58kOsPwrAlarmSettingOsPwr,
+               sts58kOsPwrAlarmSettingSeverity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when OS and power alarm severity setting configuration was changed
+          .
+         "
+
+     ::= { sts58kTrap 1901 }
+
+sts58kOsPwrAlarmStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58ksPwrAlarmSettingShelf,
+               sts58kOsPwrAlarmSettingOsPwr,
+               sts58kOsPwrAlarmSeverity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when OS and power alarm severity status was changed
+          .
+         "
+
+     ::= { sts58kTrap 1902 }
+
+sts58kOutputAlarmSettingConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kOutputAlarmSettingShelf,
+               sts58kOutputAlarmSettingSlot,
+               sts58kOutputAlarmSettingPort,
+               sts58kOutputAlarmSettingType,
+               sts58kOutputAlarmSettingSeverity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when output alarm severity setting configuration was changed
+          .
+         "
+
+     ::= { sts58kTrap 2001 }
+
+sts58kOutputAlarmStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kOutputAlarmSettingShelf,
+               sts58kOutputAlarmSettingSlot,
+               sts58kOutputAlarmSettingPort,
+               sts58kOutputAlarmSettingType,
+               sts58kOutputAlarmSeverity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when output alarm severity status was changed
+          .
+         "
+
+     ::= { sts58kTrap 2002 }
+
+sts58kOutputTiuSettingConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+ 	         sts58kOutputTiuSettingShelf,
+	         sts58kOutputTiuSettingSlot,
+               sts58kOutputTiuSettingPort,
+               sts58kOutputTiuSettingLineCoding,
+               sts58kOutputTiuSettingFMT,
+               sts58kOutputTiuSettingTermination
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when output tiu setting configuration was changed
+          .
+         "
+
+     ::= { sts58kTrap 2003 }
+
+
+sts58kAlarmStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kAlarmSource,
+               sts58kAlarmSourceType,
+               sts58kAlarmSeverity,
+               sts58kAlarmSrvEff
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when alarm status was changed
+          .
+         "
+
+     ::= { sts58kTrap 2101 }
+
+sts58kOutputCardConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kOutputShelf,
+               sts58kOutputSlot,
+               sts58kOutputRedState,
+               sts58kOutputCRCCHK,
+               sts58kOutputCAS,
+               sts58kOutputSSM,
+               sts58kOutputSSMValue,
+               sts58kOutputTimingFormat
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when output card configuration was changed
+          .
+         "
+
+     ::= { sts58kTrap 2201 }
+
+
+
+sts58kEMMAlarmStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kEmmShelf,
+               sts58kEmmUnitId,
+               sts58kEmmSensorType,
+               sts58kEmmAlarmStatus,
+               sts58kEmmSensorReading
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when EMM alarm status was changed
+          .
+         "
+
+     ::= { sts58kTrap 2301 }
+
+
+
+sts58kEMMAlarmThresholdChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kEmmShelf,
+               sts58kEmmUnitId,
+               sts58kEmmSensorType,
+               sts58kEmmMajorAlmHiThresh,
+               sts58kEmmMajorAlmLoThresh,
+               sts58kEmmMinorAlmHiThresh,
+               sts58kEmmMinorAlmLoThresh
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when EMM alarm threshold configuration was changed
+          .
+         "
+
+     ::= { sts58kTrap 2302 }
+
+
+sts58kAntStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kAntIndex,
+               sts58kAntStatus
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when Antenna status was changed
+          .
+         "
+
+     ::= { sts58kTrap 2401 }
+
+
+sts58kTrapRegMgrConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               sts58kSystemId,
+               sts58kTrapRegMgrNumber,
+               sts58kTrapRegMgrIp,
+               sts58kTrapRegMgrUdpPort,
+               sts58kTrapRegCommunityStr,
+               sts58kTrapRegState
+
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when a trap receiver IP state  was changed.
+          .
+         "
+
+     ::= { sts58kTrap 2501 }
+
+	 END

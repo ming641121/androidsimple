@@ -1,0 +1,3456 @@
+LARUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, 
+    Counter32, Gauge32, Integer32, 
+    TimeTicks, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DateAndTime, DisplayString
+        FROM SNMPv2-TC
+    larusMgmt
+        FROM LARUS-SMI;
+    
+
+larusMib MODULE-IDENTITY
+	LAST-UPDATED "0307300000Z"  -- Oct 28, 2005
+	ORGANIZATION 
+  		"CXR LARUS"
+	CONTACT-INFO
+		"CXR Larus
+		A Subsidiary of EMRISE CORPORATION
+		894 Faulstich Court,
+		San Jose, CA 95112
+		Tel: +1 408-200-2561
+		LARUS, Inc.
+		"
+	DESCRIPTION
+    	"The LARUS STS58k Enterprise MIB.
+    	"
+		::= { larusMgmt 2 }   
+
+
+stsSystem	OBJECT IDENTIFIER ::= { larusMib 1 } 
+stsClockInput		OBJECT IDENTIFIER ::= { larusMib 2 }
+stsClockInputSSM		OBJECT IDENTIFIER ::= { larusMib 3 }
+stsTop		OBJECT IDENTIFIER ::= { larusMib 4 }
+stsClockInputStatus		OBJECT IDENTIFIER ::= { larusMib 5 }
+stsClockInputSSMStatus		OBJECT IDENTIFIER ::= { larusMib 6 }
+stsCard      OBJECT IDENTIFIER ::= { larusMib 7 }
+stsOscillator		OBJECT IDENTIFIER ::= { larusMib 8 }
+stsGPS       OBJECT IDENTIFIER ::= { larusMib 9 }
+stsLink     OBJECT IDENTIFIER ::= { larusMib 10 }
+stsShelf    OBJECT IDENTIFIER ::= { larusMib 11 }
+stsAlarmThreshold	OBJECT IDENTIFIER ::= { larusMib 12 }
+stsLinkAlarmSetting	OBJECT IDENTIFIER ::= { larusMib 13 }
+stsOscillatorAlarmSetting	OBJECT IDENTIFIER ::= { larusMib 14 }
+stsOsPwrAlarmSetting	OBJECT IDENTIFIER ::= { larusMib 15 }
+stsOutputAlarmSetting	OBJECT IDENTIFIER ::= { larusMib 16 }
+stsOutputTiuSetting	OBJECT IDENTIFIER ::= { larusMib 17 }
+stsPerfMon	OBJECT IDENTIFIER ::= { larusMib 18 }
+stsAlarmStatus   OBJECT IDENTIFIER ::= { larusMib 19 }
+stsOutputCard   OBJECT IDENTIFIER ::= { larusMib 20 }
+stsEmmStatus   OBJECT IDENTIFIER ::= { larusMib 21 }
+stsAnt   OBJECT IDENTIFIER ::= { larusMib 22 }
+stsTopDest   OBJECT IDENTIFIER ::= { larusMib 23 }
+stsTrapReg   OBJECT IDENTIFIER ::= { larusMib 24 }
+-- stsTrap   OBJECT IDENTIFIER ::= { larusMib 101 }
+
+
+
+-- MMS_CLI_START <stsSystemScalar>
+--
+--  CMD {<stsSystemcli;0;LOG;A; "sts 58k system root command">}
+--
+--
+--  API {<cfgsysparam;3;LOG; A; "Configure system parameters(s)"><row><[;sysid;%1][;sysmgipopt;%2][;sysmgip;%3]
+--       [;sysmgsubm;%4][;sysmggwip;%5]
+--       [;sntpipopt;%6][;sntpip;%7][;sntpipsubm;%8][;sntpgwip;%9][;systime;%10][;systmzone;%11]
+--       [;sysalmacomd;%12][;sysalmacocut;%13][;sysalmestime;%14][;sysswact;%15][;syswmreset;%16][;syscoreset;%17]
+--        [;syscfreset;%18]>}
+--
+--   OPT {<stsSystemId>		<sysid>}
+--   OPT {<stsSystemMgmtIpOption>		<sysmgipopt>}
+--   OPT {<stsSystemMgmtIpAddress>		<sysmgip>}
+--   OPT {<stsSystemMgmtIpSubnetMask>		<sysmgsubm>}
+--   OPT {<stsSystemMgmtIpGatewayAddress>		<sysmggwip>}
+--   OPT {<stsSystemSntpIpOption>	<sntpipopt>}
+--   OPT {<stsSystemSntpIpAddress>		<sntpip>}
+--   OPT {<stsSystemSntpIpSubnetMask>		<sntpipsubm>}
+--   OPT {<stsSystemSntpIpGatewayAddress>	<sntpgwip>}
+--   OPT {<stsSystemTime>		<systime>}
+--   OPT {<stsSystemTimeZone>		<systmzone>}
+--   OPT {<stsSystemIntegratedAlarm>		<sysalm>}
+--   OPT {<stsSystemAlarmAcoMode>		<sysalmacomd>}
+--   OPT {<stsSystemAlarmAcoLed>		<sysalmacoled>}
+--   OPT {<stsSystemAlarmAcoCutOff>		<sysalmacocut>}
+--   OPT {<stsSystemAlarmEscalatingTime>		<sysalmestime>}
+--   OPT {<stsSystemMinorLED>		<sysminled>}
+--   OPT {<stsSystemMajorLED>		<sysmajled>}
+--   OPT {<stsSystemCriticalLED>	<syscriled>}
+--   OPT {<stsSystemUpgradeSWAction>		<sysswact>}
+--   OPT {<stsSystemCurrentSWVersion>		<sysswver>}
+--   OPT {<stsSystemServiceState>		<syssvcst>}
+--   OPT {<stsSystemWarmReset>		<syswmreset>}
+--   OPT {<stsSystemColdReset>		<syscoreset>}
+--   OPT {<stsSystemConfigReset>	<syscfreset>}
+--
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsClockInputScalar>
+--
+--  CMD {<stsClockInputcli;0;LOG;A; "sts 58k clock input root command">}
+--  API {<cfgclkinparam;3;LOG;A; "Configure clock input parameters"><row><[;clkinmansel;%1][;clkinopmod;%2]
+--       [;clkinprotpri;%3][;clkinslip;%4]>}
+--
+--   OPT {<stsClockInputManualSelect>		<clkinmansel>}
+--   OPT {<stsClockInputOperMode>		<clkinopmod>}
+--   OPT {<stsClockInputProtectedPri>		<clkinprotpri>}
+--   OPT {<stsClockInputSetSlip>		<clkinslip>}
+--   OPT {<stsClockInputType>	<clkintype>}
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsClockInputSSMScalar>
+--
+--  CMD {<stsClockInputSSMcli;0;LOG;A; "sts 58k clock input SSM root command">}
+--  API {<cfgclkinssmparam;3;LOG;A; "Configure clock input SSM parameters"><row><[;clkinssmsel;%1]>}
+--
+--   OPT {<stsClockInputSSMSelect>		<clkinssmsel>}
+--
+--  MMS_CLI_END
+
+--
+-- MMS_CLI_START <stsTopScalar>
+--
+--  CMD {<stsTopcli;0;LOG;A; "sts 58k TOP root command">}
+--  API {<cfgtopip;3;LOG;A; "Configure TOP IP"><row><[;topipopt;%1][;topip;%2][;topipsubm;%3]
+--        [;topgwip;%4][;toppktrate;%5][;topinsel;%6]>}
+--
+--   OPT {<stsTopSourceIpOption>		<topipopt>}
+--   OPT {<stsTopSourceIpAddress>		<topip>}
+--   OPT {<stsTopSourceIpSubnetMask>	<topipsubm>}
+--   OPT {<stsTopSourceIpGatewayAddress>		<topgwip>}
+--   OPT {<stsTopPacketRate>		<toppktrate>}
+--   OPT {<stsTopInputSelect>		<topinsel>}
+--   OPT {<stsTopTxPackets>		<toptxpkt>}
+--   OPT {<stsTopTxBytes>		<toptxbyte>}
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsClockInputSSMTable>
+--
+--  CMD {<stsClockInputSSMcli;0;LOG;A; "sts 58k clock input SSM root command">}
+--  API {<cfgclkinssm;3;LOG;A; "Configure clock input SSM"><row><[;clkinssmidx;%1][;clkinssmtype;%2][;clkinssmval;%3]>}
+--
+--   KEY {<stsClockInputSSMIndex>		<clkinssmidx>}
+--   KEY {<stsClockInputSSMType>		<clkinssmtype>}
+--   OPT {<stsClockInputSSMValue>	<clkinssmval>}
+--
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsCardTable>
+--
+--  CMD {<stsCardcli;0;LOG;A; "sts 58k card root command">}
+--  API {<cfgcdreset;3;LOG;A; "Reset Card"><row><[;cdshelf;%1][;cdidx;%2][;cdreset;%3]>}
+--
+--   KEY {<stsCardShelf>		<cdshelf>}
+--   KEY {<stsCardIndex>		<cdidx>}
+--   OPT {<stsCardType>		<cdtype>}
+--   OPT {<stsCardDescr>		<cddescr>}
+--   OPT {<stsCardSerial>		<cdseri>}
+--   OPT {<stsCardHwVersion>	<cdhwver>}
+--   OPT {<stsCardCLEICode>		<cdclei>}
+--   OPT {<stsCardOperStatus>		<cdopst>}
+--   OPT {<stsCardReset>	<cdreset>}
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsOscillatorTable>
+--
+--  CMD {<stsOscillatorcli;0;LOG;A; "sts 58k oscillator root command">}
+--
+--  API {<cfgosc;3;LOG;A; "Configure Oscillator"><row><[;oscidx;%1][;oscsetact;%2]>}
+--
+--   KEY {<stsOscillatorIndex>		<oscidx>}
+--   OPT {<stsOscillatorModuleType>		<oscmodtype>}
+--   OPT {<stsOscillatorEFER>		<oscefer>}
+--   OPT {<stsOscillatorESSD>		<oscessd>}
+--   OPT {<stsOscillatorESSN>		<oscessn>}
+--   OPT {<stsOscillatorFAGE>	<oscfage>}
+--   OPT {<stsOscillatorTIMD>		<osctimd>}
+--   OPT {<stsOscillatorSetActive>		<oscsetact>}
+--   OPT {<stsOscillatorStatus>	<oscst>}
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsGpsTable>
+--
+--  CMD {<stsGPScli;0;LOG;A; "sts 58k GPS root command">}
+--
+--  API {<cfggps;3;LOG;A; "Configure GPS"><row><[;gpsidx;%1][;gpsspos;%2][;gpstrmo;%3]>}
+--
+--   KEY {<stsGpsIndex>		<gpsidx>}
+--   OPT {<stsGpsStatus>		<gpsst>}
+--   OPT {<stsGpsANTD>		<gpsantd>}
+--   OPT {<stsGpsAZEL>		<gpsazel>}
+--   OPT {<stsGpsRSTG>		<gpsrstg>}
+--   OPT {<stsGpsBITS>	<gpsbits>}
+--   OPT {<stsGpsPAVG>		<gpspavg>}
+--   OPT {<stsGpsSIGQ>		<gpssigq>}
+--   OPT {<stsGpsSPOS>	<gpsspos>}
+--   OPT {<stsGpsTRMO>		<gpstrmo>}
+--   OPT {<stsGpsUTCT>		<gpsutct>}
+--   OPT {<stsGpsVERS>		<gpsvers>}
+--   OPT {<stsGpsDETF>		<gpsdetf>}
+--   OPT {<stsGpsEFER>		<gpsefer>}
+--   OPT {<stsGpsESSD>	<gpsessd>}
+--   OPT {<stsGpsESSN>		<gpsessn>}
+--   OPT {<stsGpsFAGE>		<gpsfage>}
+--   OPT {<stsGpsTIMD>	<gpstimd>}
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsLinkTable>
+--
+--  CMD {<stsLinkcli;0;LOG;A; "sts 58k link root command">}
+--
+--  API {<set-attr-link;3;LOG;A; "Configure Link"><row><[;lnkidx;%1][;lnkenable;%2][;lnklncode;%3]
+--        [;lnkfmt;%4][;lnkterm;%5][;lnkmfchk;%6][;lnkid;%7]>}
+--
+--  DSP {<rtrv-attr-link;5;NOLOG;A; "List information for link"> <row>
+--       <[;@0:lnkidx;%u]
+--        [;@6:":";lnktype;%s]
+--        [;@13:",";lnkenable;%s]
+--        [@21:",";lnklncode;%s]
+--        [@36:",";lnkfmt;%s]
+--        [@41:",";lnkterm;%s]
+--        [@51:",";lnkmfchk;%s]
+--        [@61:",";lnkid;%s]>
+--      }
+--
+--
+--   KEY {<stsLinkIndex>		<lnkidx>}
+--   OPT {<stsLinkType>		<lnktype>}
+--   OPT {<stsLinkEnable>		<lnkenable>}
+--   OPT {<stsLinkLineCode>		<lnklncode>}
+--   OPT {<stsLinkFMT>	<lnkfmt>}
+--   OPT {<stsLinkTermination>	<lnkterm>}
+--   OPT {<stsLinkMFCHK>		<lnkmfchk>}
+--   OPT {<stsLinkId>		<lnkid>}
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsShelfTable>
+--
+--  CMD {<stsShelfcli;0;LOG;A; "sts 58k shelf root command">}
+--
+--  API {<cfgshf;3;LOG;A; "Configure Shelf"><row><[;shfidx;%1][;shfreset;%2]>}
+--
+--   KEY {<stsShelfIndex>		<shfidx>}
+--   OPT {<stsShelfSerial>	<shfser>}
+--   OPT {<stsShelfCLEICode>		<shfclei>}
+--   OPT {<stsShelfReset>		<shfreset>}
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsAlarmThresholdTable>
+--
+--  CMD {<stsAlarmThresholdcli;0;LOG;A; "sts 58k GPS root command">}
+--
+--  API {<cfgalmthresh;3;LOG;A; "Configure alarm threshold"><row><[;almthrcurmon;%1][;almthrtype;%2]
+--        [;almthrval;%3][;almthrtmintval;%4]>}
+--
+--   KEY {<stsAlarmThresholdCurrentMon>		<almthrcurmon>}
+--   KEY {<stsAlarmThresholdType>	<almthrtype>}
+--   OPT {<stsAlarmThresholdValue>		<almthrval>}
+--   OPT {<stsAlarmThresholdTimeInterval>		<almthrtmintval>}
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsLinkAlarmTable>
+--
+--  CMD {<stsLinkAlarmSettingcli;0;LOG;A; "sts 58k GPS root command">}
+--
+--  API {<cfglinkalmsev;3;LOG;A; "Configure link alarm severity"><row><[;lnkalmsetlnktype;%1][;lnkalmsettype;%2]
+--        [;lnkalmsetsev;%3]>}
+--
+--   KEY {<stsLinkAlarmSettingLinkType>		<lnkalmsetlnktype>}
+--   KEY {<stsLinkAlarmSettingType>	<lnkalmsettype>}
+--   OPT {<stsLinkAlarmSettingSevirity>		<lnkalmsetsev>}
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsOscillatorAlarmTable>
+--  CMD {<stsOscillatorAlarmSettingcli;0;LOG;A; "sts 58k oscillator alarm root command">}
+--
+--  API {<cfgoscalmsev;3;LOG;A; "Configure Oscillator alarm severity"><row><[;oscalmsetclk;%1][;oscalmsettype;%2]
+--        [;oscalmsetsev;%3]>}
+--
+--   KEY {<stsOscillatorAlarmSettingClock>		<oscalmsetclk>}
+--   KEY {<stsOscillatorAlarmSettingType>	<oscalmsettype>}
+--   OPT {<stsOscillatorAlarmSettingSeverity>		<oscalmsetsev>}
+--
+--  MMS_CLI_END
+--
+-- MMS_CLI_START <stsOsPwrAlarmTable>
+--
+--  CMD {<stsOsPwrAlarmSettingcli;0;LOG;A; "sts 58k OS and power root command">}
+--
+--  API {<cfgospwralmsev;3;LOG;A; "Configure OS and Power alarm severity"><row><[;pwralmsetshf;%1][;ospwralmset;%2]
+--        [;ospwralmsetsev;%3]>}
+--
+--   KEY {<stssPwrAlarmSettingShelf>		<pwralmsetshf>}
+--   KEY {<stsOsPwrAlarmSettingOsPwr>	<ospwralmset>}
+--   OPT {<stsOsPwrAlarmSettingSeverity>		<ospwralmsetsev>}
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsOutputAlarmTable>
+--
+--  CMD {<stsOutputAlarmSettingcli;0;LOG;A; "sts 58k output port root command">}
+--
+--  API {<cfgoutportalam;3;LOG;A; "Configure Output Port Alarm"><row><[;outalmsetshf;%1][;outalmsetslot;%2][;outalmsetport;%3]
+--        [;outalmsettype;%4][;outalmsetsev;%5]>}
+--
+--   KEY {<stsOutputAlarmSettingShelf>		<outalmsetshf>}
+--   KEY {<stsOutputAlarmSettingSlot>	<outalmsetslot>}
+--   KEY {<stsOutputAlarmSettingPort>		<outalmsetport>}
+--   KEY {<stsOutputAlarmSettingType>		<outalmsettype>}
+--   OPT {<stsOutputAlarmSettingSeverity>	<outalmsetsev>}
+--
+--  MMS_CLI_END
+--
+-- MMS_CLI_START <stsOutputTiuSettingTable>
+--
+--  CMD {<stsOutputTiuSettingcli;0;LOG;A; "sts 58k output port Tiu root command">}
+--
+--  API {<cfgoutporttiu;3;LOG;A; "Configure Output Port Tiu"><row><[;outtiusetshf;%1][;outtiusetslot;%2][;outtiusetport;%3]
+--        [;outtiusetlncode;%4][;outtiusetfmt;%5][;outtiusetterm;%6]>}
+--
+--   KEY {<stsOutputTiuSettingShelf>		<outtiusetshf>}
+--   KEY {<stsOutputTiuSettingSlot>	<outtiusetslot>}
+--   KEY {<stsOutputTiuSettingPort>		<outtiusetport>}
+--   OPT {<stsOutputTiuSettingLineCoding>		<outtiusetlncode>}
+--   OPT {<stsOutputTiuSettingFMT>	<outtiusetfmt>}
+--   OPT {<stsOutputTiuSettingTermination>	<outtiusetterm>}
+--
+--  MMS_CLI_END
+--
+-- MMS_CLI_START <stsOutputCardTable>
+--
+--  CMD {<stsOutputCardcli;0;LOG;A; "sts 58k output card root command">}
+--
+--  API {<cfgoutputcd;3;LOG;A; "Configure Output Card"><row><[;outshf;%1][;outslot;%2][;outredswst;%3]
+--        [;outcrcchk;%4][;outcas;%5][;outssm;%6][;outssmval;%7][;outtimefmt;%8]>}
+--
+--   KEY {<stsOutputShelf>		<outshf>}
+--   KEY {<stsOutputSlot>		<outslot>}
+--   OPT {<stsOutputRedState>		<outredst>}
+--   OPT {<stsOutputRedSwitchState>		<outredswst>}
+--   OPT {<stsOutputCRCCHK>		<outcrcchk>}
+--   OPT {<stsOutputCAS>	<outcas>}
+--   OPT {<stsOutputSSM>		<outssm>}
+--   OPT {<stsOutputSSMValue>		<outssmval>}
+--   OPT {<stsOutputTimingFormat>		<outtimefmt>}
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsEmmStatusTable>
+--
+--  CMD {<stsEmmStatuscli;0;LOG;A; "sts 58k EMM status root command">}
+--
+--  API {<cfgemmalm;3;LOG;A; "Configure EMM Alarm Threshold"><row><[;emmshf;%1][;emmunitid;%2][;emmmajalmhi;%3]
+--        [;emmmajalmlo;%4][;emmminalmhi;%5][;emmminalmlo;%6]>}
+--
+--   KEY {<stsEmmShelf>		<emmshf>}
+--   KEY {<stsEmmUnitId>		<emmunitid>}
+--   OPT {<stsEmmSensorType>		<emmsentype>}
+--   OPT {<stsEmmAlarmStatus>		<emmalmst>}
+--   OPT {<stsEmmSensorReading>		<emmsenread>}
+--   OPT {<stsEmmMajorAlmHiThresh>	<emmmajalmhi>}
+--   OPT {<stsEmmMajorAlmLoThresh>		<emmmajalmlo>}
+--   OPT {<stsEmmMinorAlmHiThresh>		<emmminalmhi>}
+--   OPT {<stsEmmMinorAlmLoThresh>		<emmminalmlo>}
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsAntTable>
+--
+--  CMD {<stsAntcli;0;LOG;A; "sts 58k GPS root command">}
+--
+--  API {<cfgantsw;3;LOG;A; "Configure Ant Switch State"><row><[;antidx;%1][;antswst;%2]>}
+--
+--   KEY {<stsAntIndex>		<antidx>}
+--   OPT {<stsAntStatus >		<antst>}
+--   OPT {<stsAntSwitchState >		<antswst>}
+--
+--  MMS_CLI_END
+--
+-- MMS_CLI_START <stsTopDestTable>
+--
+--  CMD {<stsTopDestcli;0;LOG;A; "sts 58k top destination root command">}
+--
+--  API {<cfgtopdest;3;LOG;A; "Configure TOP Destination"><row><[;topdestnum;%1][;topdestip;%2][;topudpport;%3]
+--        [;topvlanid;%4]>}
+--
+--   KEY {<stsTopDestNumber>	<topdestnum>}
+--   OPT {<stsTopDestIp>		<topdestip>}
+--   OPT {<stsTopDestUdpPort>		<topudpport>}
+--   OPT {<stsTopDestVlanId>		<topvlanid>}
+--
+--  MMS_CLI_END
+--
+--
+-- MMS_CLI_START <stsTrapRegTable>
+--
+--  CMD {<stsTrapRegcli;0;LOG;A; "sts 58k trap registration root command">}
+--
+--  API {<cfgtrapmgr;3;LOG;A; "Configure Trap Manager"><row><[;trapmgrnum;%1][;trapmgrip;%2][;trapmgrudpport;%3]
+--        [;trapcommstr;%4][;trapst;%5]>}
+--
+--   KEY {<stsTrapRegMgrNumber>	<trapmgrnum>}
+--   OPT {<stsTrapRegMgrIp>		<trapmgrip>}
+--   OPT {<stsTrapRegMgrUdpPort>		<trapmgrudpport>}
+--   OPT {<stsTrapRegCommunityStr>		<trapcommstr>}
+--   OPT {<stsTrapRegState>	<trapst>}
+--
+--  MMS_CLI_END
+--
+--  # MMS_CLI_END is key word defined beginning of MMS Cli
+--
+-- --------------------------------------------------------------------
+
+
+--
+-- stsSystem Group
+--
+
+ 
+-- SET-SID, RTRV-HDR
+
+ stsSystemId OBJECT-TYPE 
+ SYNTAX       DisplayString (SIZE(1..24)) 
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION " The system ID is assigned by the administrator for this node.
+             "
+ DEFVAL {"NodeName"}
+
+ ::= { stsSystem 1 }  
+
+-- new SET-SYSIP-OPTION, RTRV-SYSIP-OPTION
+
+stsSystemMgmtIpOption OBJECT-TYPE
+ SYNTAX       INTEGER {
+                           static(1),
+		           dhcp(2)
+                      }
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION "Current option for proivioning of system management ip address."
+
+ DEFVAL {1}
+
+ ::= { stsSystem 2 }
+
+
+-- new SET-SYSIP-ADDRESS, RTRV-SYSIP-ADDRESS
+
+stsSystemMgmtIpAddress OBJECT-TYPE 
+ SYNTAX       IpAddress
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION " The setting of the static management IP address for this node. If stsSystemMgmtIpOption is dhcp, then this IP will be discovered.
+             "
+ ::= { stsSystem 3 }  
+
+-- new SET-SYSIP-MASK, RTRV-SYSIP-MASK
+
+ stsSystemMgmtIpSubnetMask OBJECT-TYPE 
+ SYNTAX       IpAddress
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION " The setting of the static subnet mask for the management port. If stsSystemMgmtIpOption is dhcp, then this Subnet mask will be discovered.
+             "
+ ::= { stsSystem 4 }  
+
+-- new SET-SYSIP-GATEWAY, RTRV-SYSIP-GATEWAY
+
+ stsSystemMgmtIpGatewayAddress OBJECT-TYPE 
+ SYNTAX       IpAddress
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION " The setting of the gateway address for the management port. If stsSystemMgmtIpOption is dhcp, then this gateway IP will be discovered.
+             "
+ ::= { stsSystem 5 } 
+ 
+
+
+-- new SET-SNTPIP-OPTION, RTRV-SNTPIP-OPTION
+
+stsSystemSntpIpOption OBJECT-TYPE
+ SYNTAX       INTEGER {
+                           static(1),
+		           dhcp(2)
+                      }
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION "Current option for proivioning of system SNTP ip address.
+             "
+
+ DEFVAL {1}
+
+ ::= { stsSystem 6 }
+
+-- new SET-SNTPIP-ADDRESS, RTRV-SNTPIP-ADDRESS
+
+stsSystemSntpIpAddress OBJECT-TYPE 
+ SYNTAX       IpAddress
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION " The setting of the static TOP IP address for this node. If stsSystemSntpIpOption is dhcp, then this IP will be discovered.
+             "
+ ::= { stsSystem 7 }  
+
+-- new SET-SNTPIP-MASK, RTRV-SNTPIP-MASK
+
+ stsSystemSntpIpSubnetMask OBJECT-TYPE 
+ SYNTAX       IpAddress
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION " The setting of the static subnet mask for the TOP port. If stsSystemSntpIpOption is dhcp, then this Subnet mask will be discovered.
+             "
+ ::= { stsSystem 8 }  
+
+-- new SET-SNTPIP-GATEWAY, RTRV-SNTPIP-GATEWAY
+
+ stsSystemSntpIpGatewayAddress OBJECT-TYPE 
+ SYNTAX       IpAddress
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION " The setting of the gateway address for the TOP port. If stsSystemSntpIpOption is dhcp, then this gateway IP will be discovered.
+             "
+ ::= { stsSystem 9 }  
+
+
+--ED-DAT
+
+ stsSystemTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current local date and time for the system in the format DAT,TM
+DAT Date in format YY-MM-DD, TM Time in format HH-MM-SS"
+
+ ::= { stsSystem 10 }
+
+-- new ED-TIMEZONE, RTRV-TIMEZONE
+
+
+ stsSystemTimeZone OBJECT-TYPE
+ SYNTAX       INTEGER  {
+                        gmtplus12(1),
+                        gmtplus11(2),
+                        gmtplus10(3),
+                        gmtplus09(4),
+                        gmtplus08(5),
+                        gmtplus07(6),
+                        gmtplus06(7),
+                        gmtplus05(8),
+                        gmtplus04(9),
+                        gmtplus03(10),
+                        gmtplus02(11),
+                        gmtplus01(12),
+                        gmt(13),
+                        gmtminus01(14),
+                        gmtminus02(15),
+                        gmtminus03(16),
+                        gmtminus04(17),
+                        gmtminus05(18),
+                        gmtminus06(19),
+                        gmtminus07(20),
+                        gmtminus08(21),
+                        gmtminus09(22),
+                        gmtminus10(23),
+                        gmtminus11(24),
+                        gmtminus12(25)
+                       }
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION " The Time Zone where this node is installed."
+ ::= { stsSystem 11 }
+
+-- new RTRV-SYSTEM-ALARM
+
+ stsSystemIntegratedAlarm OBJECT-TYPE
+ SYNTAX       INTEGER {
+                       clear(1),
+		           minor(2),
+                       major(3),
+                       critical(4)
+                      }
+ MAX-ACCESS       read-only
+ STATUS       current
+ DESCRIPTION "Current alarm severity of this system.
+             "
+ ::= { stsSystem 12 }
+
+
+-- SET-ACO-COM
+
+ stsSystemAlarmAcoMode OBJECT-TYPE
+ SYNTAX       INTEGER {
+                       manual(1),
+                       auto(2)
+                      }
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION "This object to set the alarm cutoff mode
+for an equipment unit or facility in the system. The mode describes the
+source of the command and the degree to which the system is permitted
+to provide an automatic ACO function.
+Valid values are:
+manual - Alarm cutoff introduced by OS command or by manual operations at the IMC.
+auto -  Alarm cutoff introduced automatically at the IMC but delayed for about 5 seconds to allow a brief audible announcement of the trouble.
+             "
+ ::= { stsSystem 13 }
+
+ stsSystemAlarmAcoLed OBJECT-TYPE
+ SYNTAX       INTEGER {
+                       on(1),
+                       off(2)
+                      }
+ MAX-ACCESS       read-only
+ STATUS       current
+ DESCRIPTION "This object indicates the current status of alarm audio.
+              Alarm audio is turning on once there is an alarm in this system. 
+              Alarm audio can be turn off manually by system administrator by pushing 
+              acknowledged button located in the system module.
+
+             "
+ ::= { stsSystem 14 }
+
+-- OPR-ACO-ALL
+
+ stsSystemAlarmAcoCutOff OBJECT-TYPE
+ SYNTAX       INTEGER {
+                       no-change(1),
+                       cutoff(2)
+                      }
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION "This object indicates the current status of alarm audio.
+              Alarm audio is turning off once there is an alarm in this system. 
+              Alarm audio can be turn off manually by system administrator by pushing 
+              acknowledged button located in the system module or setting the cutoff(2) value.
+
+             "
+ ::= { stsSystem 15 }
+
+
+-- new ED-ALARM-ESCAL-TIME
+
+
+ stsSystemAlarmEscalatingTime OBJECT-TYPE
+ SYNTAX       INTEGER (1..360)
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION "This object indicates the time in hours for the alarm escalation occurs. 
+              System will raise one level of the alarm severity for system alarm.
+             "
+ ::= { stsSystem 16 }
+
+-- new RTRV-SYSTEM-LED
+
+ stsSystemMinorLED OBJECT-TYPE
+ SYNTAX       INTEGER {
+                           off(1),
+		               on(2)
+                      }
+ MAX-ACCESS       read-only
+ STATUS       current
+ DESCRIPTION "Current Minor LED state on the system module of this system.
+             "
+ ::= { stsSystem 17 }
+
+ stsSystemMajorLED OBJECT-TYPE
+ SYNTAX       INTEGER {
+                           off(1),
+		               on(2)
+                      }
+ MAX-ACCESS       read-only
+ STATUS       current
+ DESCRIPTION "Current Major LED state on the system module of this system.
+             "
+ ::= { stsSystem 18 }
+
+ stsSystemCriticalLED OBJECT-TYPE
+ SYNTAX       INTEGER {
+                           off(1),
+		               on(2)
+                      }
+ MAX-ACCESS       read-only
+ STATUS       current
+ DESCRIPTION "Current Critical LED state on the system module of this system.
+             "
+ ::= { stsSystem 19 }
+
+
+-- new SET-SYSTEM-UPGRADE
+
+
+ stsSystemUpgradeSWAction OBJECT-TYPE
+ SYNTAX       INTEGER {
+                           no-action(1),
+		               upgrade(2)
+                      }
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION "Upgrade SW image on this system.
+             "
+ ::= { stsSystem 20 }
+
+
+stsSystemCurrentSWVersion OBJECT-TYPE
+ SYNTAX       OCTET STRING (SIZE(1..40)) 
+ MAX-ACCESS       read-only
+ STATUS       current
+ DESCRIPTION "The current software version running in the system.
+             "
+ ::= { stsSystem 21 }
+
+
+
+ stsSystemServiceState OBJECT-TYPE 
+    SYNTAX       INTEGER {
+                           init(1),
+		           inService(2),
+		           outOfService(3)
+                      }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION "To indicate the state of service.
+                 " 
+ ::= { stsSystem 22 }
+
+
+-- INIT-SYS
+
+stsSystemWarmReset  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					noAction(1),
+					reset(2)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Restarts system. Clears history alarm and PM.
+        "
+    ::= { stsSystem 23 }
+
+-- INIT-SYS
+
+stsSystemColdReset  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					noAction(1),
+					reset(2)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Restarts system through power cycle. Clears history alarm and PM.
+        "
+    ::= { stsSystem 24 }
+
+-- INIT-SYS
+
+stsSystemConfigReset  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					noAction(1),
+					reset(2)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Restarts system. Initializes user setting to default
+value. Clears history alarm and PM.
+        "
+    ::= { stsSystem 25 }
+
+
+-- SW-DX-REF
+
+
+stsClockInputManualSelect OBJECT-TYPE 
+    SYNTAX       INTEGER {
+                           esr1(1),
+                           esr2(2),
+                           prs(3),
+		               input1(4),
+		               input2(5)
+                      }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "To provision the manual clock selected from external signal 1, 2, or prs or input 1 or 2 .
+                 " 
+ ::= { stsClockInput 1 }
+
+stsClockInputOperMode OBJECT-TYPE 
+    SYNTAX       INTEGER {
+ 					protected(1),
+					manual(2)
+                      }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "To provision the clock mode.
+protected - once the original active clock recovered, system will make it active.
+manual - system will not switch the clock even the original active clock recovered.
+                 " 
+ ::= { stsClockInput 2 }
+
+stsClockInputProtectedPri OBJECT-TYPE 
+    SYNTAX       INTEGER {
+ 					esr(1),
+					input(2),
+                              prs(3)
+                      }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "To provision the clock input under protected mode.
+external signal receiver - this is the default mode.
+input - users can choose it for giving the high priority to input 1 or input2 as the clock input under protected mode.
+                 " 
+ ::= { stsClockInput 3 }
+
+-- SET-SLIP
+
+stsClockInputSetSlip OBJECT-TYPE 
+    SYNTAX       INTEGER {
+ 					betweenTwoClockModule(1),
+					active-input1(2),
+					active-input2(3),
+					active-input3(4),
+					active-input4(5),
+					active-input5(6)
+                      }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "sets the slip rate between either the A and B
+clock reference signals that will be shown on the IMC seven-segment
+display or the active reference signal and one of the five input signals
+monitored by the SMU. The latter is the default setting when the IMC is
+initialized.
+                 " 
+ ::= { stsClockInput 4 }
+
+
+stsClockInputType  OBJECT-TYPE
+     SYNTAX      INTEGER {
+					stratum1(1),
+					stratum2(2),
+					stratum3(3)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Oscillator type
+        "
+    ::= { stsClockInput 5 }
+
+
+-- new SET-SSM
+
+stsClockInputSSMSelect OBJECT-TYPE 
+    SYNTAX       INTEGER {
+ 					e1-sa4-ssm(1),
+					e1-sa5-ssm(2),
+					e1-sa6-ssm(3),
+					e1-sa7-ssm(4),
+					e1-sa8-ssm(5),
+					t1-ssm(6)
+                      }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "sets the SSM.
+                 " 
+ ::= { stsClockInputSSM 1 }
+
+-- new SET-TOPIP-OPTION, RTRV-TOPIP-OPTION
+
+stsTopSourceIpOption OBJECT-TYPE
+ SYNTAX       INTEGER {
+                           static(1),
+		               dhcp(2)
+                      }
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION "Current option for proivioning of system TOP ip address.
+             "
+ DEFVAL {1}
+
+ ::= { stsTop 1 }
+
+-- new SET-TOPIP-ADDRESS, RTRV-TOPIP-ADDRESS
+
+stsTopSourceIpAddress OBJECT-TYPE 
+ SYNTAX       IpAddress
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION " The setting of the static TOP IP address for this node. If stsTopSourceIpOption is dhcp, then this IP will be discovered.
+             "
+ ::= { stsTop 2 }  
+
+-- new SET-TOPIP-MASK, RTRV-TOPIP-MASK
+
+ stsTopSourceIpSubnetMask OBJECT-TYPE 
+ SYNTAX       IpAddress
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION " The setting of the static subnet mask for the TOP port. If stsTopSourceIpOption is dhcp, then this Subnet mask will be discovered.
+             "
+ ::= { stsTop 3 }  
+
+-- new SET-TOPIP-GATEWAY, RTRV-TOPIP-GATEWAY
+
+ stsTopSourceIpGatewayAddress OBJECT-TYPE 
+ SYNTAX       IpAddress
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION " The setting of the gateway address for the TOP port. If stsTopSourceIpOption is dhcp, then this gateway IP will be discovered.
+             "
+ ::= { stsTop 4 }  
+
+ stsTopPacketRate OBJECT-TYPE 
+ SYNTAX       INTEGER (10..1000)
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION " The setting of the packet rate per second of TOP.
+             "
+ ::= { stsTop 5 }  
+
+stsTopInputSelect OBJECT-TYPE 
+     SYNTAX      INTEGER {
+					e1(1),
+					t1(2),
+					cc(3)
+				}
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION " The setting of the input select of TOP.
+             "
+ ::= { stsTop 6 }  
+
+
+ stsTopTxPackets OBJECT-TYPE 
+ SYNTAX       INTEGER (0..1000000)
+ MAX-ACCESS       read-only
+ STATUS       current
+ DESCRIPTION " The count of TOP transmitted packets.
+             "
+ ::= { stsTop 7 }  
+
+
+ stsTopTxBytes OBJECT-TYPE 
+ SYNTAX       INTEGER (0..1000000)
+ MAX-ACCESS       read-only
+ STATUS       current
+ DESCRIPTION " The count of TOP transmitted bytes.
+             "
+ ::= { stsTop 8 }  
+
+
+--
+--	stsClockInputStatusTable
+--
+
+stsClockInputStatusTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsClockInputStatusEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "Clock input status table
+        "
+	::= { stsClockInputStatus 1 }
+
+stsClockInputStatusEntry OBJECT-TYPE
+	SYNTAX      StsClockInputStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Clock input status entry
+        "
+	INDEX	{ stsClockInputStatusIndex }
+	::= { stsClockInputStatusTable 1 }
+
+StsClockInputStatusEntry ::= SEQUENCE {
+	stsClockInputStatusIndex
+		INTEGER,
+      stsClockInputState
+		INTEGER
+}
+
+stsClockInputStatusIndex  OBJECT-TYPE
+     SYNTAX      INTEGER {
+					esr1(1),
+					esr2(2),
+					prs(3),
+					input1(4),
+					input2(5)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "It contains external signal receiver 1, external signal receiver 2,or prs or input 1 and input 2.
+        "
+    ::= { stsClockInputStatusEntry 1 }
+
+
+stsClockInputState  OBJECT-TYPE
+     SYNTAX      INTEGER {
+					active(1),
+					standby(2),
+					down(3),
+					recovering(4)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object allows users to view this clock module status.
+        "
+    ::= { stsClockInputStatusEntry 2 }
+
+
+--
+--	stsClockInputSSMTable
+--
+
+stsClockInputSSMTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsClockInputSSMEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "Clock input SSM table
+        "
+	::= { stsClockInputSSMStatus 1 }
+
+stsClockInputSSMEntry OBJECT-TYPE
+	SYNTAX      StsClockInputSSMEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Clock input SSM entry
+        "
+	INDEX	{ stsClockInputSSMIndex, stsClockInputSSMType }
+	::= { stsClockInputSSMTable 1 }
+
+StsClockInputSSMEntry ::= SEQUENCE {
+	stsClockInputSSMIndex
+		INTEGER,
+      stsClockInputSSMType
+		INTEGER,
+      stsClockInputSSMValue
+		INTEGER
+}
+
+stsClockInputSSMIndex  OBJECT-TYPE
+     SYNTAX      INTEGER {
+					input1(1),
+					input2(2)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the index of indicating input 1 and input 2.
+        "
+    ::= { stsClockInputSSMEntry 1 }
+
+
+stsClockInputSSMType  OBJECT-TYPE
+     SYNTAX      INTEGER {
+					e1-sa4-ssm(1),
+					e1-sa5-ssm(2),
+					e1-sa6-ssm(3),
+					e1-sa7-ssm(4),
+					e1-sa8-ssm(5),
+					t1-ssm(6)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This second index indetifies the SSM type.
+        "
+    ::= { stsClockInputSSMEntry 2 }
+
+stsClockInputSSMValue  OBJECT-TYPE
+     SYNTAX      INTEGER {
+					prs(1),
+					stu(2),
+					st2(3),
+					st3(4),
+					sic(5),
+					duc(6)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object does not allow users to specify this SSM value.
+prs - primary reference (stratum 1)
+stu - sync traceability unknown
+st2 - stratum 2 reference
+st3 - stratum 3 reference
+sic - sonet minimum clock traceable
+dus - don't use for sync
+        "
+    ::= { stsClockInputSSMEntry 3 }
+
+
+--
+--	stsCardTable  RTRV-CONFIG for slot and card info. 
+--
+
+stsCardTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsCardEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "Card table includes all the module information.
+        "
+	::= { stsCard 1 }
+
+stsCardEntry OBJECT-TYPE
+	SYNTAX      StsCardEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Card entry
+        "
+	INDEX	{ stsCardShelf, stsCardIndex }
+	::= { stsCardTable 1 }
+
+StsCardEntry ::= SEQUENCE {
+   stsCardShelf
+		INTEGER,
+    stsCardIndex
+		INTEGER,
+    stsCardType  
+		INTEGER,
+    stsCardDescr
+            DisplayString,
+    stsCardSerial
+            DisplayString,
+    stsCardHwVersion
+            DisplayString,
+    stsCardCLEICode
+            DisplayString,
+    stsCardOperStatus
+            INTEGER,
+    stsCardReset
+            INTEGER
+}
+
+stsCardShelf  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					main(100),
+					expansion-1(1),
+					expansion-2(2),
+					expansion-3(3),
+					expansion-4(4)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Output shelf number. Shelf 0 is the main chassis.
+        "
+    ::= { stsCardEntry 1 }
+
+stsCardIndex  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    output1(1),			   
+                    output2(2),
+                    output3(3),
+                    output4(4),
+                    output5(5),
+                    output6(6),
+                    output7(7),
+                    output8(8),
+                    output9(9),
+                    output10(10),
+                    output11(11),
+                    output12(12),			   
+                    output13(13),
+                    output14(14),
+                    output15(15),
+                    output16(16),
+                    esr1(17),
+                    esr2(18),
+                    smu(19),
+                    oscillator1(20),			   
+                    oscillator2(21),
+                    top(22),
+                    imu(23)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Index into cardTable. In 5820 system index 17 to 24 are built in models if existed.
+        "
+    ::= { stsCardEntry 2 }
+
+stsCardType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    cardTypeSmu(1),			   
+                    cardTypeOutputFrequency(2),
+                    cardTypeOutputIrig-B(3),
+                    cardTypeOutputTiming(4),
+                    cardTypeOutputTiu(5),
+                    cardTypeOutputF5F10(6),
+                    cardTypeOutputTop(7),
+                    cardTypeGpsCdma(8),
+                    cardTypeGpsFrequency(9),
+                    cardTypeGpsUmts(10),
+                    cardTypeGpsGsm(11),
+                    cardTypeClkRb(12),
+                    cardTypeClkCrystalSt2(13),
+                    cardTypeClkCrystalSt3(14),
+                    cardTypeClkCrystal(15),
+                    cardTypeImu(16)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "card type.
+        "
+    ::= { stsCardEntry 3 }
+
+stsCardDescr OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "Text description of this card."
+     ::= { stsCardEntry 4 }
+
+stsCardSerial OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "The serial number of this card, or zero if
+      unavailable."
+     ::= { stsCardEntry 5 }
+
+stsCardHwVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "Hardware revision level of this card, or an
+    empty string if unavailable."
+    ::= { stsCardEntry 6 }
+
+
+stsCardCLEICode OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "CLEI code of this card, or an empty string if
+      unavailable."
+     ::= { stsCardEntry 7 }
+
+
+stsCardOperStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+                          active(1), 
+                          standby(2),
+                          failed(3),
+                          notPresent(4),
+                          misMatch(5)
+                      }
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "The operational status of the card.
+       stsCardOperStatus is up when a card is
+       recognized by the device and is enabled for
+       operation. stsCardOperStatus is failed if the
+       card is not recognized by the device, or if
+       it is not enabled for operation.
+       stsCardOperStatus is standby if the card is
+       enabled and acting as a standby slave"
+       ::= { stsCardEntry 8 }
+
+stsCardReset  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					noAction(1),
+					reset(2)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This object is used to reset this card
+        "
+    ::= { stsCardEntry 9 }
+
+
+
+--
+--	stsOscillatorTable
+--
+
+stsOscillatorTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsOscillatorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "Oscillator table
+        "
+	::= { stsOscillator 1 }
+
+stsOscillatorEntry OBJECT-TYPE
+	SYNTAX      StsOscillatorEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Oscillator entry
+        "
+	INDEX	{ stsOscillatorIndex }
+	::= { stsOscillatorTable 1 }
+
+StsOscillatorEntry ::= SEQUENCE {
+
+    stsOscillatorIndex
+		INTEGER,
+    stsOscillatorModuleType
+		INTEGER,
+	stsOscillatorEFER
+		DisplayString,
+	stsOscillatorESSD
+		DisplayString,
+	stsOscillatorESSN
+		DisplayString,
+	stsOscillatorFAGE
+		DisplayString,
+	stsOscillatorTIMD
+		DisplayString,
+    stsOscillatorSetActive
+		INTEGER,
+    stsOscillatorStatus
+		INTEGER
+}
+
+stsOscillatorIndex  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					oscillator1(1),
+					oscillator2(2)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Oscillator index
+        "
+    ::= { stsOscillatorEntry 1 }
+
+
+stsOscillatorModuleType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					rb(1),
+					crystalSt2(2),
+					crystalSt3(3),
+					crystal(4)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Oscillator module
+        "
+    ::= { stsOscillatorEntry 2 }
+
+stsOscillatorEFER  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Estimator Frequency Error, EFER outputs the most recently calculated frequency error estimate.
+This object is supported in 5850, but not 5820.
+        "
+    ::= { stsOscillatorEntry 3 }
+
+stsOscillatorESSD  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Estimator Standard Deviation, ESSD outputs the most recently calculated standard deviation of the
+estimator error (actual/estimated time error).
+This object is supported in 5850, but not 5820.
+        "
+    ::= { stsOscillatorEntry 4 }
+
+stsOscillatorESSN  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Estimator Sample Number, The ESSN command outputs the current estimator sample. One sample is
+taken per second.
+This object is supported in 5850, but not 5820.
+        "
+    ::= { stsOscillatorEntry 5}
+
+stsOscillatorFAGE  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Frequency Age, FAGE outputs the frequency aging. This is a measurement of how quickly
+the on-board VCXO frequency is changing.
+This object is supported in 5850, but not 5820.
+        "
+    ::= { stsOscillatorEntry 6 }
+
+stsOscillatorTIMD  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time Difference between GPS 1PPS and Oscillator 1PPS,TIMD outputs the time difference between the GPS 1PPS and oscillator
+1PPS in nanoseconds relative to coordinated universal time (UTC).
+This object is supported in 5850, but not 5820.
+        "
+    ::= { stsOscillatorEntry 7 }
+
+
+-- SW-DX-OSC  between two Oscillator modules.
+
+stsOscillatorSetActive  OBJECT-TYPE
+     SYNTAX      INTEGER {
+					noAction(1),
+					active(2)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This object allows users to provision this Oscillator module to be active manually. 
+                 The previous active one will be switched over to standby.
+        "
+    ::= { stsOscillatorEntry 8 }
+
+stsOscillatorStatus  OBJECT-TYPE
+     SYNTAX      INTEGER {
+					active(1),
+					standby(2),
+					holdoversync(3),
+					aqrsync(4),
+					frngsync(5),
+					lkdsync(6),
+					absent(7)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object allows users to view this Oscillator module status.
+        "
+    ::= { stsOscillatorEntry 9 }
+
+
+
+--
+--	stsGpsTable  RTRV-GPS
+--
+
+stsGpsTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsGpsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "GPS table
+        "
+	::= { stsGPS 1 }
+
+stsGpsEntry OBJECT-TYPE
+	SYNTAX      StsGpsEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "GPS entry
+        "
+	INDEX	{ stsGpsIndex }
+	::= { stsGpsTable 1 }
+
+StsGpsEntry ::= SEQUENCE {
+	stsGpsIndex 
+		INTEGER,
+	stsGpsStatus 
+		INTEGER,
+       stsGpsANTD
+		DisplayString,
+       stsGpsAZEL
+		DisplayString,
+        stsGpsRSTG
+		DisplayString,
+        stsGpsBITS
+		DisplayString,
+	stsGpsPAVG
+		DisplayString,
+        stsGpsSIGQ
+		DisplayString,
+	stsGpsSPOS
+		OCTET STRING,
+	stsGpsTRMO
+		OCTET STRING,
+	stsGpsUTCT
+		DisplayString,
+	stsGpsVERS
+		DisplayString,
+       stsGpsDETF
+		DisplayString,
+	stsGpsEFER
+		DisplayString,
+	stsGpsESSD
+		DisplayString,
+	stsGpsESSN
+		DisplayString,
+	stsGpsFAGE
+		DisplayString,
+	stsGpsTIMD
+		DisplayString,
+	stsGpsReset 
+		INTEGER
+}
+
+stsGpsIndex  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					esr1(1),
+					esr2(2)
+
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "GPS module index
+        "
+    ::= { stsGpsEntry 1 }
+
+stsGpsStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					active(1),
+					standby(2)
+
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "GPS current status
+        "
+    ::= { stsGpsEntry 2 }
+
+
+stsGpsANTD  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ANTD outputs of the antenna cable delay., +99999 THRU -99999 in nanoseconds.
+        "
+    ::= { stsGpsEntry 3 }
+
+stsGpsAZEL  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Azimuth and Elevation, AZEL outputs the satellite number followed by its elevation in degrees
+above the horizon and azimuth in degrees relative to true north. The twelve
+satellites are the ones currently visible to the GPS receiver.
+        "
+    ::= { stsGpsEntry 4 }
+
+stsGpsRSTG  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RSTG.
+        "
+    ::= { stsGpsEntry 5 }
+
+stsGpsBITS  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Built-in Test Status, the BITS command outputs the status of various built-in tests.
+        "
+    ::= { stsGpsEntry 6 }
+
+stsGpsPAVG  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Position Average Status, The PAVG command retrieves the average latitude, longitude, and altitude.
+        "
+    ::= { stsGpsEntry 7 }
+
+stsGpsSIGQ  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Signal Quality, The SIGQ command outputs eight sets of satellite signal quality from 0 to
+9, where 0 is the worst and 9 is the best signal strength. Signal levels
+greater than three are considered adequate for normal operation.
+        "
+    ::= { stsGpsEntry 8 }
+
+stsGpsSPOS  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..80))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Set Position, SPOS retrieves or sets the latitude, longitude, and altitude.
+        "
+    ::= { stsGpsEntry 9 }
+
+stsGpsTRMO  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..80))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Time Recovery Mode, TRMO allows the user to select or read back the Time Recovery mode of
+operation. If mode option K is added, the receiver will be put into Known
+mode. This is only recommended if the current position (SPOS) is correct
+or the user is about to set the position. The unit will enter GPS Track
+sooner in Known mode than in Position Average mode. Do not use mode
+option D; it is only for a station that is not stationary. Use mode option P
+if mode option K is entered and the current position is not correct.
+        "
+    ::= { stsGpsEntry 10 }
+
+stsGpsUTCT  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Coordinated Universal Time, The UTCT command retrieves UTC time.
+        "
+    ::= { stsGpsEntry 11 }
+
+stsGpsVERS  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Get Current Firmware Version, VERS outputs the current version numbers.
+        "
+    ::= { stsGpsEntry 12 }
+
+stsGpsDETF  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Determine Frequency, DETF determines the frequency of the GPS input (should be 1.544 MHz).
+Use this command when the antenna is moved. Precede this command with RSTG,C.
+This object is supported in 5850, but not 5820.
+        "
+    ::= { stsGpsEntry 13 }
+
+stsGpsEFER  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Estimator Frequency Error, EFER outputs the most recently calculated frequency error estimate.
+This object is supported in 5850, but not 5820.
+        "
+    ::= { stsGpsEntry 14 }
+
+stsGpsESSD  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Estimator Standard Deviation, ESSD outputs the most recently calculated standard deviation of the
+estimator error (actual/estimated time error).
+This object is supported in 5850, but not 5820.
+        "
+    ::= { stsGpsEntry 15 }
+
+stsGpsESSN  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Estimator Sample Number, The ESSN command outputs the current estimator sample. One sample is
+taken per second.
+This object is supported in 5850, but not 5820.
+        "
+    ::= { stsGpsEntry 16}
+
+stsGpsFAGE  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Frequency Age, FAGE outputs the frequency aging. This is a measurement of how quickly
+the on-board VCXO frequency is changing.
+This object is supported in 5850, but not 5820.
+        "
+    ::= { stsGpsEntry 17 }
+
+stsGpsTIMD  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time Difference between GPS 1PPS and Oscillator 1PPS,TIMD outputs the time difference between the GPS 1PPS and oscillator
+1PPS in nanoseconds relative to coordinated universal time (UTC).
+This object is supported in 5850, but not 5820.
+        "
+    ::= { stsGpsEntry 18 }
+
+
+stsGpsReset  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					noAction(0),
+					reset(1)
+
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Allow users to reset this GPS.
+        "
+    ::= { stsGpsEntry 19 }
+
+--
+--	stsLinkTable ED-LINK, RTRV-LINK
+--
+
+stsLinkTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsLinkEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "This table specify the link status.
+        "
+	::= { stsLink 1 }
+
+stsLinkEntry OBJECT-TYPE
+	SYNTAX      StsLinkEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Link entry.
+        "
+	INDEX	{ stsLinkIndex }
+	::= { stsLinkTable 1 }
+
+StsLinkEntry ::= SEQUENCE {
+    stsLinkIndex 
+		INTEGER,
+    stsLinkType
+		INTEGER,
+    stsLinkEnable
+		INTEGER,
+    stsLinkLineCode
+		INTEGER,
+    stsLinkFMT
+		INTEGER,
+    stsLinkTermination
+		INTEGER,
+    stsLinkMFCHK
+		INTEGER,
+    stsLinkId
+                OCTET STRING
+}
+
+stsLinkIndex  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					mon1(1),
+					mon2(2),
+					mon3(3),
+					mon4(4),
+					mon5(5)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Type identify this input link.
+        "
+    ::= { stsLinkEntry 1 }
+
+stsLinkType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					e1(1),
+					t1(2),
+					cc(3),
+					f2(4),
+					j1(5)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Identify the input link type.
+        "
+    ::= { stsLinkEntry 2 }
+
+stsLinkEnable  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					yes(1),
+					no(2)
+
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Cab be configured on link 3, 4 and 5.
+        "
+    ::= { stsLinkEntry 3 }
+
+stsLinkLineCode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					ami(1),
+					b8zs(2),
+				      hdb3(3),
+					zbtsi(4),
+				      jbzs(5),
+					other(6)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "for T1 link only. default is AMI.
+        "
+    ::= { stsLinkEntry 4 }
+
+stsLinkFMT  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					t1-d4(1),
+					t1-esf(2),
+					j1-d4(3),
+					j1-esf(4),
+					e1(5),
+					e1-crc(6),
+					e1-mf(7),
+					e1-crc-mf(8),
+					f2(9),
+					cc(10),
+					cc-400(11)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "default is t1-d4.
+        "
+    ::= { stsLinkEntry 5 }
+
+
+stsLinkTermination  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					ohm-75(1),
+					ohm-100(2),
+					ohm-110(3),
+					ohm-120(4)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "default is ohm-100.
+        "
+    ::= { stsLinkEntry 6 }
+
+stsLinkMFCHK  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					enable(1),
+					disable(2)
+
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used for MON1 through MON5. If MFCHK is enabled,
+it will force a counter MF error. Otherwise, it will ignore a MF error.
+        "
+    ::= { stsLinkEntry 7 }
+
+stsLinkId OBJECT-TYPE 
+ SYNTAX       OCTET STRING (SIZE(1..24)) 
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION " The Link ID is assigned by the administrator for this link. Identification code of the primary or secondary external
+timing link. This is one to twenty characters. Only letters, digits, and hyphens are allowed. Special characters, including space and quotes, are not allowed.
+The first character may not be a hyphen. Only applicable to PLNK and SLNK
+"  
+    ::= { stsLinkEntry 8 }
+
+--
+--	stsShelfTable
+--
+
+stsShelfTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsShelfEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "Shelf table.
+        "
+	::= { stsShelf 1 }
+
+stsShelfEntry OBJECT-TYPE
+	SYNTAX      StsShelfEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Shelf entry.
+        "
+	INDEX	{ stsShelfIndex }
+	::= { stsShelfTable 1 }
+
+StsShelfEntry ::= SEQUENCE {
+	stsShelfIndex
+		INTEGER,
+    stsShelfSerial
+            DisplayString,
+    stsShelfCLEICode
+            DisplayString,
+    stsShelfReset
+            INTEGER
+}
+
+stsShelfIndex  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					main(100),
+					expansion-1(1),
+					expansion-2(2),
+					expansion-3(3),
+					expansion-4(4)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Output shelf number. index value 100 is the main chassis.
+        "
+    ::= { stsShelfEntry 1 }
+
+stsShelfSerial OBJECT-TYPE
+     SYNTAX  DisplayString 
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+     "The serial number of this shelf, or zero if
+      unavailable."
+     ::= { stsShelfEntry 2 }
+
+
+ stsShelfCLEICode OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   MAX-ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "CLEI code of this shelf, or an empty string if
+                           unavailable."
+                   ::= { stsShelfEntry 3 }
+
+stsShelfReset  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					noAction(1),
+					reset(2)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This object is used to reset shelf
+        "
+    ::= { stsShelfEntry 4 }
+
+
+--
+--	stsAlarmThresholdTable SET-TH-LINK and RTRV-TH-LINK 
+--
+
+stsAlarmThresholdTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsAlarmThresholdEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "Alarm threshold table.
+        "
+	::= { stsAlarmThreshold 1 }
+
+stsAlarmThresholdEntry OBJECT-TYPE
+	SYNTAX      StsAlarmThresholdEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Alarm threshold entry.
+        "
+	INDEX	{ stsAlarmThresholdCurrentMon, stsAlarmThresholdType }
+	::= { stsAlarmThresholdTable 1 }
+
+StsAlarmThresholdEntry ::= SEQUENCE {
+	stsAlarmThresholdCurrentMon
+		INTEGER,
+	stsAlarmThresholdType
+		INTEGER,
+    stsAlarmThresholdValue
+		INTEGER,
+    stsAlarmThresholdTimeInterval
+		INTEGER
+ 
+}
+
+
+stsAlarmThresholdCurrentMon  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					mon1(1),
+					mon2(2),
+					mon3(3),
+					mon4(4),
+					mon5(5)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current monitor number.
+        "
+    ::= { stsAlarmThresholdEntry 1 }
+
+
+stsAlarmThresholdType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					cvl(1),
+					cvp(2),
+					cs(3),
+					jitter(4),
+					tie(5),
+					mtie(6),
+					wander(7)
+
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Monitor alarm threshold setting type.
+CVL - Coding violation count - Line (BPV)
+CVP - Coding violation count - Path (CRC)
+CS - Controlled slip count
+JITTER - Peak to peak JITTER in unit interval
+TIE - Time interval error in nanoseconds
+MTIE - Maximum time interval error in nanoseconds
+        "
+    ::= { stsAlarmThresholdEntry 2 }
+
+stsAlarmThresholdValue  OBJECT-TYPE
+    SYNTAX      INTEGER   (0..10000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Threshold level to set. When this value is reached, a trap will be sent out. Below are the default values:
+
+CVL - 16
+CVP - 16
+CS - 1
+JITTER - 5 UI (T1)
+1 - UI (E1)
+TIE (Stratum 1) - 0.503 UI (T1), 0.668 UI (E1) - use 503 and 668 as the integer values. 
+MTIE (Stratum 1) - 0.503 UI (T1), 0.668 UI (E1) - use 503 and 668 as the integer values.
+        "
+    ::= { stsAlarmThresholdEntry 3 }
+
+stsAlarmThresholdTimeInterval  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					one-Sec(1),
+					ten-Sec(2),
+					hundred-Sec(3),
+					thousand-Sec(4),
+					tenThousand-Sec(5),
+					hundredThousand-Sec(6),
+					one-Hour(7),
+					one-Day(8)
+
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Time interval setting for the corresponding alarm threshold value. Below are the default values.
+
+CVL - ten-Sec
+CVP - ten-Sec
+CS - one-Hour
+JITTER - 1-Sec
+TIE (Stratum 1) - one-Hour
+MTIE (Stratum 1) - one-Hour
+wander - hundred-Sec
+        "
+    ::= { stsAlarmThresholdEntry 4 }
+
+
+
+--
+--	stsLinkAlarmTable SET-ATTR and RTRV-ATTR for LINK type
+--
+
+stsLinkAlarmTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsLinkAlarmEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "Link alarm setting table
+        "
+	::= { stsLinkAlarmSetting 1 }
+
+stsLinkAlarmEntry OBJECT-TYPE
+	SYNTAX      StsLinkAlarmEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Link alarm setting entry
+        "
+	INDEX	{ stsLinkAlarmSettingLinkType, stsLinkAlarmSettingType }
+	::= { stsLinkAlarmTable 1 }
+
+StsLinkAlarmEntry ::= SEQUENCE {
+	stsLinkAlarmSettingLinkType
+		INTEGER,
+	stsLinkAlarmSettingType
+		INTEGER,
+    stsLinkAlarmSettingSevirity
+		INTEGER,
+  stsLinkAlarmSevirity
+		INTEGER
+
+}
+
+
+stsLinkAlarmSettingLinkType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					mon1(1),
+					mon2(2),
+					mon3(3),
+					mon4(4),
+					mon5(5),
+					f5F10(6),
+					plnk(7),
+					slnk(8)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Link type for the alarm setting
+        "
+    ::= { stsLinkAlarmEntry 1 }
+
+
+stsLinkAlarmSettingType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					act(1),
+					los(2),
+					aisp(3),
+					lof(4),
+					cvl(5),
+					cvp(6),
+					cs(7),
+					jitter(8),
+					tie(9),
+					mtie(10)
+
+
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Alarm setting type. 
+ACT (NR, NSA) Link in active state
+AISP (MN, SA) Alarm indication signal detected - Path. N/A to F2 and F5F10 link types.
+LOF (MN, SA) Loss of frame. N/A to F2 and F5F10 link types.
+LOS (MN, SA) Loss of signal
+T-CS (NA, NSA) Threshold violation for MONTYPE CS. N/A to F2, F5F10, PLNK and SLNK link types.
+T-TIE (NA, NSA) Threshold violation for MONTYPE TIE. N/A to F5F10, PLNK and SLNK link types.
+T-MTIE (NA, NSA) Threshold violation for MONTYPE MTIE. N/A to F5F10, PLNK and SLNK link types.
+
+        "
+    ::= { stsLinkAlarmEntry 2 }
+
+stsLinkAlarmSettingSevirity  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					cr(1),
+					mj(2),
+					mn(3),
+					na(4),
+					nr(5)
+
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Threshold level to set. When this value is reached, a trap will be sent out.
+
+cr - Critical alarm
+mj - Major alarm
+mn - Minor alarm
+na - Not alarmed; report as event
+nr - Not reported
+        "
+    ::= { stsLinkAlarmEntry 3 }
+
+stsLinkAlarmSevirity  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					cr(1),
+					mj(2),
+					mn(3),
+					na(4),
+					nr(5),
+					cl(6)
+
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current alarm status.
+
+cr - Critical alarm
+mj - Major alarm.
+mn - Minor alarm
+na - Not alarmed; report as event
+nr - Not reported
+cl - No alarm or alarm cleared; also used in trap report.
+        "
+    ::= { stsLinkAlarmEntry 4 }
+
+
+
+
+--
+--	stsOscillatorAlarmTable SET-ATTR and RTRV-ATTR for CLK
+--
+
+stsOscillatorAlarmTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsOscillatorAlarmEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "......
+        "
+	::= { stsOscillatorAlarmSetting 1 }
+
+stsOscillatorAlarmEntry OBJECT-TYPE
+	SYNTAX      StsOscillatorAlarmEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   ".....
+        "
+	INDEX	{ stsOscillatorAlarmSettingClock, stsOscillatorAlarmSettingType }
+	::= { stsOscillatorAlarmTable 1 }
+
+StsOscillatorAlarmEntry ::= SEQUENCE {
+	stsOscillatorAlarmSettingClock
+		INTEGER,
+	stsOscillatorAlarmSettingType
+		INTEGER,
+    stsOscillatorAlarmSettingSeverity
+		INTEGER,
+   stsOscillatorAlarmSeverity
+		INTEGER
+
+}
+
+
+stsOscillatorAlarmSettingClock  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					oscillator1(1),
+					oscillator2(2),
+					all(3)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Oscillator for the alarm setting. 
+                 all means both, can only apply frngsync as value of stsOscillatorAlarmSettingType.
+        "
+    ::= { stsOscillatorAlarmEntry 1 }
+
+
+stsOscillatorAlarmSettingType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					aqrsync(1),
+					frngsync(2),
+					hldovrsync(3),
+					lkdsync(4),
+					act(5)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Alarm setting type. 
+aqrsync (NR, NSA) - Acquire synchronization mode
+frngsync (NR, NSA) - Free running synchronization mode.
+hldovrsync (MJ, SA) - Holdover synchronization mode
+lkdsync (NR, NSA) - Lock synchronization mode
+act (NR, NSA) - Unit in active state
+
+        "
+    ::= { stsOscillatorAlarmEntry 2 }
+
+stsOscillatorAlarmSettingSeverity  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					cr(1),
+					mj(2),
+					mn(3),
+					na(4),
+					nr(5)
+
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Alarm level to set.
+
+cr - Critical alarm
+mj - Major alarm.
+mn - Minor alarm
+na - Not alarmed; report as event
+nr - Not reported
+        "
+    ::= { stsOscillatorAlarmEntry 3 }
+
+stsOscillatorAlarmSeverity  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					cr(1),
+					mj(2),
+					mn(3),
+					na(4),
+					nr(5),
+					cl(6)
+
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current alarm status.
+
+cr - Critical alarm
+mj - Major alarm.
+mn - Minor alarm
+na - Not alarmed; report as event
+nr - Not reported
+cl - No alarm or alarm cleared; also used in trap report.
+        "
+    ::= { stsOscillatorAlarmEntry 4 }
+
+
+--
+--	stsOsPwrAlarmTable SET-ATTR and RTRV-ATTR for OS and PWR types
+--
+
+stsOsPwrAlarmTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsOsPwrAlarmEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "OS and power alarm setting table.
+        "
+	::= { stsOsPwrAlarmSetting 1 }
+
+stsOsPwrAlarmEntry OBJECT-TYPE
+	SYNTAX      StsOsPwrAlarmEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "OS and power alarm setting entry.
+        "
+	INDEX	{ stssPwrAlarmSettingShelf, stsOsPwrAlarmSettingOsPwr}
+	::= { stsOsPwrAlarmTable 1 }
+
+StsOsPwrAlarmEntry ::= SEQUENCE {
+    stssPwrAlarmSettingShelf
+		INTEGER,
+    stsOsPwrAlarmSettingOsPwr
+		INTEGER,
+    stsOsPwrAlarmSettingSeverity
+		INTEGER,
+   stsOsPwrAlarmSeverity
+		INTEGER
+}
+
+stssPwrAlarmSettingShelf  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					main(100),
+					expansion-1(1),
+					expansion-2(2),
+					expansion-3(3),
+					expansion-4(4)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Shelf number. index value 100 is the main chassis.
+        "
+    ::= { stsOsPwrAlarmEntry 1 }
+
+stsOsPwrAlarmSettingOsPwr  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					os-oslink-failure(1),
+					pwrA-failure(2),
+					pwrB-failure(3)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OS and power alarm types for the alarm setting
+        "
+    ::= { stsOsPwrAlarmEntry 2 }
+
+
+stsOsPwrAlarmSettingSeverity  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					cr(1),
+					mj(2),
+					mn(3),
+					na(4),
+					nr(5)
+
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Alarm level to set. 
+
+cr - Critical alarm
+mj - Major alarm
+mn - Minor alarm
+na - Not alarmed; report as event
+nr - Not reported
+        "
+    ::= { stsOsPwrAlarmEntry 3 }
+
+stsOsPwrAlarmSeverity  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					cr(1),
+					mj(2),
+					mn(3),
+					na(4),
+					nr(5),
+					cl(6)
+
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current alarm status.
+
+cr - Critical alarm
+mj - Major alarm.
+mn - Minor alarm
+na - Not alarmed; report as event
+nr - Not reported
+cl - No alarm or alarm cleared; also used in trap report.
+        "
+    ::= { stsOsPwrAlarmEntry 4 }
+
+
+
+--
+--	stsOutputAlarmTable SET-ATTR and RTRV-ATTR for OUT
+--
+
+stsOutputAlarmTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsOutputAlarmEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "Output alarm setting table.
+        "
+	::= { stsOutputAlarmSetting 1 }
+
+stsOutputAlarmEntry OBJECT-TYPE
+	SYNTAX      StsOutputAlarmEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Output alarm setting entry.
+        "
+	INDEX	{ stsOutputAlarmSettingShelf, stsOutputAlarmSettingSlot, stsOutputAlarmSettingPort, stsOutputAlarmSettingType }
+	::= { stsOutputAlarmTable 1 }
+
+StsOutputAlarmEntry ::= SEQUENCE {
+	stsOutputAlarmSettingShelf
+		INTEGER,
+	stsOutputAlarmSettingSlot
+		INTEGER,
+        stsOutputAlarmSettingPort
+                INTEGER,
+        stsOutputAlarmSettingType
+               INTEGER,
+        stsOutputAlarmSettingSeverity
+		INTEGER,
+      stsOutputAlarmSeverity
+		INTEGER
+}
+
+
+stsOutputAlarmSettingShelf  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					main(100),
+					expansion-1(1),
+					expansion-2(2),
+					expansion-3(3),
+					expansion-4(4)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Output shelf number. index value 100 is the main chassis.
+        "
+    ::= { stsOutputAlarmEntry 1 }
+
+stsOutputAlarmSettingSlot  OBJECT-TYPE
+    SYNTAX      INTEGER (1..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Slot number of this shelf. Shelf 0 can only support 8 slots. The rest of shelf can support up to 16 slots.
+        "
+    ::= { stsOutputAlarmEntry 2 }
+
+stsOutputAlarmSettingPort  OBJECT-TYPE
+    SYNTAX      INTEGER (1..8)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Port number located at this slot.
+        "
+    ::= { stsOutputAlarmEntry 3 }
+
+
+stsOutputAlarmSettingType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					lossClock(1),
+					tiu-act(2),
+					tiu-los(3),
+					tiu-t-tie(4),
+					tiu-t-mtie(5),
+					tiu-aisp(6),
+					tiu-lof(7),
+					tiu-t-cs(8)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Alarm setting type. 
+syncclk (MJ, SA) Synchronization channel failure
+
+        "
+    ::= { stsOutputAlarmEntry 4 }
+
+stsOutputAlarmSettingSeverity  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					cr(1),
+					mj(2),
+					mn(3),
+					na(4),
+					nr(5)
+
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Alarm level to set.
+
+cr - Critical alarm
+mj - Major alarm
+mn - Minor alarm
+na - Not alarmed; report as event
+nr - Not reported
+        "
+    ::= { stsOutputAlarmEntry 5 }
+
+stsOutputAlarmSeverity  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					cr(1),
+					mj(2),
+					mn(3),
+					na(4),
+					nr(5),
+					cl(6)
+
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current alarm status.
+
+cr - Critical alarm
+mj - Major alarm.
+mn - Minor alarm
+na - Not alarmed; report as event
+nr - Not reported
+cl - No alarm or alarm cleared; also used in trap report.
+        "
+    ::= { stsOutputAlarmEntry 6 }
+
+
+
+stsOutputTiuSettingTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsOutputTiuSettingEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "Output Tiu port setting table.
+        "
+	::= { stsOutputTiuSetting 1 }
+
+stsOutputTiuSettingEntry OBJECT-TYPE
+	SYNTAX      StsOutputTiuSettingEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Output alarm setting entry.
+        "
+	INDEX	{ stsOutputTiuSettingShelf, stsOutputTiuSettingSlot, stsOutputTiuSettingPort }
+	::= { stsOutputTiuSettingTable 1 }
+
+StsOutputTiuSettingEntry ::= SEQUENCE {
+	stsOutputTiuSettingShelf
+		INTEGER,
+	stsOutputTiuSettingSlot
+		INTEGER,
+        stsOutputTiuSettingPort
+                INTEGER,
+        stsOutputTiuSettingLineCoding
+               INTEGER,
+        stsOutputTiuSettingFMT
+		INTEGER,
+        stsOutputTiuSettingTermination
+		INTEGER
+
+}
+
+
+stsOutputTiuSettingShelf  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					main(100),
+					expansion-1(1),
+					expansion-2(2),
+					expansion-3(3),
+					expansion-4(4)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Output shelf number. index value 100 is the main chassis.
+        "
+    ::= { stsOutputTiuSettingEntry 1 }
+
+stsOutputTiuSettingSlot  OBJECT-TYPE
+    SYNTAX      INTEGER (1..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Slot number of this shelf. Shelf 0 can only support 8 slots. The rest of shelf can support up to 16 slots.
+        "
+    ::= { stsOutputTiuSettingEntry 2 }
+
+stsOutputTiuSettingPort  OBJECT-TYPE
+    SYNTAX      INTEGER (1..8)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Port number located at this slot.
+        "
+    ::= { stsOutputTiuSettingEntry 3 }
+
+
+stsOutputTiuSettingLineCoding  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					ami(1),
+					b8zs(2),
+					hdb3(3),
+					other(4)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Line Coding setting type. 
+
+        "
+    ::= { stsOutputTiuSettingEntry 4 }
+
+stsOutputTiuSettingFMT  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					t1-d4(1),
+					t1-esf(2),
+					j1-d4(3),
+					j1-esf(4)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "FMT to set.
+        "
+    ::= { stsOutputTiuSettingEntry 5 }
+
+stsOutputTiuSettingTermination  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					ohm-75(1),
+					ohm-100(2),
+					ohm-110(3),
+					ohm-120(4)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Termination to set.
+        "
+    ::= { stsOutputTiuSettingEntry 6 }
+
+
+--
+--	stsPerfMonTable  RTRV-PM-LINK (default mode)
+--
+
+stsPerfMonTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsPerfMonEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "Performance monitor table.
+        "
+	::= { stsPerfMon 1 }
+
+stsPerfMonEntry OBJECT-TYPE
+	SYNTAX      StsPerfMonEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Performance monitor entry.
+        "
+	INDEX	{ stsPerfMonInputCurrentMon, stsPerfMonInputMonPeriod, stsPerfMonInputMonBucket }
+	::= { stsPerfMonTable 1 }
+
+StsPerfMonEntry ::= SEQUENCE {
+	stsPerfMonInputCurrentMon
+		INTEGER,
+	stsPerfMonInputMonPeriod
+		INTEGER,
+	stsPerfMonInputMonBucket
+		INTEGER,
+    stsPerfMonInputClockType
+		INTEGER,
+    stsPerfMonPerfCVL
+		INTEGER,
+    stsPerfMonPerfCVP
+		INTEGER,
+    stsPerfMonPerfCS
+		INTEGER,
+    stsPerfMonPerfESP
+		INTEGER,
+    stsPerfMonPerfJitter
+		INTEGER,
+    stsPerfMonPerfPhaseData
+		INTEGER,
+    stsPerfMonPerfSESP
+		INTEGER,
+    stsPerfMonPerfTIE
+		INTEGER,
+    stsPerfMonPerfMTIE
+		INTEGER,
+    stsPerfMonPerfWDR5M
+		INTEGER,
+    stsPerfMonPerfWDR24H
+		INTEGER
+}
+
+
+stsPerfMonInputCurrentMon  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					mon1(1),
+					mon2(2),
+					mon3(3),
+					mon4(4),
+					mon5(5)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current monitor number.
+        "
+    ::= { stsPerfMonEntry 1 }
+
+stsPerfMonInputMonPeriod  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					one-hour(1),
+					one-day(2),
+					hundred-Sec(3)
+ 
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Accumulation period of the performance monitoring. This
+may be 100 second, 1-DAY or 1-HR.
+        "
+    ::= { stsPerfMonEntry 2 }
+
+stsPerfMonInputMonBucket  OBJECT-TYPE
+       SYNTAX      INTEGER (0..72)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of the register to be retrieved. If stsPerfMonInputMonPeriod is 1-HR,
+this may be a value from 0 to 72 (3 days). 0 means the (incomplete)
+hour now in progress, 1 means the most recently completed
+hour, and so on. If stsPerfMonInputMonPeriod is 1-DAY, this may be a value
+from 0 to 7. 0 means the (incomplete) day now in progress;
+if a complete day is not available, then the current day's
+hourly data are displayed. 1 means the most recent
+complete day, 2 the day previous to that, and so on.
+REGNO may be a single value or a group. If stsPerfMonInputMonPeriod is 100-Sec, this may be a value
+from 0 to 30. 0 means the (incomplete) 100 second period now in progress
+        "
+    ::= { stsPerfMonEntry 3 }
+
+stsPerfMonInputClockType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					unknown(1),
+					t1(2),
+					e1(3),
+					cc(4),
+					f2(5),
+					f5(6),
+					f10(7)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object specifies the input monitor type"
+        
+    ::= { stsPerfMonEntry 4 }
+
+stsPerfMonPerfCVL  OBJECT-TYPE
+    SYNTAX      INTEGER (-1..1000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Coding violation count - Line (BPV). -1 means not applicable to current monitor type value in stsPerfMonInputClockType.
+        "
+    ::= { stsPerfMonEntry 5 }
+
+stsPerfMonPerfCVP  OBJECT-TYPE
+    SYNTAX      INTEGER (-1..1000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Coding violation count - Path (CRC). -1 means not applicable to current monitor type value in stsPerfMonInputClockType.
+        "
+    ::= { stsPerfMonEntry 6 }
+
+stsPerfMonPerfCS  OBJECT-TYPE
+    SYNTAX      INTEGER (-1..1000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Controlled slip count. -1 means not applicable to current monitor type value in stsPerfMonInputClockType.
+        "
+    ::= { stsPerfMonEntry 7 }
+
+stsPerfMonPerfESP  OBJECT-TYPE
+    SYNTAX      INTEGER (-1..1000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Errored second count - Path. -1 means not applicable to current monitor type value in stsPerfMonInputClockType.
+        "
+    ::= { stsPerfMonEntry 8 }
+
+
+stsPerfMonPerfJitter  OBJECT-TYPE
+    SYNTAX      INTEGER (-1..1000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Peak to peak JITTER in unit interval. -1 means not applicable to current monitor type value in stsPerfMonInputClockType.
+        "
+    ::= { stsPerfMonEntry 9 }
+
+stsPerfMonPerfPhaseData  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Phase data in nanoseconds. -1 means not applicable to current monitor type value in stsPerfMonInputClockType.
+        "
+    ::= { stsPerfMonEntry 10 }
+
+stsPerfMonPerfSESP  OBJECT-TYPE
+    SYNTAX      INTEGER (-1..1000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Severely errored second count - Path. -1 means not applicable to current monitor type value in stsPerfMonInputClockType.
+        "
+    ::= { stsPerfMonEntry 11 }
+
+stsPerfMonPerfTIE  OBJECT-TYPE
+    SYNTAX      INTEGER (-1..1000000)
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION "Time interval error in nanoseconds. -1 means not applicable to current monitor type value in stsPerfMonInputClockType.
+        "
+    ::= { stsPerfMonEntry 12 }
+
+
+stsPerfMonPerfMTIE  OBJECT-TYPE
+    SYNTAX      INTEGER (-1..1000000)
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION "Maximum time interval error in nanoseconds. -1 means not applicable to current monitor type value in stsPerfMonInputClockType.
+        "
+    ::= { stsPerfMonEntry 13 }
+
+
+stsPerfMonPerfWDR5M  OBJECT-TYPE
+    SYNTAX      INTEGER (-1..1000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "5 minutes peak to peak WANDER in unit interval. -1 means not applicable to current monitor type value in stsPerfMonInputClockType.
+        "
+    ::= { stsPerfMonEntry 14 }
+
+stsPerfMonPerfWDR24H  OBJECT-TYPE
+    SYNTAX      INTEGER (-1..1000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "24 hours peak to peak WANDER in unit interval. -1 means not applicable to current monitor type value in stsPerfMonInputClockType.
+        "
+    ::= { stsPerfMonEntry 15 }
+
+
+--
+--	stsAlarmStatusTable RTRV-ALM for all types except OUT type. RTRV-COND for all but OUT type filtering MJ and MN.
+--
+
+stsAlarmStatusTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsAlarmStatusEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "the current state of alarm conditions.
+        "
+	::= { stsAlarmStatus 1 }
+
+stsAlarmStatusEntry OBJECT-TYPE
+	SYNTAX      StsAlarmStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Entry of the current state of alarm conditions.
+        "
+	INDEX	{ stsAlarmSource }
+	::= { stsAlarmStatusTable 1 }
+
+StsAlarmStatusEntry ::= SEQUENCE {
+	stsAlarmSource
+		INTEGER,
+        stsAlarmSourceType
+		INTEGER,
+        stsAlarmSeverity
+		INTEGER,
+        stsAlarmSrvEff
+		INTEGER
+}
+
+
+stsAlarmSource  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					clk1(1),
+					clk2(2),
+					pwr(3),
+					os(4),
+					plnk(5),
+					slnk(6),
+					f10(7),
+					mon1(8),
+					mon2(9),
+					mon3(10),
+					mon4(11),
+					mon5(12),
+					esr1(13),
+					esr2(14)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Source of current alarm status
+        "
+    ::= { stsAlarmStatusEntry 1 }
+
+
+stsAlarmSourceType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					eqpt(1),
+					link(2),
+					com(3)
+
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Alarm Source type.
+
+        "
+    ::= { stsAlarmStatusEntry 2 }
+
+stsAlarmSeverity  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					cr(1),
+					mj(2),
+					mn(3),
+					na(4),
+					nr(5),
+					cl(6)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current alarm level.
+
+cr - Critical alarm
+mj - Major alarm
+mn - Minor alarm
+na - Not alarmed; report as event
+nr - Not reported
+cl - No alarm or alarm cleared. Also used by trap.
+
+        "
+    ::= { stsAlarmStatusEntry 3 }
+
+stsAlarmSrvEff  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					sa(1),
+					nsa(2)
+
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Has the value service effect or non-service effect.
+
+SA Service-affecting condition. Immediate action required. The IMC defines major alarms as service-affecting.
+NSA Nonservice-affecting condition. The IMC defines minor alarms and events as nonservice-affecting.
+        "
+    ::= { stsAlarmStatusEntry 4 }
+
+
+--
+--	stsOutputRedStatusTable RTRV-OUTPUTRED for OUTPUT card redundancy.
+--
+
+stsOutputCardTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsOutputCardEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "the current state of output card.
+        "
+	::= { stsOutputCard 1 }
+
+stsOutputCardEntry OBJECT-TYPE
+	SYNTAX      StsOutputCardEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Entry of the current state of output card redundancy conditions.
+        "
+	INDEX	{ stsOutputShelf, stsOutputSlot}
+	::= { stsOutputCardTable 1 }
+
+StsOutputCardEntry ::= SEQUENCE {
+	stsOutputShelf
+		INTEGER,
+	stsOutputSlot
+		INTEGER,
+        stsOutputRedState
+		INTEGER,
+        stsOutputRedSwitchState
+		INTEGER,
+	stsOutputCRCCHK
+		INTEGER,
+        stsOutputCAS
+		INTEGER,
+        stsOutputSSM
+		INTEGER,
+        stsOutputSSMValue
+		INTEGER,
+        stsOutputTimingFormat
+		OCTET STRING
+}
+
+
+stsOutputShelf  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					main(100),
+					expansion-1(1),
+					expansion-2(2),
+					expansion-3(3),
+					expansion-4(4)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Output shelf number. Shelf 0 is the main chassis.
+        "
+    ::= { stsOutputCardEntry 1 }
+
+stsOutputSlot  OBJECT-TYPE
+    SYNTAX      INTEGER (1..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Slot number of this shelf. Shelf 0 can only support 8 slots. The rest of shelf can support up to 16 slots.
+        "
+    ::= { stsOutputCardEntry 2 }
+
+
+stsOutputRedState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					active(1),
+					standby(2)
+
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Output card current card status
+        "
+    ::= { stsOutputCardEntry 3 }
+
+stsOutputRedSwitchState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                                        noAction(0),
+					active(1),
+					standby(2)
+
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Provisioning current output card to be redundancy or not. Only slot pair 1 and 2, 3 and 4,5and 6, 7 and 8, 9 and 10, 11 and 12, 13 and 14, 15 and 16 can be redundancy pair. 
+        "
+    ::= { stsOutputCardEntry 4 }
+
+stsOutputCRCCHK  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					enable(1),
+					disable(2)
+
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Provisioning output card CRC check status
+        "
+    ::= { stsOutputCardEntry 5 }
+
+stsOutputCAS  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					enable(1),
+					disable(2)
+
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Provisioning output card CAS enable/disable status
+        "
+    ::= { stsOutputCardEntry 6 }
+
+stsOutputSSM  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					sa4(1),
+					sa5(2),
+					sa6(3),
+					sa7(4),
+					sa8(5)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Provisioning output card SSM.
+        "
+    ::= { stsOutputCardEntry 7 }
+
+stsOutputSSMValue  OBJECT-TYPE
+     SYNTAX      INTEGER {
+					prs(1),
+					stu(2),
+					st2(3),
+					st3(4),
+					sic(5),
+					duc(6)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This object allows users to specify this SSM value.
+prs - primary reference (stratum 1)
+stu - sync traceability unknown
+st2 - stratum 2 reference
+st3 - stratum 3 reference
+sic - sonet minimum clock traceable
+dus - don't use for sync
+        "
+    ::= { stsOutputCardEntry 8 }
+
+stsOutputTimingFormat  OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE(1..60))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Provisioning output card timing format, default is UTC format.
+        "
+    ::= { stsOutputCardEntry 9 }
+
+
+
+--
+--	stsEmmStatusTable RTRV-Emm for Emm status. ED-Emm for provisioning Emm thresholds.
+--
+
+stsEmmStatusTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsEmmStatusEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "the current state of Emm conditions.
+        "
+	::= { stsEmmStatus 1 }
+
+stsEmmStatusEntry OBJECT-TYPE
+	SYNTAX      StsEmmStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Entry of the current state of Emm conditions.
+        "
+	INDEX	{ stsEmmShelf, stsEmmUnitId}
+	::= { stsEmmStatusTable 1 }
+
+StsEmmStatusEntry ::= SEQUENCE {
+	stsEmmShelf
+		INTEGER,
+	stsEmmUnitId
+		INTEGER,
+        stsEmmSensorType
+		INTEGER,
+        stsEmmAlarmStatus
+		INTEGER,
+	stsEmmSensorReading
+		INTEGER,
+        stsEmmMajorAlmHiThresh
+		INTEGER,
+        stsEmmMajorAlmLoThresh
+		INTEGER,
+        stsEmmMinorAlmHiThresh
+		INTEGER,
+        stsEmmMinorAlmLoThresh
+		INTEGER
+}
+
+
+stsEmmShelf  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					main(100),
+					expansion-1(1),
+					expansion-2(2),
+					expansion-3(3)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Output shelf number. Shelf 0 is the main chassis.
+        "
+    ::= { stsEmmStatusEntry 1 }
+
+stsEmmUnitId  OBJECT-TYPE
+    SYNTAX      INTEGER (1..20)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Unique number to identify this Emm sensor in the shelf. 
+        "
+    ::= { stsEmmStatusEntry 2 }
+
+
+stsEmmSensorType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					temp-celsius(1),
+					voltage-mvolt(2)
+
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Sensor type.
+        "
+    ::= { stsEmmStatusEntry 3 }
+
+stsEmmAlarmStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					cr(1),
+					mj(2),
+					mn(3),
+					na(4),
+					nr(5),
+					cl(6)
+
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current alarm level.
+
+cr - Critical alarm
+mj - Major alarm
+mn - Minor alarm
+na - Not alarmed; report as event
+nr - Not reported
+cl - No alarm or alarm cleared; also used in trap
+        "
+    ::= { stsEmmStatusEntry 4 }
+
+
+stsEmmSensorReading  OBJECT-TYPE
+    SYNTAX      INTEGER (-50..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "  The current Emm sensor reading.
+        "
+    ::= { stsEmmStatusEntry 5 }
+
+stsEmmMajorAlmHiThresh  OBJECT-TYPE
+    SYNTAX      INTEGER (-50..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "  The setting value of the majoralarm high threshold of this sensor. 
+                   Not applicable to voltage-mvolt.
+        "
+    ::= { stsEmmStatusEntry 6 }
+
+stsEmmMajorAlmLoThresh  OBJECT-TYPE
+    SYNTAX      INTEGER (-50..100)
+    MAX-ACCESS  read-write 
+    STATUS      current
+    DESCRIPTION "  The setting value of the major alarm low threshold of this sensor.
+                  Not applicable to voltage-mvolt.
+        "
+    ::= { stsEmmStatusEntry 7 }
+
+stsEmmMinorAlmHiThresh  OBJECT-TYPE
+    SYNTAX      INTEGER (-50..100)
+    MAX-ACCESS  read-write 
+    STATUS      current
+    DESCRIPTION "  The setting value of the minor alarm high threshold of this sensor.
+                   Not applicable to voltage-mvolt.
+        "
+    ::= { stsEmmStatusEntry 8 }
+
+
+stsEmmMinorAlmLoThresh  OBJECT-TYPE
+    SYNTAX      INTEGER (-50..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "  The setting value of the minor alarm low threshold of this sensor.
+                  Not applicable to voltage-mvolt.
+        "
+    ::= { stsEmmStatusEntry 9 }
+
+
+--
+--	stsAntTable  SW-ANT, SET-ANT
+--
+
+stsAntTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StsAntEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION   "Antenna table
+        "
+	::= { stsAnt 1 }
+
+stsAntEntry OBJECT-TYPE
+	SYNTAX      StsAntEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION   "Antenna entry.
+        "
+	INDEX	{ stsAntIndex }
+	::= { stsAntTable 1 }
+
+StsAntEntry ::= SEQUENCE {
+	stsAntIndex 
+		INTEGER,
+	stsAntStatus 
+		INTEGER,
+	stsAntSwitchState 
+		INTEGER
+}
+
+stsAntIndex  OBJECT-TYPE
+    SYNTAX      INTEGER (1..2)
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION "Ant module index
+        "
+    ::= { stsAntEntry 1 }
+
+stsAntStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+					active(1),
+					standby(2),
+					failure(3),
+					absent(4)
+
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ant current status
+        "
+    ::= { stsAntEntry 2 }
+
+stsAntSwitchState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                              noAction(0),
+					active(1),
+					standby(2)
+
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Provisioning this Ant to be active or standby. The other Ant (if existed) will change its active/standby state accordingly.
+        "
+    ::= { stsAntEntry 3 }
+
+
+--- TOP Destination table
+
+ stsTopDestTable OBJECT-TYPE 
+	SYNTAX		SEQUENCE OF StsTopDestEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+ DESCRIPTION "The table has the information on the manager receiving traps 
+              " 
+ ::= {  stsTopDest 1 } 
+ 
+ stsTopDestEntry OBJECT-TYPE 
+ SYNTAX       StsTopDestEntry
+ MAX-ACCESS       not-accessible
+ STATUS       current
+ DESCRIPTION "An entry for the manager 
+              " 
+ INDEX { stsTopDestNumber } 
+ ::= { stsTopDestTable 1 } 
+ 
+ StsTopDestEntry ::= 
+ SEQUENCE { 
+            stsTopDestNumber                  INTEGER,
+            stsTopDestIp                      IpAddress,
+            stsTopDestUdpPort                 INTEGER,
+	      stsTopDestVlanId			       INTEGER
+          }
+          
+ stsTopDestNumber OBJECT-TYPE 
+ SYNTAX       INTEGER (1..28)
+ MAX-ACCESS       read-only
+ STATUS       current
+ DESCRIPTION "A device ID of this TOP entry in the table. 
+              " 
+ ::= { stsTopDestEntry 1 }    
+         
+ stsTopDestIp OBJECT-TYPE 
+ SYNTAX       IpAddress
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION "IP address of the destination. 
+              " 
+ ::= { stsTopDestEntry 2 }  
+ 
+ stsTopDestUdpPort OBJECT-TYPE 
+ SYNTAX       INTEGER (0..65535)
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION "UDP port number of the destination.
+              " 
+ ::= { stsTopDestEntry 3 } 
+ 
+
+ stsTopDestVlanId OBJECT-TYPE 
+ SYNTAX       INTEGER (1..32)
+ MAX-ACCESS   read-write
+ STATUS       current
+ DESCRIPTION "VLAN ID for this TOP" 
+ 
+ ::= { stsTopDestEntry 4 } 
+ 
+
+
+--- trap receiver table
+
+ stsTrapRegTable OBJECT-TYPE 
+ SYNTAX       SEQUENCE OF  StsTrapRegEntry 
+ MAX-ACCESS       not-accessible
+ STATUS       current
+ DESCRIPTION "The table has the information on the manager receiving traps 
+              " 
+ ::= {  stsTrapReg 1 } 
+ 
+ stsTrapRegEntry OBJECT-TYPE 
+ SYNTAX       StsTrapRegEntry
+ MAX-ACCESS       not-accessible
+ STATUS       current
+ DESCRIPTION "An entry for the manager 
+              " 
+ INDEX { stsTrapRegMgrNumber } 
+ ::= { stsTrapRegTable 1 } 
+ 
+ StsTrapRegEntry ::= 
+ SEQUENCE { 
+            stsTrapRegMgrNumber                  INTEGER,
+            stsTrapRegMgrIp                      IpAddress,
+            stsTrapRegMgrUdpPort                 INTEGER,
+            stsTrapRegCommunityStr               DisplayString,
+	      stsTrapRegState			    INTEGER
+          }
+          
+ stsTrapRegMgrNumber OBJECT-TYPE 
+ SYNTAX       INTEGER (1..10)
+ MAX-ACCESS       read-only
+ STATUS       current
+ DESCRIPTION "A unique number used as an index to the table. 
+              " 
+ ::= { stsTrapRegEntry 1 }    
+         
+ stsTrapRegMgrIp OBJECT-TYPE 
+ SYNTAX       IpAddress
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION "IP address of the trap receiver manager. 
+              " 
+ ::= { stsTrapRegEntry 2 }  
+ 
+ stsTrapRegMgrUdpPort OBJECT-TYPE 
+ SYNTAX       INTEGER (0..65535)
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION "UDP port number on which the manager receives traps from an agent. 
+              " 
+ 
+ ::= { stsTrapRegEntry 3 } 
+ 
+
+ stsTrapRegCommunityStr OBJECT-TYPE 
+ SYNTAX       DisplayString (SIZE  (0..24))
+ MAX-ACCESS       read-write
+ STATUS       current
+ DESCRIPTION "This object is the community string(up to 20 characters)to be 
+              carried by the traps sent to the registered manager. Each mamanger 
+              can have different community string.
+              " 
+ ::= { stsTrapRegEntry 4 } 
+
+ stsTrapRegState OBJECT-TYPE 
+ SYNTAX       INTEGER {
+				enabled(1),
+				disabled(2)
+			  }
+ MAX-ACCESS   read-write
+ STATUS       current
+ DESCRIPTION "The state of the Trap IP. Trap will not sent to this trap manager if disabled" 
+ ::= { stsTrapRegEntry 5 } 
+ 
+
+
+END
+
+
+

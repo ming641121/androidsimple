@@ -1,0 +1,4523 @@
+/*
+ *
+ * Copyright (C) 1992-2003 by SNMP Research, Incorporated.
+ *
+ * This software is furnished under a license and may be used and copied
+ * only in accordance with the terms of such license and with the
+ * inclusion of the above copyright notice. This software or any other
+ * copies thereof may not be provided or otherwise made available to any
+ * other person. No title to and ownership of the software is hereby
+ * transferred.
+ *
+ * The information in this software is subject to change without notice
+ * and should not be construed as a commitment by SNMP Research, Incorporated.
+ *
+ * Restricted Rights Legend:
+ *  Use, duplication, or disclosure by the Government is subject to
+ *  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+ *  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+ *  subparagraphs (c)(4) and (d) of the Commercial Computer
+ *  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+ *  clauses in the NASA FAR Supplement and other corresponding
+ *  governmental regulations.
+ *
+ */
+
+/*
+ *                PROPRIETARY NOTICE
+ *
+ * This software is an unpublished work subject to a confidentiality agreement
+ * and is protected by copyright and trade secret law.  Unauthorized copying,
+ * redistribution or other use of this work is prohibited.
+ *
+ * The above notice of copyright on this source code product does not indicate
+ * any actual or intended publication of such source code.
+ */
+
+
+/*
+ * Arguments used to create this file:
+ * -search_table (implies -row_status) -c Larus58k larus58kMib -agent -per_file_init 
+ * 
+ */
+
+#include "sr_conf.h"
+
+#ifdef HAVE_STDIO_H
+#include <stdio.h>
+#endif /* HAVE_STDIO_H */
+
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif	/* HAVE_STDLIB_H */
+
+#ifdef HAVE_MALLOC_H
+#include <malloc.h>
+#endif	/* HAVE_MALLOC_H */
+
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif	/* HAVE_STRING_H */
+
+#ifdef HAVE_MEMORY_H
+#include <memory.h>
+#endif	/* HAVE_MEMORY_H */
+
+#ifdef HAVE_STDDEF_H
+#include <stddef.h>
+#endif /* HAVE_STDDEF_H */
+#include "sr_snmp.h"
+#include "sr_trans.h"
+#include "context.h"
+#include "method.h"
+#include "makevb.h"
+#include "inst_lib.h"
+#include "oid_lib.h"
+#include "lookup.h"
+#include "v2table.h"
+#include "diag.h"
+SR_FILENAME
+#include "min_v.h"
+#include "mibout.h"
+
+const SnmpType sts58kSystemTypeTable[] = {
+    { OCTET_PRIM_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemId), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemMgmtIpOption), -1 },
+    { IP_ADDR_PRIM_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemMgmtIpAddress), -1 },
+    { IP_ADDR_PRIM_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemMgmtIpSubnetMask), -1 },
+    { IP_ADDR_PRIM_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemMgmtIpGatewayAddress), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemSntpIpOption), -1 },
+    { IP_ADDR_PRIM_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemSntpIpAddress), -1 },
+    { IP_ADDR_PRIM_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemSntpIpSubnetMask), -1 },
+    { IP_ADDR_PRIM_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemSntpIpGatewayAddress), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemTime), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemTimeZone), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(sts58kSystem_t, sts58kSystemIntegratedAlarm), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemAlarmAcoMode), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(sts58kSystem_t, sts58kSystemAlarmAcoLed), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemAlarmAcoCutOff), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemAlarmEscalatingTime), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(sts58kSystem_t, sts58kSystemMinorLED), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(sts58kSystem_t, sts58kSystemMajorLED), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(sts58kSystem_t, sts58kSystemCriticalLED), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemUpgradeSWAction), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(sts58kSystem_t, sts58kSystemCurrentSWVersion), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(sts58kSystem_t, sts58kSystemServiceState), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemWarmReset), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemColdReset), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kSystem_t, sts58kSystemConfigReset), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+const SrGetInfoEntry sts58kSystemGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kSystem_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kSystem_t),
+    I_sts58kSystem_max,
+    (SnmpType *) sts58kSystemTypeTable,
+    NULL,
+    (short) offsetof(sts58kSystem_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kSystem family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kSystem_get(OID *incoming, ObjectInfo *object, int searchType,
+                 ContextInfo *contextInfo, int serialNum)
+{
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kSystemGetInfo));
+}
+
+sts58kSystem_t *
+new_k_sts58kSystem_get(int serialNum, ContextInfo *contextInfo,
+                       int nominator, int searchType,
+                       sts58kSystem_t *data)
+{
+    return k_sts58kSystem_get(serialNum, contextInfo, nominator);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kSystem_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kSystem family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static LengthTest_t  sts58kSystemId_len[] = { { 1, 24 } };
+static RangeTest_t   sts58kSystemMgmtIpOption_range[] = { { 1, 2 } };
+static RangeTest_t   sts58kSystemSntpIpOption_range[] = { { 1, 2 } };
+static LengthTest_t  sts58kSystemTime_len[] = { { 1, 8 } };
+static RangeTest_t   sts58kSystemTimeZone_range[] = { { 1, 25 } };
+static RangeTest_t   sts58kSystemAlarmAcoMode_range[] = { { 1, 2 } };
+static RangeTest_t   sts58kSystemAlarmAcoCutOff_range[] = { { 1, 2 } };
+static RangeTest_t   sts58kSystemAlarmEscalatingTime_range[] = { { 1, 360 } };
+static RangeTest_t   sts58kSystemUpgradeSWAction_range[] = { { 1, 2 } };
+static RangeTest_t   sts58kSystemWarmReset_range[] = { { 1, 2 } };
+static RangeTest_t   sts58kSystemColdReset_range[] = { { 1, 2 } };
+static RangeTest_t   sts58kSystemConfigReset_range[] = { { 1, 2 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kSystem family.
+ */
+static struct sr_member_test sts58kSystem_member_test[] =
+{
+    /* sts58kSystemId */
+    { MINV_LENGTH_TEST, 
+      sizeof(sts58kSystemId_len)/sizeof(LengthTest_t), /* 1 */
+      sts58kSystemId_len, DisplayString_test },
+
+    /* sts58kSystemMgmtIpOption */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kSystemMgmtIpOption_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kSystemMgmtIpOption_range, NULL },
+
+    /* sts58kSystemMgmtIpAddress */
+    { MINV_NO_TEST, 0, NULL, NULL },
+
+    /* sts58kSystemMgmtIpSubnetMask */
+    { MINV_NO_TEST, 0, NULL, NULL },
+
+    /* sts58kSystemMgmtIpGatewayAddress */
+    { MINV_NO_TEST, 0, NULL, NULL },
+
+    /* sts58kSystemSntpIpOption */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kSystemSntpIpOption_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kSystemSntpIpOption_range, NULL },
+
+    /* sts58kSystemSntpIpAddress */
+    { MINV_NO_TEST, 0, NULL, NULL },
+
+    /* sts58kSystemSntpIpSubnetMask */
+    { MINV_NO_TEST, 0, NULL, NULL },
+
+    /* sts58kSystemSntpIpGatewayAddress */
+    { MINV_NO_TEST, 0, NULL, NULL },
+
+    /* sts58kSystemTime */
+    { MINV_LENGTH_TEST, 
+      sizeof(sts58kSystemTime_len)/sizeof(LengthTest_t), /* 1 */
+      sts58kSystemTime_len, DisplayString_test },
+
+    /* sts58kSystemTimeZone */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kSystemTimeZone_range)/sizeof(RangeTest_t), /* 25 */
+      sts58kSystemTimeZone_range, NULL },
+
+    /* sts58kSystemIntegratedAlarm */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kSystemAlarmAcoMode */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kSystemAlarmAcoMode_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kSystemAlarmAcoMode_range, NULL },
+
+    /* sts58kSystemAlarmAcoLed */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kSystemAlarmAcoCutOff */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kSystemAlarmAcoCutOff_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kSystemAlarmAcoCutOff_range, NULL },
+
+    /* sts58kSystemAlarmEscalatingTime */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kSystemAlarmEscalatingTime_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kSystemAlarmEscalatingTime_range, NULL },
+
+    /* sts58kSystemMinorLED */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kSystemMajorLED */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kSystemCriticalLED */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kSystemUpgradeSWAction */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kSystemUpgradeSWAction_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kSystemUpgradeSWAction_range, NULL },
+
+    /* sts58kSystemCurrentSWVersion */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kSystemServiceState */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kSystemWarmReset */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kSystemWarmReset_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kSystemWarmReset_range, NULL },
+
+    /* sts58kSystemColdReset */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kSystemColdReset_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kSystemColdReset_range, NULL },
+
+    /* sts58kSystemConfigReset */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kSystemConfigReset_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kSystemConfigReset_range, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kSystem family.
+ */
+const SrTestInfoEntry sts58kSystemTestInfo = {
+    &sts58kSystemGetInfo,
+    sts58kSystem_member_test,
+    NULL,
+    k_sts58kSystem_test,
+    k_sts58kSystem_ready,
+#ifdef SR_sts58kSystem_UNDO
+    sts58kSystem_undo,
+#else /* SR_sts58kSystem_UNDO */
+    NULL,
+#endif /* SR_sts58kSystem_UNDO */
+    sts58kSystem_ready,
+    sts58kSystem_set,
+    sts58kSystem_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kSystem set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kSystem_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kSystemTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kSystem family
+ *---------------------------------------------------------------------*/
+sts58kSystem_t *
+Clone_sts58kSystem(sts58kSystem_t *sts58kSystem)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kSystem,
+                         sts58kSystemGetInfo.family_size,
+                         sts58kSystemGetInfo.type_table,
+                         sts58kSystemGetInfo.highest_nominator,
+                         sts58kSystemGetInfo.valid_offset,
+                         sts58kSystemTestInfo.userpart_clone_func,
+                         sts58kSystemGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kSystem_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                  doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kSystemTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kSystem_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kSystemTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kSystem_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kSystem_set((sts58kSystem_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+const SnmpType sts58kClockInputTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kClockInput_t, sts58kClockInputManualSelect), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kClockInput_t, sts58kClockInputOperMode), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kClockInput_t, sts58kClockInputProtectedPri), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kClockInput_t, sts58kClockInputSetSlip), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(sts58kClockInput_t, sts58kClockInputType), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+const SrGetInfoEntry sts58kClockInputGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kClockInput_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kClockInput_t),
+    I_sts58kClockInput_max,
+    (SnmpType *) sts58kClockInputTypeTable,
+    NULL,
+    (short) offsetof(sts58kClockInput_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kClockInput family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kClockInput_get(OID *incoming, ObjectInfo *object, int searchType,
+                     ContextInfo *contextInfo, int serialNum)
+{
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kClockInputGetInfo));
+}
+
+sts58kClockInput_t *
+new_k_sts58kClockInput_get(int serialNum, ContextInfo *contextInfo,
+                           int nominator, int searchType,
+                           sts58kClockInput_t *data)
+{
+    return k_sts58kClockInput_get(serialNum, contextInfo, nominator);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kClockInput_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kClockInput family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static RangeTest_t   sts58kClockInputManualSelect_range[] = { { 1, 5 } };
+static RangeTest_t   sts58kClockInputOperMode_range[] = { { 1, 2 } };
+static RangeTest_t   sts58kClockInputProtectedPri_range[] = { { 1, 3 } };
+static RangeTest_t   sts58kClockInputSetSlip_range[] = { { 1, 6 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kClockInput family.
+ */
+static struct sr_member_test sts58kClockInput_member_test[] =
+{
+    /* sts58kClockInputManualSelect */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kClockInputManualSelect_range)/sizeof(RangeTest_t), /* 5 */
+      sts58kClockInputManualSelect_range, NULL },
+
+    /* sts58kClockInputOperMode */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kClockInputOperMode_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kClockInputOperMode_range, NULL },
+
+    /* sts58kClockInputProtectedPri */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kClockInputProtectedPri_range)/sizeof(RangeTest_t), /* 3 */
+      sts58kClockInputProtectedPri_range, NULL },
+
+    /* sts58kClockInputSetSlip */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kClockInputSetSlip_range)/sizeof(RangeTest_t), /* 6 */
+      sts58kClockInputSetSlip_range, NULL },
+
+    /* sts58kClockInputType */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kClockInput family.
+ */
+const SrTestInfoEntry sts58kClockInputTestInfo = {
+    &sts58kClockInputGetInfo,
+    sts58kClockInput_member_test,
+    NULL,
+    k_sts58kClockInput_test,
+    k_sts58kClockInput_ready,
+#ifdef SR_sts58kClockInput_UNDO
+    sts58kClockInput_undo,
+#else /* SR_sts58kClockInput_UNDO */
+    NULL,
+#endif /* SR_sts58kClockInput_UNDO */
+    sts58kClockInput_ready,
+    sts58kClockInput_set,
+    sts58kClockInput_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kClockInput set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kClockInput_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kClockInputTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kClockInput family
+ *---------------------------------------------------------------------*/
+sts58kClockInput_t *
+Clone_sts58kClockInput(sts58kClockInput_t *sts58kClockInput)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kClockInput,
+                         sts58kClockInputGetInfo.family_size,
+                         sts58kClockInputGetInfo.type_table,
+                         sts58kClockInputGetInfo.highest_nominator,
+                         sts58kClockInputGetInfo.valid_offset,
+                         sts58kClockInputTestInfo.userpart_clone_func,
+                         sts58kClockInputGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kClockInput_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                      doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kClockInputTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kClockInput_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kClockInputTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kClockInput_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kClockInput_set((sts58kClockInput_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+const SnmpType sts58kClockInputSSMTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kClockInputSSM_t, sts58kClockInputSSMSelect), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+const SrGetInfoEntry sts58kClockInputSSMGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kClockInputSSM_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kClockInputSSM_t),
+    I_sts58kClockInputSSM_max,
+    (SnmpType *) sts58kClockInputSSMTypeTable,
+    NULL,
+    (short) offsetof(sts58kClockInputSSM_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kClockInputSSM family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kClockInputSSM_get(OID *incoming, ObjectInfo *object, int searchType,
+                        ContextInfo *contextInfo, int serialNum)
+{
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kClockInputSSMGetInfo));
+}
+
+sts58kClockInputSSM_t *
+new_k_sts58kClockInputSSM_get(int serialNum, ContextInfo *contextInfo,
+                              int nominator, int searchType,
+                              sts58kClockInputSSM_t *data)
+{
+    return k_sts58kClockInputSSM_get(serialNum, contextInfo, nominator);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kClockInputSSM_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kClockInputSSM family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static RangeTest_t   sts58kClockInputSSMSelect_range[] = { { 1, 6 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kClockInputSSM family.
+ */
+static struct sr_member_test sts58kClockInputSSM_member_test[] =
+{
+    /* sts58kClockInputSSMSelect */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kClockInputSSMSelect_range)/sizeof(RangeTest_t), /* 6 */
+      sts58kClockInputSSMSelect_range, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kClockInputSSM family.
+ */
+const SrTestInfoEntry sts58kClockInputSSMTestInfo = {
+    &sts58kClockInputSSMGetInfo,
+    sts58kClockInputSSM_member_test,
+    NULL,
+    k_sts58kClockInputSSM_test,
+    k_sts58kClockInputSSM_ready,
+#ifdef SR_sts58kClockInputSSM_UNDO
+    sts58kClockInputSSM_undo,
+#else /* SR_sts58kClockInputSSM_UNDO */
+    NULL,
+#endif /* SR_sts58kClockInputSSM_UNDO */
+    sts58kClockInputSSM_ready,
+    sts58kClockInputSSM_set,
+    sts58kClockInputSSM_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kClockInputSSM set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kClockInputSSM_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kClockInputSSMTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kClockInputSSM family
+ *---------------------------------------------------------------------*/
+sts58kClockInputSSM_t *
+Clone_sts58kClockInputSSM(sts58kClockInputSSM_t *sts58kClockInputSSM)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kClockInputSSM,
+                         sts58kClockInputSSMGetInfo.family_size,
+                         sts58kClockInputSSMGetInfo.type_table,
+                         sts58kClockInputSSMGetInfo.highest_nominator,
+                         sts58kClockInputSSMGetInfo.valid_offset,
+                         sts58kClockInputSSMTestInfo.userpart_clone_func,
+                         sts58kClockInputSSMGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kClockInputSSM_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                         doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kClockInputSSMTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kClockInputSSM_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kClockInputSSMTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kClockInputSSM_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kClockInputSSM_set((sts58kClockInputSSM_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+const SnmpType sts58kTopTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kTop_t, sts58kTopSourceIpOption), -1 },
+    { IP_ADDR_PRIM_TYPE, SR_READ_WRITE, offsetof(sts58kTop_t, sts58kTopSourceIpAddress), -1 },
+    { IP_ADDR_PRIM_TYPE, SR_READ_WRITE, offsetof(sts58kTop_t, sts58kTopSourceIpSubnetMask), -1 },
+    { IP_ADDR_PRIM_TYPE, SR_READ_WRITE, offsetof(sts58kTop_t, sts58kTopSourceIpGatewayAddress), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kTop_t, sts58kTopPacketRate), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(sts58kTop_t, sts58kTopInputSelect), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(sts58kTop_t, sts58kTopTxPackets), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(sts58kTop_t, sts58kTopTxBytes), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+const SrGetInfoEntry sts58kTopGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kTop_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kTop_t),
+    I_sts58kTop_max,
+    (SnmpType *) sts58kTopTypeTable,
+    NULL,
+    (short) offsetof(sts58kTop_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kTop family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kTop_get(OID *incoming, ObjectInfo *object, int searchType,
+              ContextInfo *contextInfo, int serialNum)
+{
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kTopGetInfo));
+}
+
+sts58kTop_t *
+new_k_sts58kTop_get(int serialNum, ContextInfo *contextInfo,
+                    int nominator, int searchType,
+                    sts58kTop_t *data)
+{
+    return k_sts58kTop_get(serialNum, contextInfo, nominator);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kTop_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kTop family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static RangeTest_t   sts58kTopSourceIpOption_range[] = { { 1, 2 } };
+static RangeTest_t   sts58kTopPacketRate_range[] = { { 10, 1000 } };
+static RangeTest_t   sts58kTopInputSelect_range[] = { { 1, 3 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kTop family.
+ */
+static struct sr_member_test sts58kTop_member_test[] =
+{
+    /* sts58kTopSourceIpOption */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kTopSourceIpOption_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kTopSourceIpOption_range, NULL },
+
+    /* sts58kTopSourceIpAddress */
+    { MINV_NO_TEST, 0, NULL, NULL },
+
+    /* sts58kTopSourceIpSubnetMask */
+    { MINV_NO_TEST, 0, NULL, NULL },
+
+    /* sts58kTopSourceIpGatewayAddress */
+    { MINV_NO_TEST, 0, NULL, NULL },
+
+    /* sts58kTopPacketRate */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kTopPacketRate_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kTopPacketRate_range, NULL },
+
+    /* sts58kTopInputSelect */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kTopInputSelect_range)/sizeof(RangeTest_t), /* 3 */
+      sts58kTopInputSelect_range, NULL },
+
+    /* sts58kTopTxPackets */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kTopTxBytes */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kTop family.
+ */
+const SrTestInfoEntry sts58kTopTestInfo = {
+    &sts58kTopGetInfo,
+    sts58kTop_member_test,
+    NULL,
+    k_sts58kTop_test,
+    k_sts58kTop_ready,
+#ifdef SR_sts58kTop_UNDO
+    sts58kTop_undo,
+#else /* SR_sts58kTop_UNDO */
+    NULL,
+#endif /* SR_sts58kTop_UNDO */
+    sts58kTop_ready,
+    sts58kTop_set,
+    sts58kTop_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kTop set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kTop_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kTopTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kTop family
+ *---------------------------------------------------------------------*/
+sts58kTop_t *
+Clone_sts58kTop(sts58kTop_t *sts58kTop)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kTop,
+                         sts58kTopGetInfo.family_size,
+                         sts58kTopGetInfo.type_table,
+                         sts58kTopGetInfo.highest_nominator,
+                         sts58kTopGetInfo.valid_offset,
+                         sts58kTopTestInfo.userpart_clone_func,
+                         sts58kTopGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kTop_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+               doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kTopTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kTop_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kTopTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kTop_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kTop_set((sts58kTop_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kClockInputStatusEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kClockInputStatusEntryTypeTable[];
+
+const SrIndexInfo sts58kClockInputStatusEntryIndexInfo[] = {
+#ifdef I_sts58kClockInputStatusIndex
+    { I_sts58kClockInputStatusIndex, T_uint, -1 },
+#endif /* I_sts58kClockInputStatusIndex */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kClockInputStatusEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kClockInputStatusEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kClockInputStatusEntry_t),
+    I_sts58kClockInputStatusEntry_max,
+    (SnmpType *) sts58kClockInputStatusEntryTypeTable,
+    sts58kClockInputStatusEntryIndexInfo,
+    (short) offsetof(sts58kClockInputStatusEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kClockInputStatusEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kClockInputStatusEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                                ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kClockInputStatusIndex)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kClockInputStatusEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kClockInputStatusEntry_t *
+new_k_sts58kClockInputStatusEntry_get(int serialNum, ContextInfo *contextInfo,
+                                      int nominator, int searchType,
+                                      sts58kClockInputStatusEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kClockInputStatusEntry_get(serialNum, contextInfo, nominator,
+                                             searchType,
+                                             data->sts58kClockInputStatusIndex);
+}
+
+/*----------------------------------------------------------------------
+ * Free the sts58kClockInputStatusEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kClockInputStatusEntry_free(sts58kClockInputStatusEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kClockInputStatusEntryGetInfo.type_table,
+                 sts58kClockInputStatusEntryGetInfo.highest_nominator,
+                 sts58kClockInputStatusEntryGetInfo.valid_offset,
+                 sts58kClockInputStatusEntryGetInfo.userpart_free_func);
+}
+
+/*
+ * The sts58kClockInputSSMEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kClockInputSSMEntryTypeTable[];
+
+const SrIndexInfo sts58kClockInputSSMEntryIndexInfo[] = {
+#ifdef I_sts58kClockInputSSMIndex
+    { I_sts58kClockInputSSMIndex, T_uint, -1 },
+#endif /* I_sts58kClockInputSSMIndex */
+#ifdef I_sts58kClockInputSSMType
+    { I_sts58kClockInputSSMType, T_uint, -1 },
+#endif /* I_sts58kClockInputSSMType */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kClockInputSSMEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kClockInputSSMEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kClockInputSSMEntry_t),
+    I_sts58kClockInputSSMEntry_max,
+    (SnmpType *) sts58kClockInputSSMEntryTypeTable,
+    sts58kClockInputSSMEntryIndexInfo,
+    (short) offsetof(sts58kClockInputSSMEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kClockInputSSMEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kClockInputSSMEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                             ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kClockInputSSMIndex) || !defined(I_sts58kClockInputSSMType)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kClockInputSSMEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kClockInputSSMEntry_t *
+new_k_sts58kClockInputSSMEntry_get(int serialNum, ContextInfo *contextInfo,
+                                   int nominator, int searchType,
+                                   sts58kClockInputSSMEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kClockInputSSMEntry_get(serialNum, contextInfo, nominator,
+                                          searchType,
+                                          data->sts58kClockInputSSMIndex,
+                                          data->sts58kClockInputSSMType);
+}
+
+/*----------------------------------------------------------------------
+ * Free the sts58kClockInputSSMEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kClockInputSSMEntry_free(sts58kClockInputSSMEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kClockInputSSMEntryGetInfo.type_table,
+                 sts58kClockInputSSMEntryGetInfo.highest_nominator,
+                 sts58kClockInputSSMEntryGetInfo.valid_offset,
+                 sts58kClockInputSSMEntryGetInfo.userpart_free_func);
+}
+
+/*
+ * The sts58kCardEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kCardEntryTypeTable[];
+
+const SrIndexInfo sts58kCardEntryIndexInfo[] = {
+#ifdef I_sts58kCardShelf
+    { I_sts58kCardShelf, T_uint, -1 },
+#endif /* I_sts58kCardShelf */
+#ifdef I_sts58kCardIndex
+    { I_sts58kCardIndex, T_uint, -1 },
+#endif /* I_sts58kCardIndex */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kCardEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kCardEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kCardEntry_t),
+    I_sts58kCardEntry_max,
+    (SnmpType *) sts58kCardEntryTypeTable,
+    sts58kCardEntryIndexInfo,
+    (short) offsetof(sts58kCardEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kCardEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kCardEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                    ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kCardShelf) || !defined(I_sts58kCardIndex)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kCardEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kCardEntry_t *
+new_k_sts58kCardEntry_get(int serialNum, ContextInfo *contextInfo,
+                          int nominator, int searchType,
+                          sts58kCardEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kCardEntry_get(serialNum, contextInfo, nominator,
+                                 searchType, data->sts58kCardShelf,
+                                 data->sts58kCardIndex);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kCardEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kCardEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static EnumIntTest_t sts58kCardShelf_enums[] = { 100, 1, 2, 3, 4 };
+static RangeTest_t   sts58kCardIndex_range[] = { { 1, 23 } };
+static RangeTest_t   sts58kCardReset_range[] = { { 1, 2 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kCardEntry family.
+ */
+static struct sr_member_test sts58kCardEntry_member_test[] =
+{
+    /* sts58kCardShelf */
+    { MINV_INTEGER_ENUM_TEST, 
+    sizeof(sts58kCardShelf_enums)/sizeof(EnumIntTest_t),
+    sts58kCardShelf_enums, NULL },
+
+    /* sts58kCardIndex */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kCardIndex_range)/sizeof(RangeTest_t), /* 23 */
+      sts58kCardIndex_range, NULL },
+
+    /* sts58kCardType */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kCardDescr */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kCardSerial */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kCardHwVersion */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kCardCLEICode */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kCardOperStatus */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kCardReset */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kCardReset_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kCardReset_range, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kCardEntry family.
+ */
+const SrTestInfoEntry sts58kCardEntryTestInfo = {
+    &sts58kCardEntryGetInfo,
+    sts58kCardEntry_member_test,
+#ifdef sts58kCardEntry_READ_CREATE
+    k_sts58kCardEntry_set_defaults,
+#else /* sts58kCardEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kCardEntry_READ_CREATE */
+    k_sts58kCardEntry_test,
+    k_sts58kCardEntry_ready,
+#ifdef SR_sts58kCardEntry_UNDO
+    sts58kCardEntry_undo,
+#else /* SR_sts58kCardEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kCardEntry_UNDO */
+    sts58kCardEntry_ready,
+    sts58kCardEntry_set,
+    sts58kCardEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kCardEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kCardEntry_free(sts58kCardEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kCardEntryGetInfo.type_table,
+                 sts58kCardEntryGetInfo.highest_nominator,
+                 sts58kCardEntryGetInfo.valid_offset,
+                 sts58kCardEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kCardEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kCardEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kCardEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kCardEntry family
+ *---------------------------------------------------------------------*/
+sts58kCardEntry_t *
+Clone_sts58kCardEntry(sts58kCardEntry_t *sts58kCardEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kCardEntry,
+                         sts58kCardEntryGetInfo.family_size,
+                         sts58kCardEntryGetInfo.type_table,
+                         sts58kCardEntryGetInfo.highest_nominator,
+                         sts58kCardEntryGetInfo.valid_offset,
+                         sts58kCardEntryTestInfo.userpart_clone_func,
+                         sts58kCardEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kCardEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                     doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kCardEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kCardEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kCardEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kCardEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kCardEntry_set((sts58kCardEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kOscillatorEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kOscillatorEntryTypeTable[];
+
+const SrIndexInfo sts58kOscillatorEntryIndexInfo[] = {
+#ifdef I_sts58kOscillatorIndex
+    { I_sts58kOscillatorIndex, T_uint, -1 },
+#endif /* I_sts58kOscillatorIndex */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kOscillatorEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kOscillatorEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kOscillatorEntry_t),
+    I_sts58kOscillatorEntry_max,
+    (SnmpType *) sts58kOscillatorEntryTypeTable,
+    sts58kOscillatorEntryIndexInfo,
+    (short) offsetof(sts58kOscillatorEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kOscillatorEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kOscillatorEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                          ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kOscillatorIndex)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kOscillatorEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kOscillatorEntry_t *
+new_k_sts58kOscillatorEntry_get(int serialNum, ContextInfo *contextInfo,
+                                int nominator, int searchType,
+                                sts58kOscillatorEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kOscillatorEntry_get(serialNum, contextInfo, nominator,
+                                       searchType,
+                                       data->sts58kOscillatorIndex);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kOscillatorEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kOscillatorEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static RangeTest_t   sts58kOscillatorIndex_range[] = { { 1, 2 } };
+static RangeTest_t   sts58kOscillatorSetActive_range[] = { { 1, 2 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kOscillatorEntry family.
+ */
+static struct sr_member_test sts58kOscillatorEntry_member_test[] =
+{
+    /* sts58kOscillatorIndex */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOscillatorIndex_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kOscillatorIndex_range, NULL },
+
+    /* sts58kOscillatorModuleType */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kOscillatorEFER */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kOscillatorESSD */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kOscillatorESSN */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kOscillatorFAGE */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kOscillatorTIMD */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kOscillatorSetActive */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOscillatorSetActive_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kOscillatorSetActive_range, NULL },
+
+    /* sts58kOscillatorStatus */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kOscillatorEntry family.
+ */
+const SrTestInfoEntry sts58kOscillatorEntryTestInfo = {
+    &sts58kOscillatorEntryGetInfo,
+    sts58kOscillatorEntry_member_test,
+#ifdef sts58kOscillatorEntry_READ_CREATE
+    k_sts58kOscillatorEntry_set_defaults,
+#else /* sts58kOscillatorEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kOscillatorEntry_READ_CREATE */
+    k_sts58kOscillatorEntry_test,
+    k_sts58kOscillatorEntry_ready,
+#ifdef SR_sts58kOscillatorEntry_UNDO
+    sts58kOscillatorEntry_undo,
+#else /* SR_sts58kOscillatorEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kOscillatorEntry_UNDO */
+    sts58kOscillatorEntry_ready,
+    sts58kOscillatorEntry_set,
+    sts58kOscillatorEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kOscillatorEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kOscillatorEntry_free(sts58kOscillatorEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kOscillatorEntryGetInfo.type_table,
+                 sts58kOscillatorEntryGetInfo.highest_nominator,
+                 sts58kOscillatorEntryGetInfo.valid_offset,
+                 sts58kOscillatorEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kOscillatorEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kOscillatorEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kOscillatorEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kOscillatorEntry family
+ *---------------------------------------------------------------------*/
+sts58kOscillatorEntry_t *
+Clone_sts58kOscillatorEntry(sts58kOscillatorEntry_t *sts58kOscillatorEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kOscillatorEntry,
+                         sts58kOscillatorEntryGetInfo.family_size,
+                         sts58kOscillatorEntryGetInfo.type_table,
+                         sts58kOscillatorEntryGetInfo.highest_nominator,
+                         sts58kOscillatorEntryGetInfo.valid_offset,
+                         sts58kOscillatorEntryTestInfo.userpart_clone_func,
+                         sts58kOscillatorEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kOscillatorEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                           doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kOscillatorEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kOscillatorEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kOscillatorEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kOscillatorEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kOscillatorEntry_set((sts58kOscillatorEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kGpsEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kGpsEntryTypeTable[];
+
+const SrIndexInfo sts58kGpsEntryIndexInfo[] = {
+#ifdef I_sts58kGpsIndex
+    { I_sts58kGpsIndex, T_uint, -1 },
+#endif /* I_sts58kGpsIndex */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kGpsEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kGpsEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kGpsEntry_t),
+    I_sts58kGpsEntry_max,
+    (SnmpType *) sts58kGpsEntryTypeTable,
+    sts58kGpsEntryIndexInfo,
+    (short) offsetof(sts58kGpsEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kGpsEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kGpsEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                   ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kGpsIndex)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kGpsEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kGpsEntry_t *
+new_k_sts58kGpsEntry_get(int serialNum, ContextInfo *contextInfo,
+                         int nominator, int searchType,
+                         sts58kGpsEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kGpsEntry_get(serialNum, contextInfo, nominator,
+                                searchType, data->sts58kGpsIndex);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kGpsEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kGpsEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static RangeTest_t   sts58kGpsIndex_range[] = { { 1, 2 } };
+static LengthTest_t  sts58kGpsSPOS_len[] = { { 1, 80 } };
+static LengthTest_t  sts58kGpsTRMO_len[] = { { 1, 80 } };
+static RangeTest_t   sts58kGpsReset_range[] = { { 0, 1 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kGpsEntry family.
+ */
+static struct sr_member_test sts58kGpsEntry_member_test[] =
+{
+    /* sts58kGpsIndex */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kGpsIndex_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kGpsIndex_range, NULL },
+
+    /* sts58kGpsStatus */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsANTD */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsAZEL */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsRSTG */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsBITS */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsPAVG */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsSIGQ */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsSPOS */
+    { MINV_LENGTH_TEST, 
+      sizeof(sts58kGpsSPOS_len)/sizeof(LengthTest_t), /* 1 */
+      sts58kGpsSPOS_len, NULL },
+
+    /* sts58kGpsTRMO */
+    { MINV_LENGTH_TEST, 
+      sizeof(sts58kGpsTRMO_len)/sizeof(LengthTest_t), /* 1 */
+      sts58kGpsTRMO_len, NULL },
+
+    /* sts58kGpsUTCT */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsVERS */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsDETF */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsEFER */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsESSD */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsESSN */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsFAGE */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsTIMD */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kGpsReset */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kGpsReset_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kGpsReset_range, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kGpsEntry family.
+ */
+const SrTestInfoEntry sts58kGpsEntryTestInfo = {
+    &sts58kGpsEntryGetInfo,
+    sts58kGpsEntry_member_test,
+#ifdef sts58kGpsEntry_READ_CREATE
+    k_sts58kGpsEntry_set_defaults,
+#else /* sts58kGpsEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kGpsEntry_READ_CREATE */
+    k_sts58kGpsEntry_test,
+    k_sts58kGpsEntry_ready,
+#ifdef SR_sts58kGpsEntry_UNDO
+    sts58kGpsEntry_undo,
+#else /* SR_sts58kGpsEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kGpsEntry_UNDO */
+    sts58kGpsEntry_ready,
+    sts58kGpsEntry_set,
+    sts58kGpsEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kGpsEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kGpsEntry_free(sts58kGpsEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kGpsEntryGetInfo.type_table,
+                 sts58kGpsEntryGetInfo.highest_nominator,
+                 sts58kGpsEntryGetInfo.valid_offset,
+                 sts58kGpsEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kGpsEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kGpsEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kGpsEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kGpsEntry family
+ *---------------------------------------------------------------------*/
+sts58kGpsEntry_t *
+Clone_sts58kGpsEntry(sts58kGpsEntry_t *sts58kGpsEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kGpsEntry,
+                         sts58kGpsEntryGetInfo.family_size,
+                         sts58kGpsEntryGetInfo.type_table,
+                         sts58kGpsEntryGetInfo.highest_nominator,
+                         sts58kGpsEntryGetInfo.valid_offset,
+                         sts58kGpsEntryTestInfo.userpart_clone_func,
+                         sts58kGpsEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kGpsEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                    doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kGpsEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kGpsEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kGpsEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kGpsEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kGpsEntry_set((sts58kGpsEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kLinkEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kLinkEntryTypeTable[];
+
+const SrIndexInfo sts58kLinkEntryIndexInfo[] = {
+#ifdef I_sts58kLinkIndex
+    { I_sts58kLinkIndex, T_uint, -1 },
+#endif /* I_sts58kLinkIndex */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kLinkEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kLinkEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kLinkEntry_t),
+    I_sts58kLinkEntry_max,
+    (SnmpType *) sts58kLinkEntryTypeTable,
+    sts58kLinkEntryIndexInfo,
+    (short) offsetof(sts58kLinkEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kLinkEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kLinkEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                    ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kLinkIndex)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kLinkEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kLinkEntry_t *
+new_k_sts58kLinkEntry_get(int serialNum, ContextInfo *contextInfo,
+                          int nominator, int searchType,
+                          sts58kLinkEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kLinkEntry_get(serialNum, contextInfo, nominator,
+                                 searchType, data->sts58kLinkIndex);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kLinkEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kLinkEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static RangeTest_t   sts58kLinkIndex_range[] = { { 1, 5 } };
+static RangeTest_t   sts58kLinkType_range[] = { { 1, 5 } };
+static RangeTest_t   sts58kLinkEnable_range[] = { { 1, 2 } };
+static RangeTest_t   sts58kLinkLineCode_range[] = { { 1, 6 } };
+static RangeTest_t   sts58kLinkFMT_range[] = { { 1, 11 } };
+static RangeTest_t   sts58kLinkTermination_range[] = { { 1, 4 } };
+static RangeTest_t   sts58kLinkMFCHK_range[] = { { 1, 2 } };
+static LengthTest_t  sts58kLinkId_len[] = { { 1, 24 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kLinkEntry family.
+ */
+static struct sr_member_test sts58kLinkEntry_member_test[] =
+{
+    /* sts58kLinkIndex */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kLinkIndex_range)/sizeof(RangeTest_t), /* 5 */
+      sts58kLinkIndex_range, NULL },
+
+    /* sts58kLinkType */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kLinkType_range)/sizeof(RangeTest_t), /* 5 */
+      sts58kLinkType_range, NULL },
+
+    /* sts58kLinkEnable */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kLinkEnable_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kLinkEnable_range, NULL },
+
+    /* sts58kLinkLineCode */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kLinkLineCode_range)/sizeof(RangeTest_t), /* 6 */
+      sts58kLinkLineCode_range, NULL },
+
+    /* sts58kLinkFMT */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kLinkFMT_range)/sizeof(RangeTest_t), /* 11 */
+      sts58kLinkFMT_range, NULL },
+
+    /* sts58kLinkTermination */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kLinkTermination_range)/sizeof(RangeTest_t), /* 4 */
+      sts58kLinkTermination_range, NULL },
+
+    /* sts58kLinkMFCHK */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kLinkMFCHK_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kLinkMFCHK_range, NULL },
+
+    /* sts58kLinkId */
+    { MINV_LENGTH_TEST, 
+      sizeof(sts58kLinkId_len)/sizeof(LengthTest_t), /* 1 */
+      sts58kLinkId_len, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kLinkEntry family.
+ */
+const SrTestInfoEntry sts58kLinkEntryTestInfo = {
+    &sts58kLinkEntryGetInfo,
+    sts58kLinkEntry_member_test,
+#ifdef sts58kLinkEntry_READ_CREATE
+    k_sts58kLinkEntry_set_defaults,
+#else /* sts58kLinkEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kLinkEntry_READ_CREATE */
+    k_sts58kLinkEntry_test,
+    k_sts58kLinkEntry_ready,
+#ifdef SR_sts58kLinkEntry_UNDO
+    sts58kLinkEntry_undo,
+#else /* SR_sts58kLinkEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kLinkEntry_UNDO */
+    sts58kLinkEntry_ready,
+    sts58kLinkEntry_set,
+    sts58kLinkEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kLinkEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kLinkEntry_free(sts58kLinkEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kLinkEntryGetInfo.type_table,
+                 sts58kLinkEntryGetInfo.highest_nominator,
+                 sts58kLinkEntryGetInfo.valid_offset,
+                 sts58kLinkEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kLinkEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kLinkEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kLinkEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kLinkEntry family
+ *---------------------------------------------------------------------*/
+sts58kLinkEntry_t *
+Clone_sts58kLinkEntry(sts58kLinkEntry_t *sts58kLinkEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kLinkEntry,
+                         sts58kLinkEntryGetInfo.family_size,
+                         sts58kLinkEntryGetInfo.type_table,
+                         sts58kLinkEntryGetInfo.highest_nominator,
+                         sts58kLinkEntryGetInfo.valid_offset,
+                         sts58kLinkEntryTestInfo.userpart_clone_func,
+                         sts58kLinkEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kLinkEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                     doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kLinkEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kLinkEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kLinkEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kLinkEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kLinkEntry_set((sts58kLinkEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kShelfEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kShelfEntryTypeTable[];
+
+const SrIndexInfo sts58kShelfEntryIndexInfo[] = {
+#ifdef I_sts58kShelfIndex
+    { I_sts58kShelfIndex, T_uint, -1 },
+#endif /* I_sts58kShelfIndex */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kShelfEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kShelfEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kShelfEntry_t),
+    I_sts58kShelfEntry_max,
+    (SnmpType *) sts58kShelfEntryTypeTable,
+    sts58kShelfEntryIndexInfo,
+    (short) offsetof(sts58kShelfEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kShelfEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kShelfEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                     ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kShelfIndex)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kShelfEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kShelfEntry_t *
+new_k_sts58kShelfEntry_get(int serialNum, ContextInfo *contextInfo,
+                           int nominator, int searchType,
+                           sts58kShelfEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kShelfEntry_get(serialNum, contextInfo, nominator,
+                                  searchType, data->sts58kShelfIndex);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kShelfEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kShelfEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static EnumIntTest_t sts58kShelfIndex_enums[] = { 100, 1, 2, 3, 4 };
+static RangeTest_t   sts58kShelfReset_range[] = { { 1, 2 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kShelfEntry family.
+ */
+static struct sr_member_test sts58kShelfEntry_member_test[] =
+{
+    /* sts58kShelfIndex */
+    { MINV_INTEGER_ENUM_TEST, 
+    sizeof(sts58kShelfIndex_enums)/sizeof(EnumIntTest_t),
+    sts58kShelfIndex_enums, NULL },
+
+    /* sts58kShelfSerial */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kShelfCLEICode */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kShelfReset */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kShelfReset_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kShelfReset_range, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kShelfEntry family.
+ */
+const SrTestInfoEntry sts58kShelfEntryTestInfo = {
+    &sts58kShelfEntryGetInfo,
+    sts58kShelfEntry_member_test,
+#ifdef sts58kShelfEntry_READ_CREATE
+    k_sts58kShelfEntry_set_defaults,
+#else /* sts58kShelfEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kShelfEntry_READ_CREATE */
+    k_sts58kShelfEntry_test,
+    k_sts58kShelfEntry_ready,
+#ifdef SR_sts58kShelfEntry_UNDO
+    sts58kShelfEntry_undo,
+#else /* SR_sts58kShelfEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kShelfEntry_UNDO */
+    sts58kShelfEntry_ready,
+    sts58kShelfEntry_set,
+    sts58kShelfEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kShelfEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kShelfEntry_free(sts58kShelfEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kShelfEntryGetInfo.type_table,
+                 sts58kShelfEntryGetInfo.highest_nominator,
+                 sts58kShelfEntryGetInfo.valid_offset,
+                 sts58kShelfEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kShelfEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kShelfEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kShelfEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kShelfEntry family
+ *---------------------------------------------------------------------*/
+sts58kShelfEntry_t *
+Clone_sts58kShelfEntry(sts58kShelfEntry_t *sts58kShelfEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kShelfEntry,
+                         sts58kShelfEntryGetInfo.family_size,
+                         sts58kShelfEntryGetInfo.type_table,
+                         sts58kShelfEntryGetInfo.highest_nominator,
+                         sts58kShelfEntryGetInfo.valid_offset,
+                         sts58kShelfEntryTestInfo.userpart_clone_func,
+                         sts58kShelfEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kShelfEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                      doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kShelfEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kShelfEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kShelfEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kShelfEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kShelfEntry_set((sts58kShelfEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kAlarmThresholdEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kAlarmThresholdEntryTypeTable[];
+
+const SrIndexInfo sts58kAlarmThresholdEntryIndexInfo[] = {
+#ifdef I_sts58kAlarmThresholdCurrentMon
+    { I_sts58kAlarmThresholdCurrentMon, T_uint, -1 },
+#endif /* I_sts58kAlarmThresholdCurrentMon */
+#ifdef I_sts58kAlarmThresholdType
+    { I_sts58kAlarmThresholdType, T_uint, -1 },
+#endif /* I_sts58kAlarmThresholdType */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kAlarmThresholdEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kAlarmThresholdEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kAlarmThresholdEntry_t),
+    I_sts58kAlarmThresholdEntry_max,
+    (SnmpType *) sts58kAlarmThresholdEntryTypeTable,
+    sts58kAlarmThresholdEntryIndexInfo,
+    (short) offsetof(sts58kAlarmThresholdEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kAlarmThresholdEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kAlarmThresholdEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                              ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kAlarmThresholdCurrentMon) || !defined(I_sts58kAlarmThresholdType)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kAlarmThresholdEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kAlarmThresholdEntry_t *
+new_k_sts58kAlarmThresholdEntry_get(int serialNum, ContextInfo *contextInfo,
+                                    int nominator, int searchType,
+                                    sts58kAlarmThresholdEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kAlarmThresholdEntry_get(serialNum, contextInfo, nominator,
+                                           searchType,
+                                           data->sts58kAlarmThresholdCurrentMon,
+                                           data->sts58kAlarmThresholdType);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kAlarmThresholdEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kAlarmThresholdEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static RangeTest_t   sts58kAlarmThresholdCurrentMon_range[] = { { 1, 5 } };
+static RangeTest_t   sts58kAlarmThresholdType_range[] = { { 1, 7 } };
+static RangeTest_t   sts58kAlarmThresholdValue_range[] = { { 0, 10000 } };
+static RangeTest_t   sts58kAlarmThresholdTimeInterval_range[] = { { 1, 8 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kAlarmThresholdEntry family.
+ */
+static struct sr_member_test sts58kAlarmThresholdEntry_member_test[] =
+{
+    /* sts58kAlarmThresholdCurrentMon */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kAlarmThresholdCurrentMon_range)/sizeof(RangeTest_t), /* 5 */
+      sts58kAlarmThresholdCurrentMon_range, NULL },
+
+    /* sts58kAlarmThresholdType */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kAlarmThresholdType_range)/sizeof(RangeTest_t), /* 7 */
+      sts58kAlarmThresholdType_range, NULL },
+
+    /* sts58kAlarmThresholdValue */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kAlarmThresholdValue_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kAlarmThresholdValue_range, NULL },
+
+    /* sts58kAlarmThresholdTimeInterval */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kAlarmThresholdTimeInterval_range)/sizeof(RangeTest_t), /* 8 */
+      sts58kAlarmThresholdTimeInterval_range, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kAlarmThresholdEntry family.
+ */
+const SrTestInfoEntry sts58kAlarmThresholdEntryTestInfo = {
+    &sts58kAlarmThresholdEntryGetInfo,
+    sts58kAlarmThresholdEntry_member_test,
+#ifdef sts58kAlarmThresholdEntry_READ_CREATE
+    k_sts58kAlarmThresholdEntry_set_defaults,
+#else /* sts58kAlarmThresholdEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kAlarmThresholdEntry_READ_CREATE */
+    k_sts58kAlarmThresholdEntry_test,
+    k_sts58kAlarmThresholdEntry_ready,
+#ifdef SR_sts58kAlarmThresholdEntry_UNDO
+    sts58kAlarmThresholdEntry_undo,
+#else /* SR_sts58kAlarmThresholdEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kAlarmThresholdEntry_UNDO */
+    sts58kAlarmThresholdEntry_ready,
+    sts58kAlarmThresholdEntry_set,
+    sts58kAlarmThresholdEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kAlarmThresholdEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kAlarmThresholdEntry_free(sts58kAlarmThresholdEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kAlarmThresholdEntryGetInfo.type_table,
+                 sts58kAlarmThresholdEntryGetInfo.highest_nominator,
+                 sts58kAlarmThresholdEntryGetInfo.valid_offset,
+                 sts58kAlarmThresholdEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kAlarmThresholdEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kAlarmThresholdEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kAlarmThresholdEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kAlarmThresholdEntry family
+ *---------------------------------------------------------------------*/
+sts58kAlarmThresholdEntry_t *
+Clone_sts58kAlarmThresholdEntry(sts58kAlarmThresholdEntry_t *sts58kAlarmThresholdEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kAlarmThresholdEntry,
+                         sts58kAlarmThresholdEntryGetInfo.family_size,
+                         sts58kAlarmThresholdEntryGetInfo.type_table,
+                         sts58kAlarmThresholdEntryGetInfo.highest_nominator,
+                         sts58kAlarmThresholdEntryGetInfo.valid_offset,
+                         sts58kAlarmThresholdEntryTestInfo.userpart_clone_func,
+                         sts58kAlarmThresholdEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kAlarmThresholdEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                               doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kAlarmThresholdEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kAlarmThresholdEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kAlarmThresholdEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kAlarmThresholdEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kAlarmThresholdEntry_set((sts58kAlarmThresholdEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kLinkAlarmEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kLinkAlarmEntryTypeTable[];
+
+const SrIndexInfo sts58kLinkAlarmEntryIndexInfo[] = {
+#ifdef I_sts58kLinkAlarmSettingLinkType
+    { I_sts58kLinkAlarmSettingLinkType, T_uint, -1 },
+#endif /* I_sts58kLinkAlarmSettingLinkType */
+#ifdef I_sts58kLinkAlarmSettingType
+    { I_sts58kLinkAlarmSettingType, T_uint, -1 },
+#endif /* I_sts58kLinkAlarmSettingType */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kLinkAlarmEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kLinkAlarmEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kLinkAlarmEntry_t),
+    I_sts58kLinkAlarmEntry_max,
+    (SnmpType *) sts58kLinkAlarmEntryTypeTable,
+    sts58kLinkAlarmEntryIndexInfo,
+    (short) offsetof(sts58kLinkAlarmEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kLinkAlarmEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kLinkAlarmEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                         ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kLinkAlarmSettingLinkType) || !defined(I_sts58kLinkAlarmSettingType)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kLinkAlarmEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kLinkAlarmEntry_t *
+new_k_sts58kLinkAlarmEntry_get(int serialNum, ContextInfo *contextInfo,
+                               int nominator, int searchType,
+                               sts58kLinkAlarmEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kLinkAlarmEntry_get(serialNum, contextInfo, nominator,
+                                      searchType,
+                                      data->sts58kLinkAlarmSettingLinkType,
+                                      data->sts58kLinkAlarmSettingType);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kLinkAlarmEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kLinkAlarmEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static RangeTest_t   sts58kLinkAlarmSettingLinkType_range[] = { { 1, 8 } };
+static RangeTest_t   sts58kLinkAlarmSettingType_range[] = { { 1, 10 } };
+static RangeTest_t   sts58kLinkAlarmSettingSevirity_range[] = { { 1, 5 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kLinkAlarmEntry family.
+ */
+static struct sr_member_test sts58kLinkAlarmEntry_member_test[] =
+{
+    /* sts58kLinkAlarmSettingLinkType */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kLinkAlarmSettingLinkType_range)/sizeof(RangeTest_t), /* 8 */
+      sts58kLinkAlarmSettingLinkType_range, NULL },
+
+    /* sts58kLinkAlarmSettingType */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kLinkAlarmSettingType_range)/sizeof(RangeTest_t), /* 10 */
+      sts58kLinkAlarmSettingType_range, NULL },
+
+    /* sts58kLinkAlarmSettingSevirity */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kLinkAlarmSettingSevirity_range)/sizeof(RangeTest_t), /* 5 */
+      sts58kLinkAlarmSettingSevirity_range, NULL },
+
+    /* sts58kLinkAlarmSevirity */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kLinkAlarmEntry family.
+ */
+const SrTestInfoEntry sts58kLinkAlarmEntryTestInfo = {
+    &sts58kLinkAlarmEntryGetInfo,
+    sts58kLinkAlarmEntry_member_test,
+#ifdef sts58kLinkAlarmEntry_READ_CREATE
+    k_sts58kLinkAlarmEntry_set_defaults,
+#else /* sts58kLinkAlarmEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kLinkAlarmEntry_READ_CREATE */
+    k_sts58kLinkAlarmEntry_test,
+    k_sts58kLinkAlarmEntry_ready,
+#ifdef SR_sts58kLinkAlarmEntry_UNDO
+    sts58kLinkAlarmEntry_undo,
+#else /* SR_sts58kLinkAlarmEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kLinkAlarmEntry_UNDO */
+    sts58kLinkAlarmEntry_ready,
+    sts58kLinkAlarmEntry_set,
+    sts58kLinkAlarmEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kLinkAlarmEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kLinkAlarmEntry_free(sts58kLinkAlarmEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kLinkAlarmEntryGetInfo.type_table,
+                 sts58kLinkAlarmEntryGetInfo.highest_nominator,
+                 sts58kLinkAlarmEntryGetInfo.valid_offset,
+                 sts58kLinkAlarmEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kLinkAlarmEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kLinkAlarmEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kLinkAlarmEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kLinkAlarmEntry family
+ *---------------------------------------------------------------------*/
+sts58kLinkAlarmEntry_t *
+Clone_sts58kLinkAlarmEntry(sts58kLinkAlarmEntry_t *sts58kLinkAlarmEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kLinkAlarmEntry,
+                         sts58kLinkAlarmEntryGetInfo.family_size,
+                         sts58kLinkAlarmEntryGetInfo.type_table,
+                         sts58kLinkAlarmEntryGetInfo.highest_nominator,
+                         sts58kLinkAlarmEntryGetInfo.valid_offset,
+                         sts58kLinkAlarmEntryTestInfo.userpart_clone_func,
+                         sts58kLinkAlarmEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kLinkAlarmEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                          doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kLinkAlarmEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kLinkAlarmEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kLinkAlarmEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kLinkAlarmEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kLinkAlarmEntry_set((sts58kLinkAlarmEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kOscillatorAlarmEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kOscillatorAlarmEntryTypeTable[];
+
+const SrIndexInfo sts58kOscillatorAlarmEntryIndexInfo[] = {
+#ifdef I_sts58kOscillatorAlarmSettingClock
+    { I_sts58kOscillatorAlarmSettingClock, T_uint, -1 },
+#endif /* I_sts58kOscillatorAlarmSettingClock */
+#ifdef I_sts58kOscillatorAlarmSettingType
+    { I_sts58kOscillatorAlarmSettingType, T_uint, -1 },
+#endif /* I_sts58kOscillatorAlarmSettingType */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kOscillatorAlarmEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kOscillatorAlarmEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kOscillatorAlarmEntry_t),
+    I_sts58kOscillatorAlarmEntry_max,
+    (SnmpType *) sts58kOscillatorAlarmEntryTypeTable,
+    sts58kOscillatorAlarmEntryIndexInfo,
+    (short) offsetof(sts58kOscillatorAlarmEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kOscillatorAlarmEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kOscillatorAlarmEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                               ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kOscillatorAlarmSettingClock) || !defined(I_sts58kOscillatorAlarmSettingType)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kOscillatorAlarmEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kOscillatorAlarmEntry_t *
+new_k_sts58kOscillatorAlarmEntry_get(int serialNum, ContextInfo *contextInfo,
+                                     int nominator, int searchType,
+                                     sts58kOscillatorAlarmEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kOscillatorAlarmEntry_get(serialNum, contextInfo, nominator,
+                                            searchType,
+                                            data->sts58kOscillatorAlarmSettingClock,
+                                            data->sts58kOscillatorAlarmSettingType);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kOscillatorAlarmEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kOscillatorAlarmEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static RangeTest_t   sts58kOscillatorAlarmSettingClock_range[] = { { 1, 3 } };
+static RangeTest_t   sts58kOscillatorAlarmSettingType_range[] = { { 1, 5 } };
+static RangeTest_t   sts58kOscillatorAlarmSettingSeverity_range[] = { { 1, 5 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kOscillatorAlarmEntry family.
+ */
+static struct sr_member_test sts58kOscillatorAlarmEntry_member_test[] =
+{
+    /* sts58kOscillatorAlarmSettingClock */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOscillatorAlarmSettingClock_range)/sizeof(RangeTest_t), /* 3 */
+      sts58kOscillatorAlarmSettingClock_range, NULL },
+
+    /* sts58kOscillatorAlarmSettingType */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOscillatorAlarmSettingType_range)/sizeof(RangeTest_t), /* 5 */
+      sts58kOscillatorAlarmSettingType_range, NULL },
+
+    /* sts58kOscillatorAlarmSettingSeverity */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOscillatorAlarmSettingSeverity_range)/sizeof(RangeTest_t), /* 5 */
+      sts58kOscillatorAlarmSettingSeverity_range, NULL },
+
+    /* sts58kOscillatorAlarmSeverity */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kOscillatorAlarmEntry family.
+ */
+const SrTestInfoEntry sts58kOscillatorAlarmEntryTestInfo = {
+    &sts58kOscillatorAlarmEntryGetInfo,
+    sts58kOscillatorAlarmEntry_member_test,
+#ifdef sts58kOscillatorAlarmEntry_READ_CREATE
+    k_sts58kOscillatorAlarmEntry_set_defaults,
+#else /* sts58kOscillatorAlarmEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kOscillatorAlarmEntry_READ_CREATE */
+    k_sts58kOscillatorAlarmEntry_test,
+    k_sts58kOscillatorAlarmEntry_ready,
+#ifdef SR_sts58kOscillatorAlarmEntry_UNDO
+    sts58kOscillatorAlarmEntry_undo,
+#else /* SR_sts58kOscillatorAlarmEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kOscillatorAlarmEntry_UNDO */
+    sts58kOscillatorAlarmEntry_ready,
+    sts58kOscillatorAlarmEntry_set,
+    sts58kOscillatorAlarmEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kOscillatorAlarmEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kOscillatorAlarmEntry_free(sts58kOscillatorAlarmEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kOscillatorAlarmEntryGetInfo.type_table,
+                 sts58kOscillatorAlarmEntryGetInfo.highest_nominator,
+                 sts58kOscillatorAlarmEntryGetInfo.valid_offset,
+                 sts58kOscillatorAlarmEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kOscillatorAlarmEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kOscillatorAlarmEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kOscillatorAlarmEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kOscillatorAlarmEntry family
+ *---------------------------------------------------------------------*/
+sts58kOscillatorAlarmEntry_t *
+Clone_sts58kOscillatorAlarmEntry(sts58kOscillatorAlarmEntry_t *sts58kOscillatorAlarmEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kOscillatorAlarmEntry,
+                         sts58kOscillatorAlarmEntryGetInfo.family_size,
+                         sts58kOscillatorAlarmEntryGetInfo.type_table,
+                         sts58kOscillatorAlarmEntryGetInfo.highest_nominator,
+                         sts58kOscillatorAlarmEntryGetInfo.valid_offset,
+                         sts58kOscillatorAlarmEntryTestInfo.userpart_clone_func,
+                         sts58kOscillatorAlarmEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kOscillatorAlarmEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                                doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kOscillatorAlarmEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kOscillatorAlarmEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kOscillatorAlarmEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kOscillatorAlarmEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kOscillatorAlarmEntry_set((sts58kOscillatorAlarmEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kOsPwrAlarmEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kOsPwrAlarmEntryTypeTable[];
+
+const SrIndexInfo sts58kOsPwrAlarmEntryIndexInfo[] = {
+#ifdef I_sts58ksPwrAlarmSettingShelf
+    { I_sts58ksPwrAlarmSettingShelf, T_uint, -1 },
+#endif /* I_sts58ksPwrAlarmSettingShelf */
+#ifdef I_sts58kOsPwrAlarmSettingOsPwr
+    { I_sts58kOsPwrAlarmSettingOsPwr, T_uint, -1 },
+#endif /* I_sts58kOsPwrAlarmSettingOsPwr */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kOsPwrAlarmEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kOsPwrAlarmEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kOsPwrAlarmEntry_t),
+    I_sts58kOsPwrAlarmEntry_max,
+    (SnmpType *) sts58kOsPwrAlarmEntryTypeTable,
+    sts58kOsPwrAlarmEntryIndexInfo,
+    (short) offsetof(sts58kOsPwrAlarmEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kOsPwrAlarmEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kOsPwrAlarmEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                          ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58ksPwrAlarmSettingShelf) || !defined(I_sts58kOsPwrAlarmSettingOsPwr)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kOsPwrAlarmEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kOsPwrAlarmEntry_t *
+new_k_sts58kOsPwrAlarmEntry_get(int serialNum, ContextInfo *contextInfo,
+                                int nominator, int searchType,
+                                sts58kOsPwrAlarmEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kOsPwrAlarmEntry_get(serialNum, contextInfo, nominator,
+                                       searchType,
+                                       data->sts58ksPwrAlarmSettingShelf,
+                                       data->sts58kOsPwrAlarmSettingOsPwr);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kOsPwrAlarmEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kOsPwrAlarmEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static EnumIntTest_t sts58ksPwrAlarmSettingShelf_enums[] = { 100, 1, 2, 3, 4 };
+static RangeTest_t   sts58kOsPwrAlarmSettingOsPwr_range[] = { { 1, 3 } };
+static RangeTest_t   sts58kOsPwrAlarmSettingSeverity_range[] = { { 1, 5 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kOsPwrAlarmEntry family.
+ */
+static struct sr_member_test sts58kOsPwrAlarmEntry_member_test[] =
+{
+    /* sts58ksPwrAlarmSettingShelf */
+    { MINV_INTEGER_ENUM_TEST, 
+    sizeof(sts58ksPwrAlarmSettingShelf_enums)/sizeof(EnumIntTest_t),
+    sts58ksPwrAlarmSettingShelf_enums, NULL },
+
+    /* sts58kOsPwrAlarmSettingOsPwr */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOsPwrAlarmSettingOsPwr_range)/sizeof(RangeTest_t), /* 3 */
+      sts58kOsPwrAlarmSettingOsPwr_range, NULL },
+
+    /* sts58kOsPwrAlarmSettingSeverity */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOsPwrAlarmSettingSeverity_range)/sizeof(RangeTest_t), /* 5 */
+      sts58kOsPwrAlarmSettingSeverity_range, NULL },
+
+    /* sts58kOsPwrAlarmSeverity */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kOsPwrAlarmEntry family.
+ */
+const SrTestInfoEntry sts58kOsPwrAlarmEntryTestInfo = {
+    &sts58kOsPwrAlarmEntryGetInfo,
+    sts58kOsPwrAlarmEntry_member_test,
+#ifdef sts58kOsPwrAlarmEntry_READ_CREATE
+    k_sts58kOsPwrAlarmEntry_set_defaults,
+#else /* sts58kOsPwrAlarmEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kOsPwrAlarmEntry_READ_CREATE */
+    k_sts58kOsPwrAlarmEntry_test,
+    k_sts58kOsPwrAlarmEntry_ready,
+#ifdef SR_sts58kOsPwrAlarmEntry_UNDO
+    sts58kOsPwrAlarmEntry_undo,
+#else /* SR_sts58kOsPwrAlarmEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kOsPwrAlarmEntry_UNDO */
+    sts58kOsPwrAlarmEntry_ready,
+    sts58kOsPwrAlarmEntry_set,
+    sts58kOsPwrAlarmEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kOsPwrAlarmEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kOsPwrAlarmEntry_free(sts58kOsPwrAlarmEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kOsPwrAlarmEntryGetInfo.type_table,
+                 sts58kOsPwrAlarmEntryGetInfo.highest_nominator,
+                 sts58kOsPwrAlarmEntryGetInfo.valid_offset,
+                 sts58kOsPwrAlarmEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kOsPwrAlarmEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kOsPwrAlarmEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kOsPwrAlarmEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kOsPwrAlarmEntry family
+ *---------------------------------------------------------------------*/
+sts58kOsPwrAlarmEntry_t *
+Clone_sts58kOsPwrAlarmEntry(sts58kOsPwrAlarmEntry_t *sts58kOsPwrAlarmEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kOsPwrAlarmEntry,
+                         sts58kOsPwrAlarmEntryGetInfo.family_size,
+                         sts58kOsPwrAlarmEntryGetInfo.type_table,
+                         sts58kOsPwrAlarmEntryGetInfo.highest_nominator,
+                         sts58kOsPwrAlarmEntryGetInfo.valid_offset,
+                         sts58kOsPwrAlarmEntryTestInfo.userpart_clone_func,
+                         sts58kOsPwrAlarmEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kOsPwrAlarmEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                           doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kOsPwrAlarmEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kOsPwrAlarmEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kOsPwrAlarmEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kOsPwrAlarmEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kOsPwrAlarmEntry_set((sts58kOsPwrAlarmEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kOutputAlarmEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kOutputAlarmEntryTypeTable[];
+
+const SrIndexInfo sts58kOutputAlarmEntryIndexInfo[] = {
+#ifdef I_sts58kOutputAlarmSettingShelf
+    { I_sts58kOutputAlarmSettingShelf, T_uint, -1 },
+#endif /* I_sts58kOutputAlarmSettingShelf */
+#ifdef I_sts58kOutputAlarmSettingSlot
+    { I_sts58kOutputAlarmSettingSlot, T_uint, -1 },
+#endif /* I_sts58kOutputAlarmSettingSlot */
+#ifdef I_sts58kOutputAlarmSettingPort
+    { I_sts58kOutputAlarmSettingPort, T_uint, -1 },
+#endif /* I_sts58kOutputAlarmSettingPort */
+#ifdef I_sts58kOutputAlarmSettingType
+    { I_sts58kOutputAlarmSettingType, T_uint, -1 },
+#endif /* I_sts58kOutputAlarmSettingType */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kOutputAlarmEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kOutputAlarmEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kOutputAlarmEntry_t),
+    I_sts58kOutputAlarmEntry_max,
+    (SnmpType *) sts58kOutputAlarmEntryTypeTable,
+    sts58kOutputAlarmEntryIndexInfo,
+    (short) offsetof(sts58kOutputAlarmEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kOutputAlarmEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kOutputAlarmEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                           ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kOutputAlarmSettingShelf) || !defined(I_sts58kOutputAlarmSettingSlot) || !defined(I_sts58kOutputAlarmSettingPort) || !defined(I_sts58kOutputAlarmSettingType)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kOutputAlarmEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kOutputAlarmEntry_t *
+new_k_sts58kOutputAlarmEntry_get(int serialNum, ContextInfo *contextInfo,
+                                 int nominator, int searchType,
+                                 sts58kOutputAlarmEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kOutputAlarmEntry_get(serialNum, contextInfo, nominator,
+                                        searchType,
+                                        data->sts58kOutputAlarmSettingShelf,
+                                        data->sts58kOutputAlarmSettingSlot,
+                                        data->sts58kOutputAlarmSettingPort,
+                                        data->sts58kOutputAlarmSettingType);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kOutputAlarmEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kOutputAlarmEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static EnumIntTest_t sts58kOutputAlarmSettingShelf_enums[] = { 100, 1, 2, 3, 4 };
+static RangeTest_t   sts58kOutputAlarmSettingSlot_range[] = { { 1, 16 } };
+static RangeTest_t   sts58kOutputAlarmSettingPort_range[] = { { 1, 8 } };
+static RangeTest_t   sts58kOutputAlarmSettingType_range[] = { { 1, 8 } };
+static RangeTest_t   sts58kOutputAlarmSettingSeverity_range[] = { { 1, 5 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kOutputAlarmEntry family.
+ */
+static struct sr_member_test sts58kOutputAlarmEntry_member_test[] =
+{
+    /* sts58kOutputAlarmSettingShelf */
+    { MINV_INTEGER_ENUM_TEST, 
+    sizeof(sts58kOutputAlarmSettingShelf_enums)/sizeof(EnumIntTest_t),
+    sts58kOutputAlarmSettingShelf_enums, NULL },
+
+    /* sts58kOutputAlarmSettingSlot */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputAlarmSettingSlot_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kOutputAlarmSettingSlot_range, NULL },
+
+    /* sts58kOutputAlarmSettingPort */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputAlarmSettingPort_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kOutputAlarmSettingPort_range, NULL },
+
+    /* sts58kOutputAlarmSettingType */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputAlarmSettingType_range)/sizeof(RangeTest_t), /* 8 */
+      sts58kOutputAlarmSettingType_range, Identity_test },
+
+    /* sts58kOutputAlarmSettingSeverity */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputAlarmSettingSeverity_range)/sizeof(RangeTest_t), /* 5 */
+      sts58kOutputAlarmSettingSeverity_range, NULL },
+
+    /* sts58kOutputAlarmSeverity */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kOutputAlarmEntry family.
+ */
+const SrTestInfoEntry sts58kOutputAlarmEntryTestInfo = {
+    &sts58kOutputAlarmEntryGetInfo,
+    sts58kOutputAlarmEntry_member_test,
+#ifdef sts58kOutputAlarmEntry_READ_CREATE
+    k_sts58kOutputAlarmEntry_set_defaults,
+#else /* sts58kOutputAlarmEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kOutputAlarmEntry_READ_CREATE */
+    k_sts58kOutputAlarmEntry_test,
+    k_sts58kOutputAlarmEntry_ready,
+#ifdef SR_sts58kOutputAlarmEntry_UNDO
+    sts58kOutputAlarmEntry_undo,
+#else /* SR_sts58kOutputAlarmEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kOutputAlarmEntry_UNDO */
+    sts58kOutputAlarmEntry_ready,
+    sts58kOutputAlarmEntry_set,
+    sts58kOutputAlarmEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kOutputAlarmEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kOutputAlarmEntry_free(sts58kOutputAlarmEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kOutputAlarmEntryGetInfo.type_table,
+                 sts58kOutputAlarmEntryGetInfo.highest_nominator,
+                 sts58kOutputAlarmEntryGetInfo.valid_offset,
+                 sts58kOutputAlarmEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kOutputAlarmEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kOutputAlarmEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kOutputAlarmEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kOutputAlarmEntry family
+ *---------------------------------------------------------------------*/
+sts58kOutputAlarmEntry_t *
+Clone_sts58kOutputAlarmEntry(sts58kOutputAlarmEntry_t *sts58kOutputAlarmEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kOutputAlarmEntry,
+                         sts58kOutputAlarmEntryGetInfo.family_size,
+                         sts58kOutputAlarmEntryGetInfo.type_table,
+                         sts58kOutputAlarmEntryGetInfo.highest_nominator,
+                         sts58kOutputAlarmEntryGetInfo.valid_offset,
+                         sts58kOutputAlarmEntryTestInfo.userpart_clone_func,
+                         sts58kOutputAlarmEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kOutputAlarmEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                            doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kOutputAlarmEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kOutputAlarmEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kOutputAlarmEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kOutputAlarmEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kOutputAlarmEntry_set((sts58kOutputAlarmEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kOutputTiuSettingEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kOutputTiuSettingEntryTypeTable[];
+
+const SrIndexInfo sts58kOutputTiuSettingEntryIndexInfo[] = {
+#ifdef I_sts58kOutputTiuSettingShelf
+    { I_sts58kOutputTiuSettingShelf, T_uint, -1 },
+#endif /* I_sts58kOutputTiuSettingShelf */
+#ifdef I_sts58kOutputTiuSettingSlot
+    { I_sts58kOutputTiuSettingSlot, T_uint, -1 },
+#endif /* I_sts58kOutputTiuSettingSlot */
+#ifdef I_sts58kOutputTiuSettingPort
+    { I_sts58kOutputTiuSettingPort, T_uint, -1 },
+#endif /* I_sts58kOutputTiuSettingPort */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kOutputTiuSettingEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kOutputTiuSettingEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kOutputTiuSettingEntry_t),
+    I_sts58kOutputTiuSettingEntry_max,
+    (SnmpType *) sts58kOutputTiuSettingEntryTypeTable,
+    sts58kOutputTiuSettingEntryIndexInfo,
+    (short) offsetof(sts58kOutputTiuSettingEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kOutputTiuSettingEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kOutputTiuSettingEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                                ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kOutputTiuSettingShelf) || !defined(I_sts58kOutputTiuSettingSlot) || !defined(I_sts58kOutputTiuSettingPort)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kOutputTiuSettingEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kOutputTiuSettingEntry_t *
+new_k_sts58kOutputTiuSettingEntry_get(int serialNum, ContextInfo *contextInfo,
+                                      int nominator, int searchType,
+                                      sts58kOutputTiuSettingEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kOutputTiuSettingEntry_get(serialNum, contextInfo, nominator,
+                                             searchType,
+                                             data->sts58kOutputTiuSettingShelf,
+                                             data->sts58kOutputTiuSettingSlot,
+                                             data->sts58kOutputTiuSettingPort);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kOutputTiuSettingEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kOutputTiuSettingEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static EnumIntTest_t sts58kOutputTiuSettingShelf_enums[] = { 100, 1, 2, 3, 4 };
+static RangeTest_t   sts58kOutputTiuSettingSlot_range[] = { { 1, 16 } };
+static RangeTest_t   sts58kOutputTiuSettingPort_range[] = { { 1, 8 } };
+static RangeTest_t   sts58kOutputTiuSettingLineCoding_range[] = { { 1, 4 } };
+static RangeTest_t   sts58kOutputTiuSettingFMT_range[] = { { 1, 4 } };
+static RangeTest_t   sts58kOutputTiuSettingTermination_range[] = { { 1, 4 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kOutputTiuSettingEntry family.
+ */
+static struct sr_member_test sts58kOutputTiuSettingEntry_member_test[] =
+{
+    /* sts58kOutputTiuSettingShelf */
+    { MINV_INTEGER_ENUM_TEST, 
+    sizeof(sts58kOutputTiuSettingShelf_enums)/sizeof(EnumIntTest_t),
+    sts58kOutputTiuSettingShelf_enums, NULL },
+
+    /* sts58kOutputTiuSettingSlot */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputTiuSettingSlot_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kOutputTiuSettingSlot_range, NULL },
+
+    /* sts58kOutputTiuSettingPort */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputTiuSettingPort_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kOutputTiuSettingPort_range, NULL },
+
+    /* sts58kOutputTiuSettingLineCoding */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputTiuSettingLineCoding_range)/sizeof(RangeTest_t), /* 4 */
+      sts58kOutputTiuSettingLineCoding_range, NULL },
+
+    /* sts58kOutputTiuSettingFMT */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputTiuSettingFMT_range)/sizeof(RangeTest_t), /* 4 */
+      sts58kOutputTiuSettingFMT_range, NULL },
+
+    /* sts58kOutputTiuSettingTermination */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputTiuSettingTermination_range)/sizeof(RangeTest_t), /* 4 */
+      sts58kOutputTiuSettingTermination_range, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kOutputTiuSettingEntry family.
+ */
+const SrTestInfoEntry sts58kOutputTiuSettingEntryTestInfo = {
+    &sts58kOutputTiuSettingEntryGetInfo,
+    sts58kOutputTiuSettingEntry_member_test,
+#ifdef sts58kOutputTiuSettingEntry_READ_CREATE
+    k_sts58kOutputTiuSettingEntry_set_defaults,
+#else /* sts58kOutputTiuSettingEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kOutputTiuSettingEntry_READ_CREATE */
+    k_sts58kOutputTiuSettingEntry_test,
+    k_sts58kOutputTiuSettingEntry_ready,
+#ifdef SR_sts58kOutputTiuSettingEntry_UNDO
+    sts58kOutputTiuSettingEntry_undo,
+#else /* SR_sts58kOutputTiuSettingEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kOutputTiuSettingEntry_UNDO */
+    sts58kOutputTiuSettingEntry_ready,
+    sts58kOutputTiuSettingEntry_set,
+    sts58kOutputTiuSettingEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kOutputTiuSettingEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kOutputTiuSettingEntry_free(sts58kOutputTiuSettingEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kOutputTiuSettingEntryGetInfo.type_table,
+                 sts58kOutputTiuSettingEntryGetInfo.highest_nominator,
+                 sts58kOutputTiuSettingEntryGetInfo.valid_offset,
+                 sts58kOutputTiuSettingEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kOutputTiuSettingEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kOutputTiuSettingEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kOutputTiuSettingEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kOutputTiuSettingEntry family
+ *---------------------------------------------------------------------*/
+sts58kOutputTiuSettingEntry_t *
+Clone_sts58kOutputTiuSettingEntry(sts58kOutputTiuSettingEntry_t *sts58kOutputTiuSettingEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kOutputTiuSettingEntry,
+                         sts58kOutputTiuSettingEntryGetInfo.family_size,
+                         sts58kOutputTiuSettingEntryGetInfo.type_table,
+                         sts58kOutputTiuSettingEntryGetInfo.highest_nominator,
+                         sts58kOutputTiuSettingEntryGetInfo.valid_offset,
+                         sts58kOutputTiuSettingEntryTestInfo.userpart_clone_func,
+                         sts58kOutputTiuSettingEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kOutputTiuSettingEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                                 doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kOutputTiuSettingEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kOutputTiuSettingEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kOutputTiuSettingEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kOutputTiuSettingEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kOutputTiuSettingEntry_set((sts58kOutputTiuSettingEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kPerfMonEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kPerfMonEntryTypeTable[];
+
+const SrIndexInfo sts58kPerfMonEntryIndexInfo[] = {
+#ifdef I_sts58kPerfMonInputCurrentMon
+    { I_sts58kPerfMonInputCurrentMon, T_uint, -1 },
+#endif /* I_sts58kPerfMonInputCurrentMon */
+#ifdef I_sts58kPerfMonInputMonPeriod
+    { I_sts58kPerfMonInputMonPeriod, T_uint, -1 },
+#endif /* I_sts58kPerfMonInputMonPeriod */
+#ifdef I_sts58kPerfMonInputMonBucket
+    { I_sts58kPerfMonInputMonBucket, T_uint, -1 },
+#endif /* I_sts58kPerfMonInputMonBucket */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kPerfMonEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kPerfMonEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kPerfMonEntry_t),
+    I_sts58kPerfMonEntry_max,
+    (SnmpType *) sts58kPerfMonEntryTypeTable,
+    sts58kPerfMonEntryIndexInfo,
+    (short) offsetof(sts58kPerfMonEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kPerfMonEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kPerfMonEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                       ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kPerfMonInputCurrentMon) || !defined(I_sts58kPerfMonInputMonPeriod) || !defined(I_sts58kPerfMonInputMonBucket)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kPerfMonEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kPerfMonEntry_t *
+new_k_sts58kPerfMonEntry_get(int serialNum, ContextInfo *contextInfo,
+                             int nominator, int searchType,
+                             sts58kPerfMonEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kPerfMonEntry_get(serialNum, contextInfo, nominator,
+                                    searchType,
+                                    data->sts58kPerfMonInputCurrentMon,
+                                    data->sts58kPerfMonInputMonPeriod,
+                                    data->sts58kPerfMonInputMonBucket);
+}
+
+/*----------------------------------------------------------------------
+ * Free the sts58kPerfMonEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kPerfMonEntry_free(sts58kPerfMonEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kPerfMonEntryGetInfo.type_table,
+                 sts58kPerfMonEntryGetInfo.highest_nominator,
+                 sts58kPerfMonEntryGetInfo.valid_offset,
+                 sts58kPerfMonEntryGetInfo.userpart_free_func);
+}
+
+/*
+ * The sts58kAlarmStatusEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kAlarmStatusEntryTypeTable[];
+
+const SrIndexInfo sts58kAlarmStatusEntryIndexInfo[] = {
+#ifdef I_sts58kAlarmSource
+    { I_sts58kAlarmSource, T_uint, -1 },
+#endif /* I_sts58kAlarmSource */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kAlarmStatusEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kAlarmStatusEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kAlarmStatusEntry_t),
+    I_sts58kAlarmStatusEntry_max,
+    (SnmpType *) sts58kAlarmStatusEntryTypeTable,
+    sts58kAlarmStatusEntryIndexInfo,
+    (short) offsetof(sts58kAlarmStatusEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kAlarmStatusEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kAlarmStatusEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                           ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kAlarmSource)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kAlarmStatusEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kAlarmStatusEntry_t *
+new_k_sts58kAlarmStatusEntry_get(int serialNum, ContextInfo *contextInfo,
+                                 int nominator, int searchType,
+                                 sts58kAlarmStatusEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kAlarmStatusEntry_get(serialNum, contextInfo, nominator,
+                                        searchType, data->sts58kAlarmSource);
+}
+
+/*----------------------------------------------------------------------
+ * Free the sts58kAlarmStatusEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kAlarmStatusEntry_free(sts58kAlarmStatusEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kAlarmStatusEntryGetInfo.type_table,
+                 sts58kAlarmStatusEntryGetInfo.highest_nominator,
+                 sts58kAlarmStatusEntryGetInfo.valid_offset,
+                 sts58kAlarmStatusEntryGetInfo.userpart_free_func);
+}
+
+/*
+ * The sts58kOutputCardEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kOutputCardEntryTypeTable[];
+
+const SrIndexInfo sts58kOutputCardEntryIndexInfo[] = {
+#ifdef I_sts58kOutputShelf
+    { I_sts58kOutputShelf, T_uint, -1 },
+#endif /* I_sts58kOutputShelf */
+#ifdef I_sts58kOutputSlot
+    { I_sts58kOutputSlot, T_uint, -1 },
+#endif /* I_sts58kOutputSlot */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kOutputCardEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kOutputCardEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kOutputCardEntry_t),
+    I_sts58kOutputCardEntry_max,
+    (SnmpType *) sts58kOutputCardEntryTypeTable,
+    sts58kOutputCardEntryIndexInfo,
+    (short) offsetof(sts58kOutputCardEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kOutputCardEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kOutputCardEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                          ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kOutputShelf) || !defined(I_sts58kOutputSlot)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kOutputCardEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kOutputCardEntry_t *
+new_k_sts58kOutputCardEntry_get(int serialNum, ContextInfo *contextInfo,
+                                int nominator, int searchType,
+                                sts58kOutputCardEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kOutputCardEntry_get(serialNum, contextInfo, nominator,
+                                       searchType, data->sts58kOutputShelf,
+                                       data->sts58kOutputSlot);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kOutputCardEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kOutputCardEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static EnumIntTest_t sts58kOutputShelf_enums[] = { 100, 1, 2, 3, 4 };
+static RangeTest_t   sts58kOutputSlot_range[] = { { 1, 16 } };
+static RangeTest_t   sts58kOutputRedSwitchState_range[] = { { 0, 2 } };
+static RangeTest_t   sts58kOutputCRCCHK_range[] = { { 1, 2 } };
+static RangeTest_t   sts58kOutputCAS_range[] = { { 1, 2 } };
+static RangeTest_t   sts58kOutputSSM_range[] = { { 1, 5 } };
+static RangeTest_t   sts58kOutputSSMValue_range[] = { { 1, 6 } };
+static LengthTest_t  sts58kOutputTimingFormat_len[] = { { 1, 60 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kOutputCardEntry family.
+ */
+static struct sr_member_test sts58kOutputCardEntry_member_test[] =
+{
+    /* sts58kOutputShelf */
+    { MINV_INTEGER_ENUM_TEST, 
+    sizeof(sts58kOutputShelf_enums)/sizeof(EnumIntTest_t),
+    sts58kOutputShelf_enums, NULL },
+
+    /* sts58kOutputSlot */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputSlot_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kOutputSlot_range, NULL },
+
+    /* sts58kOutputRedState */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kOutputRedSwitchState */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputRedSwitchState_range)/sizeof(RangeTest_t), /* 3 */
+      sts58kOutputRedSwitchState_range, NULL },
+
+    /* sts58kOutputCRCCHK */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputCRCCHK_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kOutputCRCCHK_range, NULL },
+
+    /* sts58kOutputCAS */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputCAS_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kOutputCAS_range, NULL },
+
+    /* sts58kOutputSSM */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputSSM_range)/sizeof(RangeTest_t), /* 5 */
+      sts58kOutputSSM_range, NULL },
+
+    /* sts58kOutputSSMValue */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kOutputSSMValue_range)/sizeof(RangeTest_t), /* 6 */
+      sts58kOutputSSMValue_range, NULL },
+
+    /* sts58kOutputTimingFormat */
+    { MINV_LENGTH_TEST, 
+      sizeof(sts58kOutputTimingFormat_len)/sizeof(LengthTest_t), /* 1 */
+      sts58kOutputTimingFormat_len, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kOutputCardEntry family.
+ */
+const SrTestInfoEntry sts58kOutputCardEntryTestInfo = {
+    &sts58kOutputCardEntryGetInfo,
+    sts58kOutputCardEntry_member_test,
+#ifdef sts58kOutputCardEntry_READ_CREATE
+    k_sts58kOutputCardEntry_set_defaults,
+#else /* sts58kOutputCardEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kOutputCardEntry_READ_CREATE */
+    k_sts58kOutputCardEntry_test,
+    k_sts58kOutputCardEntry_ready,
+#ifdef SR_sts58kOutputCardEntry_UNDO
+    sts58kOutputCardEntry_undo,
+#else /* SR_sts58kOutputCardEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kOutputCardEntry_UNDO */
+    sts58kOutputCardEntry_ready,
+    sts58kOutputCardEntry_set,
+    sts58kOutputCardEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kOutputCardEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kOutputCardEntry_free(sts58kOutputCardEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kOutputCardEntryGetInfo.type_table,
+                 sts58kOutputCardEntryGetInfo.highest_nominator,
+                 sts58kOutputCardEntryGetInfo.valid_offset,
+                 sts58kOutputCardEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kOutputCardEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kOutputCardEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kOutputCardEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kOutputCardEntry family
+ *---------------------------------------------------------------------*/
+sts58kOutputCardEntry_t *
+Clone_sts58kOutputCardEntry(sts58kOutputCardEntry_t *sts58kOutputCardEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kOutputCardEntry,
+                         sts58kOutputCardEntryGetInfo.family_size,
+                         sts58kOutputCardEntryGetInfo.type_table,
+                         sts58kOutputCardEntryGetInfo.highest_nominator,
+                         sts58kOutputCardEntryGetInfo.valid_offset,
+                         sts58kOutputCardEntryTestInfo.userpart_clone_func,
+                         sts58kOutputCardEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kOutputCardEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                           doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kOutputCardEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kOutputCardEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kOutputCardEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kOutputCardEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kOutputCardEntry_set((sts58kOutputCardEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kEmmStatusEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kEmmStatusEntryTypeTable[];
+
+const SrIndexInfo sts58kEmmStatusEntryIndexInfo[] = {
+#ifdef I_sts58kEmmShelf
+    { I_sts58kEmmShelf, T_uint, -1 },
+#endif /* I_sts58kEmmShelf */
+#ifdef I_sts58kEmmUnitId
+    { I_sts58kEmmUnitId, T_uint, -1 },
+#endif /* I_sts58kEmmUnitId */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kEmmStatusEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kEmmStatusEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kEmmStatusEntry_t),
+    I_sts58kEmmStatusEntry_max,
+    (SnmpType *) sts58kEmmStatusEntryTypeTable,
+    sts58kEmmStatusEntryIndexInfo,
+    (short) offsetof(sts58kEmmStatusEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kEmmStatusEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kEmmStatusEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                         ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kEmmShelf) || !defined(I_sts58kEmmUnitId)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kEmmStatusEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kEmmStatusEntry_t *
+new_k_sts58kEmmStatusEntry_get(int serialNum, ContextInfo *contextInfo,
+                               int nominator, int searchType,
+                               sts58kEmmStatusEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kEmmStatusEntry_get(serialNum, contextInfo, nominator,
+                                      searchType, data->sts58kEmmShelf,
+                                      data->sts58kEmmUnitId);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kEmmStatusEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kEmmStatusEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static EnumIntTest_t sts58kEmmShelf_enums[] = { 100, 1, 2, 3 };
+static RangeTest_t   sts58kEmmUnitId_range[] = { { 1, 20 } };
+static RangeTest_t   sts58kEmmMajorAlmHiThresh_range[] = { { -50, 100 } };
+static RangeTest_t   sts58kEmmMajorAlmLoThresh_range[] = { { -50, 100 } };
+static RangeTest_t   sts58kEmmMinorAlmHiThresh_range[] = { { -50, 100 } };
+static RangeTest_t   sts58kEmmMinorAlmLoThresh_range[] = { { -50, 100 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kEmmStatusEntry family.
+ */
+static struct sr_member_test sts58kEmmStatusEntry_member_test[] =
+{
+    /* sts58kEmmShelf */
+    { MINV_INTEGER_ENUM_TEST, 
+    sizeof(sts58kEmmShelf_enums)/sizeof(EnumIntTest_t),
+    sts58kEmmShelf_enums, NULL },
+
+    /* sts58kEmmUnitId */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kEmmUnitId_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kEmmUnitId_range, NULL },
+
+    /* sts58kEmmSensorType */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kEmmAlarmStatus */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kEmmSensorReading */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kEmmMajorAlmHiThresh */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kEmmMajorAlmHiThresh_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kEmmMajorAlmHiThresh_range, NULL },
+
+    /* sts58kEmmMajorAlmLoThresh */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kEmmMajorAlmLoThresh_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kEmmMajorAlmLoThresh_range, NULL },
+
+    /* sts58kEmmMinorAlmHiThresh */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kEmmMinorAlmHiThresh_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kEmmMinorAlmHiThresh_range, NULL },
+
+    /* sts58kEmmMinorAlmLoThresh */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kEmmMinorAlmLoThresh_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kEmmMinorAlmLoThresh_range, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kEmmStatusEntry family.
+ */
+const SrTestInfoEntry sts58kEmmStatusEntryTestInfo = {
+    &sts58kEmmStatusEntryGetInfo,
+    sts58kEmmStatusEntry_member_test,
+#ifdef sts58kEmmStatusEntry_READ_CREATE
+    k_sts58kEmmStatusEntry_set_defaults,
+#else /* sts58kEmmStatusEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kEmmStatusEntry_READ_CREATE */
+    k_sts58kEmmStatusEntry_test,
+    k_sts58kEmmStatusEntry_ready,
+#ifdef SR_sts58kEmmStatusEntry_UNDO
+    sts58kEmmStatusEntry_undo,
+#else /* SR_sts58kEmmStatusEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kEmmStatusEntry_UNDO */
+    sts58kEmmStatusEntry_ready,
+    sts58kEmmStatusEntry_set,
+    sts58kEmmStatusEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kEmmStatusEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kEmmStatusEntry_free(sts58kEmmStatusEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kEmmStatusEntryGetInfo.type_table,
+                 sts58kEmmStatusEntryGetInfo.highest_nominator,
+                 sts58kEmmStatusEntryGetInfo.valid_offset,
+                 sts58kEmmStatusEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kEmmStatusEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kEmmStatusEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kEmmStatusEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kEmmStatusEntry family
+ *---------------------------------------------------------------------*/
+sts58kEmmStatusEntry_t *
+Clone_sts58kEmmStatusEntry(sts58kEmmStatusEntry_t *sts58kEmmStatusEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kEmmStatusEntry,
+                         sts58kEmmStatusEntryGetInfo.family_size,
+                         sts58kEmmStatusEntryGetInfo.type_table,
+                         sts58kEmmStatusEntryGetInfo.highest_nominator,
+                         sts58kEmmStatusEntryGetInfo.valid_offset,
+                         sts58kEmmStatusEntryTestInfo.userpart_clone_func,
+                         sts58kEmmStatusEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kEmmStatusEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                          doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kEmmStatusEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kEmmStatusEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kEmmStatusEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kEmmStatusEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kEmmStatusEntry_set((sts58kEmmStatusEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kAntEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kAntEntryTypeTable[];
+
+const SrIndexInfo sts58kAntEntryIndexInfo[] = {
+#ifdef I_sts58kAntIndex
+    { I_sts58kAntIndex, T_uint, -1 },
+#endif /* I_sts58kAntIndex */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kAntEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kAntEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kAntEntry_t),
+    I_sts58kAntEntry_max,
+    (SnmpType *) sts58kAntEntryTypeTable,
+    sts58kAntEntryIndexInfo,
+    (short) offsetof(sts58kAntEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kAntEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kAntEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                   ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kAntIndex)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kAntEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kAntEntry_t *
+new_k_sts58kAntEntry_get(int serialNum, ContextInfo *contextInfo,
+                         int nominator, int searchType,
+                         sts58kAntEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kAntEntry_get(serialNum, contextInfo, nominator,
+                                searchType, data->sts58kAntIndex);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kAntEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kAntEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static RangeTest_t   sts58kAntIndex_range[] = { { 1, 2 } };
+static RangeTest_t   sts58kAntSwitchState_range[] = { { 0, 2 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kAntEntry family.
+ */
+static struct sr_member_test sts58kAntEntry_member_test[] =
+{
+    /* sts58kAntIndex */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kAntIndex_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kAntIndex_range, NULL },
+
+    /* sts58kAntStatus */
+    { MINV_NOT_WRITABLE, 0, NULL, NULL },
+
+    /* sts58kAntSwitchState */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kAntSwitchState_range)/sizeof(RangeTest_t), /* 3 */
+      sts58kAntSwitchState_range, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kAntEntry family.
+ */
+const SrTestInfoEntry sts58kAntEntryTestInfo = {
+    &sts58kAntEntryGetInfo,
+    sts58kAntEntry_member_test,
+#ifdef sts58kAntEntry_READ_CREATE
+    k_sts58kAntEntry_set_defaults,
+#else /* sts58kAntEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kAntEntry_READ_CREATE */
+    k_sts58kAntEntry_test,
+    k_sts58kAntEntry_ready,
+#ifdef SR_sts58kAntEntry_UNDO
+    sts58kAntEntry_undo,
+#else /* SR_sts58kAntEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kAntEntry_UNDO */
+    sts58kAntEntry_ready,
+    sts58kAntEntry_set,
+    sts58kAntEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kAntEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kAntEntry_free(sts58kAntEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kAntEntryGetInfo.type_table,
+                 sts58kAntEntryGetInfo.highest_nominator,
+                 sts58kAntEntryGetInfo.valid_offset,
+                 sts58kAntEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kAntEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kAntEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kAntEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kAntEntry family
+ *---------------------------------------------------------------------*/
+sts58kAntEntry_t *
+Clone_sts58kAntEntry(sts58kAntEntry_t *sts58kAntEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kAntEntry,
+                         sts58kAntEntryGetInfo.family_size,
+                         sts58kAntEntryGetInfo.type_table,
+                         sts58kAntEntryGetInfo.highest_nominator,
+                         sts58kAntEntryGetInfo.valid_offset,
+                         sts58kAntEntryTestInfo.userpart_clone_func,
+                         sts58kAntEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kAntEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                    doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kAntEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kAntEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kAntEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kAntEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kAntEntry_set((sts58kAntEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kTopDestEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kTopDestEntryTypeTable[];
+
+const SrIndexInfo sts58kTopDestEntryIndexInfo[] = {
+#ifdef I_sts58kTopDestNumber
+    { I_sts58kTopDestNumber, T_uint, -1 },
+#endif /* I_sts58kTopDestNumber */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kTopDestEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kTopDestEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kTopDestEntry_t),
+    I_sts58kTopDestEntry_max,
+    (SnmpType *) sts58kTopDestEntryTypeTable,
+    sts58kTopDestEntryIndexInfo,
+    (short) offsetof(sts58kTopDestEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kTopDestEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kTopDestEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                       ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kTopDestNumber)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kTopDestEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kTopDestEntry_t *
+new_k_sts58kTopDestEntry_get(int serialNum, ContextInfo *contextInfo,
+                             int nominator, int searchType,
+                             sts58kTopDestEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kTopDestEntry_get(serialNum, contextInfo, nominator,
+                                    searchType, data->sts58kTopDestNumber);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kTopDestEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kTopDestEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static RangeTest_t   sts58kTopDestNumber_range[] = { { 1, 28 } };
+static RangeTest_t   sts58kTopDestUdpPort_range[] = { { 0, 65535 } };
+static RangeTest_t   sts58kTopDestVlanId_range[] = { { 1, 32 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kTopDestEntry family.
+ */
+static struct sr_member_test sts58kTopDestEntry_member_test[] =
+{
+    /* sts58kTopDestNumber */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kTopDestNumber_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kTopDestNumber_range, NULL },
+
+    /* sts58kTopDestIp */
+    { MINV_NO_TEST, 0, NULL, NULL },
+
+    /* sts58kTopDestUdpPort */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kTopDestUdpPort_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kTopDestUdpPort_range, NULL },
+
+    /* sts58kTopDestVlanId */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kTopDestVlanId_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kTopDestVlanId_range, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kTopDestEntry family.
+ */
+const SrTestInfoEntry sts58kTopDestEntryTestInfo = {
+    &sts58kTopDestEntryGetInfo,
+    sts58kTopDestEntry_member_test,
+#ifdef sts58kTopDestEntry_READ_CREATE
+    k_sts58kTopDestEntry_set_defaults,
+#else /* sts58kTopDestEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kTopDestEntry_READ_CREATE */
+    k_sts58kTopDestEntry_test,
+    k_sts58kTopDestEntry_ready,
+#ifdef SR_sts58kTopDestEntry_UNDO
+    sts58kTopDestEntry_undo,
+#else /* SR_sts58kTopDestEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kTopDestEntry_UNDO */
+    sts58kTopDestEntry_ready,
+    sts58kTopDestEntry_set,
+    sts58kTopDestEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kTopDestEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kTopDestEntry_free(sts58kTopDestEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kTopDestEntryGetInfo.type_table,
+                 sts58kTopDestEntryGetInfo.highest_nominator,
+                 sts58kTopDestEntryGetInfo.valid_offset,
+                 sts58kTopDestEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kTopDestEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kTopDestEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kTopDestEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kTopDestEntry family
+ *---------------------------------------------------------------------*/
+sts58kTopDestEntry_t *
+Clone_sts58kTopDestEntry(sts58kTopDestEntry_t *sts58kTopDestEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kTopDestEntry,
+                         sts58kTopDestEntryGetInfo.family_size,
+                         sts58kTopDestEntryGetInfo.type_table,
+                         sts58kTopDestEntryGetInfo.highest_nominator,
+                         sts58kTopDestEntryGetInfo.valid_offset,
+                         sts58kTopDestEntryTestInfo.userpart_clone_func,
+                         sts58kTopDestEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kTopDestEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                        doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kTopDestEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kTopDestEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kTopDestEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kTopDestEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kTopDestEntry_set((sts58kTopDestEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+
+/*
+ * The sts58kTrapRegEntryTypeTable array should be located in the
+ * k_Larus58k.stb file, because one of the following command-line
+ * arguments was used: -row_status, -search_table, or -parser.
+ */
+extern const SnmpType sts58kTrapRegEntryTypeTable[];
+
+const SrIndexInfo sts58kTrapRegEntryIndexInfo[] = {
+#ifdef I_sts58kTrapRegMgrNumber
+    { I_sts58kTrapRegMgrNumber, T_uint, -1 },
+#endif /* I_sts58kTrapRegMgrNumber */
+    { -1, -1, -1 }
+};
+
+const SrGetInfoEntry sts58kTrapRegEntryGetInfo = {
+    (SR_KGET_FPTR) new_k_sts58kTrapRegEntry_get,
+    (SR_FREE_FPTR) NULL,
+    (int) sizeof(sts58kTrapRegEntry_t),
+    I_sts58kTrapRegEntry_max,
+    (SnmpType *) sts58kTrapRegEntryTypeTable,
+    sts58kTrapRegEntryIndexInfo,
+    (short) offsetof(sts58kTrapRegEntry_t, valid)
+};
+
+/*---------------------------------------------------------------------
+ * Retrieve data from the sts58kTrapRegEntry family.
+ *---------------------------------------------------------------------*/
+VarBind *
+sts58kTrapRegEntry_get(OID *incoming, ObjectInfo *object, int searchType,
+                       ContextInfo *contextInfo, int serialNum)
+{
+#if !defined(I_sts58kTrapRegMgrNumber)
+    return NULL;
+#else /* all indices are supported */
+    return (v_get(incoming, object, searchType, contextInfo, serialNum,
+                  (SrGetInfoEntry *) &sts58kTrapRegEntryGetInfo));
+#endif /* all indices are supported */
+}
+
+sts58kTrapRegEntry_t *
+new_k_sts58kTrapRegEntry_get(int serialNum, ContextInfo *contextInfo,
+                             int nominator, int searchType,
+                             sts58kTrapRegEntry_t *data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    return k_sts58kTrapRegEntry_get(serialNum, contextInfo, nominator,
+                                    searchType, data->sts58kTrapRegMgrNumber);
+}
+
+#ifdef SETS 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+static int sts58kTrapRegEntry_cleanup
+    SR_PROTOTYPE((doList_t *trash));
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ * Syntax refinements for the sts58kTrapRegEntry family
+ *
+ * For each object in this family in which the syntax clause in the MIB
+ * defines a refinement to the size, range, or enumerations, initialize
+ * a data structure with these refinements.
+ */
+static RangeTest_t   sts58kTrapRegMgrNumber_range[] = { { 1, 10 } };
+static RangeTest_t   sts58kTrapRegMgrUdpPort_range[] = { { 0, 65535 } };
+static LengthTest_t  sts58kTrapRegCommunityStr_len[] = { { 0, 24 } };
+static RangeTest_t   sts58kTrapRegState_range[] = { { 1, 2 } };
+
+/*
+ * Initialize the sr_member_test array with one entry per object in the
+ * sts58kTrapRegEntry family.
+ */
+static struct sr_member_test sts58kTrapRegEntry_member_test[] =
+{
+    /* sts58kTrapRegMgrNumber */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kTrapRegMgrNumber_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kTrapRegMgrNumber_range, NULL },
+
+    /* sts58kTrapRegMgrIp */
+    { MINV_NO_TEST, 0, NULL, NULL },
+
+    /* sts58kTrapRegMgrUdpPort */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kTrapRegMgrUdpPort_range)/sizeof(RangeTest_t), /* 1 */
+      sts58kTrapRegMgrUdpPort_range, NULL },
+
+    /* sts58kTrapRegCommunityStr */
+    { MINV_LENGTH_TEST, 
+      sizeof(sts58kTrapRegCommunityStr_len)/sizeof(LengthTest_t), /* 1 */
+      sts58kTrapRegCommunityStr_len, DisplayString_test },
+
+    /* sts58kTrapRegState */
+    { MINV_INTEGER_RANGE_TEST, 
+      sizeof(sts58kTrapRegState_range)/sizeof(RangeTest_t), /* 2 */
+      sts58kTrapRegState_range, NULL }
+};
+
+/*
+ * Initialize SrTestInfoEntry for the sts58kTrapRegEntry family.
+ */
+const SrTestInfoEntry sts58kTrapRegEntryTestInfo = {
+    &sts58kTrapRegEntryGetInfo,
+    sts58kTrapRegEntry_member_test,
+#ifdef sts58kTrapRegEntry_READ_CREATE
+    k_sts58kTrapRegEntry_set_defaults,
+#else /* sts58kTrapRegEntry_READ_CREATE */
+    NULL,
+#endif /* sts58kTrapRegEntry_READ_CREATE */
+    k_sts58kTrapRegEntry_test,
+    k_sts58kTrapRegEntry_ready,
+#ifdef SR_sts58kTrapRegEntry_UNDO
+    sts58kTrapRegEntry_undo,
+#else /* SR_sts58kTrapRegEntry_UNDO */
+    NULL,
+#endif /* SR_sts58kTrapRegEntry_UNDO */
+    sts58kTrapRegEntry_ready,
+    sts58kTrapRegEntry_set,
+    sts58kTrapRegEntry_cleanup,
+    (SR_COPY_FPTR) NULL
+};
+
+/*----------------------------------------------------------------------
+ * Free the sts58kTrapRegEntry data object.
+ *---------------------------------------------------------------------*/
+void
+sts58kTrapRegEntry_free(sts58kTrapRegEntry_t *data)
+{
+    /* free function is only needed by old k_ routines with -row_status */
+    SrFreeFamily(data,
+                 sts58kTrapRegEntryGetInfo.type_table,
+                 sts58kTrapRegEntryGetInfo.highest_nominator,
+                 sts58kTrapRegEntryGetInfo.valid_offset,
+                 sts58kTrapRegEntryGetInfo.userpart_free_func);
+}
+
+/*----------------------------------------------------------------------
+ * cleanup after sts58kTrapRegEntry set/undo
+ *---------------------------------------------------------------------*/
+static int
+sts58kTrapRegEntry_cleanup(doList_t *trash)
+{
+    return SrCleanup(trash, &sts58kTrapRegEntryTestInfo);
+}
+
+/*----------------------------------------------------------------------
+ * clone the sts58kTrapRegEntry family
+ *---------------------------------------------------------------------*/
+sts58kTrapRegEntry_t *
+Clone_sts58kTrapRegEntry(sts58kTrapRegEntry_t *sts58kTrapRegEntry)
+{
+    /* Clone function is not used by auto-generated */
+    /* code, but may be used by user code */
+    return SrCloneFamily(sts58kTrapRegEntry,
+                         sts58kTrapRegEntryGetInfo.family_size,
+                         sts58kTrapRegEntryGetInfo.type_table,
+                         sts58kTrapRegEntryGetInfo.highest_nominator,
+                         sts58kTrapRegEntryGetInfo.valid_offset,
+                         sts58kTrapRegEntryTestInfo.userpart_clone_func,
+                         sts58kTrapRegEntryGetInfo.userpart_free_func);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if this SET request is valid. If so, add it to the do-list.
+ *---------------------------------------------------------------------*/
+int 
+sts58kTrapRegEntry_test(OID *incoming, ObjectInfo *object, ObjectSyntax *value,
+                        doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_test(incoming, object, value, doHead, doCur, contextInfo,
+                  &sts58kTrapRegEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Determine if entries in this SET request are consistent
+ *---------------------------------------------------------------------*/
+int 
+sts58kTrapRegEntry_ready(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+    return v_ready(doHead, doCur, contextInfo,
+                  &sts58kTrapRegEntryTestInfo);
+}
+
+/*---------------------------------------------------------------------
+ * Perform the kernel-specific set function for this group of
+ * related objects.
+ *---------------------------------------------------------------------*/
+int 
+sts58kTrapRegEntry_set(doList_t *doHead, doList_t *doCur, ContextInfo *contextInfo)
+{
+  return (k_sts58kTrapRegEntry_set((sts58kTrapRegEntry_t *) (doCur->data),
+            contextInfo, doCur->state));
+}
+
+#endif /* SETS */
+
+

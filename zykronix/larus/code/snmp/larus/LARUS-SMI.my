@@ -1,0 +1,62 @@
+
+LARUS-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+larus MODULE-IDENTITY
+	LAST-UPDATED "0601090000Z"
+	ORGANIZATION "Larus, Inc."
+	CONTACT-INFO
+		"CXR Larus
+		A Subsidiary of EMRISE CORPORATION
+		894 Faulstich Court,
+		San Jose, CA 95112
+		Tel: +1 408-200-2561
+		LARUS, Inc.
+		"
+	DESCRIPTION
+    	"The LARUS STS58k Enterprise MIB.
+    	"
+	::= { enterprises 24628 } -- assigned by IANA
+
+
+larusProducts OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"larusProducts is the root OBJECT IDENTIFIER from
+		which sysObjectID values are assigned.  Actual
+		values are defined in LARUS-PRODUCTS-MIB."
+	::= { larus 1 }
+
+larusMgmt OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"larusMgmt is the main subtree for new mib development."
+	::= { larus 2 }
+
+larusExperiment OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"larusExperiment provides a root object identifier
+		from which experimental mibs may be temporarily
+		based.  mibs are typicially based here if they
+		fall in one of two categories
+		1) are IETF work-in-process mibs which have not
+		been assigned a permanent object identifier by
+		the IANA.
+		2) are larus work-in-process which has not been
+		assigned a permanent object identifier by the
+		larus assigned number authority, typicially because
+		the mib is not ready for deployment.
+
+		NOTE WELL:  support for mibs in the larusExperiment
+		subtree will be deleted when a permanent object
+		identifier assignment is made."
+	::= { larus 3 }
+
+
+END

@@ -1,0 +1,119 @@
+README.vxworks
+/*
+ *
+ * Copyright (C) 1992-2003 by SNMP Research, Incorporated.
+ *
+ * This software is furnished under a license and may be used and copied
+ * only in accordance with the terms of such license and with the
+ * inclusion of the above copyright notice. This software or any other
+ * copies thereof may not be provided or otherwise made available to any
+ * other person. No title to and ownership of the software is hereby
+ * transferred.
+ *
+ * The information in this software is subject to change without notice
+ * and should not be construed as a commitment by SNMP Research, Incorporated.
+ *
+ * Restricted Rights Legend:
+ *  Use, duplication, or disclosure by the Government is subject to
+ *  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+ *  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+ *  subparagraphs (c)(4) and (d) of the Commercial Computer
+ *  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+ *  clauses in the NASA FAR Supplement and other corresponding
+ *  governmental regulations.
+ *
+ */
+
+/*
+ *                PROPRIETARY NOTICE
+ *
+ * This software is an unpublished work subject to a confidentiality agreement
+ * and is protected by copyright and trade secret law.  Unauthorized copying,
+ * redistribution or other use of this work is prohibited.
+ *
+ * The above notice of copyright on this source code product does not indicate
+ * any actual or intended publication of such source code.
+ *
+ */
+
+To compile, "WIND_BASE" and "WIND_HOST_TYPE" must be set to appropriate values.
+Below are the values used on our host system.
+set WIND_BASE=c:\tornado
+set WIND_HOST_TYPE=x86-win32
+
+If source code for the HOST system is not included with this product, the
+mibcompiler tools and the utilities for the HOST system are included as
+binaries.
+
+You should be able to execute one of the following commands to build your
+chosen version of the tree:
+
+Command                                 Version
+-------                                 -------
+make                                    Quadlingual (V1, V2C, V2* and V3) agent
+make -e -f Makefile.1                   SNMPv1 only agent
+make -e -f Makefile.1c                  Bilingual (V1 and V2C) agent
+make -e -f Makefile.1c3                 Trilingual (V1, V2C and V3) agent
+
+The binaries for the utilities will be installed in the "$(os)bin" subdirectory.
+
+The agent needs to know where to find the configuration files, thus you
+need to install the files found in "config/agt" in a place accessible from the
+vxworks system and arrange for VxWorks to execute commands which set up
+environment variables which point to those copied directories before
+attempting to execute the agent.  For example one might put:
+
+putenv "SR_AGT_CONF_DIR=/etc/srconf/agt"
+
+in the file pointed to by the vxworks "startup script" option in the VxWorks
+Boot configuration information (accessible by typing "p" at the [VxWorks Boot]
+prompt).  The  [VxWorks Boot] prompt may be accessed by typing any character
+other than "@" during the countdown before startup after vxworks has been
+reset.
+
+Before loading the executable, you must build a vxworks image
+that includes MIB-II instrumentation.  To accomplish this, edit
+target/config/all/configAll.h and move the following symbols from
+the EXCLUDED NETWORK FACILITIES section to the INCLUDED NETWORK FACILITIES
+section:
+
+#define INCLUDE_MIB2_TCP        /* the TCP group */
+#define INCLUDE_MIB2_ICMP       /* the ICMP group */
+#define INCLUDE_MIB2_UDP        /* the UDP group */
+#define INCLUDE_MIB2_IF         /* the interfaces group */
+#define INCLUDE_MIB2_AT         /* the AT group */
+#define INCLUDE_MIB2IP         /* the IP group */
+
+Then rebuild under target/config/$targetcard where $targetcard is replaced
+by your target card type (eg mv147).  It should be possible to do this under
+the vxworks5.4 GUI but when we have tried it it hasn't worked.  For now we
+recommend this manual method, as the GUI is a moving target from release to
+release.  If you wish to enlighten us about how easy this is to under the
+GUI then please send e-mail to spakes@snmp.com.
+
+If you want to change an environment variable in the wind shell, use
+the putenv command.  For example, to change the directory in which
+the agent searches for the snmpd.cnf file, 
+
+  putenv "SR_AGT_CONF_DIR=/my/snmp/config/agt"
+
+To use a vxworks executable, you must load it using the ld command and then
+call it with appropriate arguments.  For example to start snmpd one would do
+something like:
+
+-> cd "/home/vxworks/snmp/vxworks.bin"
+-> ld < snmpd
+-> sp snmpd_main, "-apall"
+
+That is, command line arguments must be separated by commas and enclosed in
+double quotes.  The exception to this rule is the "ld" using the "<" operator.
+
+The lint target in the Makefile does not work on VxWorks.
+
+During compile the following warnings may occur:
+
+/vxworks54/target/h/string.h:48: warning: conflicting types for built-in function `memcmp'
+/vxworks54/target/h/string.h:49: warning: conflicting types for built-in function `memcpy'
+
+These can be ignored.
+

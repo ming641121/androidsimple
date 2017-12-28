@@ -1,0 +1,67 @@
+#
+# File:               Example snmp agent configuration file.
+#
+# Description:
+#             This file defines initial values for the system group,
+#             community names, trap community names, and whether 
+#             authentication-failure traps should be generated.
+#
+#             The form of each line is:
+#                     <TAG>   <VALUE>
+#
+#             Where TAG is one of {sysDescr, sysLocation, sysContact,
+#             snmpEnableAuthenTraps, community, trap}, and VALUE
+#             is a valid value for the given key.
+#
+#             White space (tabs, spaces, line-feeds/carriage-returns)
+#             and blank lines are ignored.
+#
+
+#
+# Initial system group values. 
+# Valid tags are {sysDescr, sysLocation, sysContact}.
+#
+sysContact      "SNMP Research, Inc.  +1 865 573 1434"
+
+#
+# Initial SNMP group values.
+# The only valid tag is snmpEnableAuthenTraps.
+# It may have the value 1 (enabled) or 2 (disabled).
+#
+snmpEnableAuthenTraps   1
+
+#
+# Community specification for SNMPv1-only agents.
+#
+# The format of the value clause is:
+#     <community name, IP address, privileges, community-id>
+#
+# o The community name may be any string.
+# o The IP address indicates the remote site for which this 
+#   community is valid. If the IP address is 0.0.0.0, any
+#   address may communicate using that community name.
+# o The privileges are one of: 
+#       READ for read only
+#       WRITE for read/write
+# o If a community name appears more than once, the first
+#   match will be chosen.
+# o The community identifier can be used by some proxy agents and
+#   is not used in general
+#
+community       test1         10.1.2.3         READ  0
+community       test2         0.0.0.0          WRITE 1
+community       test3         0.0.0.0          read  2
+community       test4         10.1.2.4        write 3
+community       public        0.0.0.0          read  4
+community       proxy-letter  0.0.0.0          read  100
+community       proxy-digit   0.0.0.0          read  200
+community       proxy-other   0.0.0.0          read  300
+community       woof          0.0.0.0          write 9
+
+#
+# Trap community specification for SNMPv1-only agents.
+#
+# The format of the value clause is:
+#     <community name, IP address>
+#
+trap            test2         10.1.2.5

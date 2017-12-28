@@ -1,0 +1,14 @@
+The files in this directory include a set of RFCs which either are MIB
+documents, are of general interest or which directly relate to
+management of networks, applications or systems in some other way.
+These are provided as a service to SNMP Research's customers.
+
+The file INDEX contains a portion of the RFC index which pertains to
+the files included here.  While we attempt to keep this list
+up-to-date, that is virtually impossible given the pace of MIB
+development in the Internet community.  Please check the most recent
+version of the RFC index to be certain that an RFC included here has
+not been obsoleted.
+
+Online copies of RFCs are available from http://www.ietf.org.
+

@@ -1,0 +1,116 @@
+--
+--
+-- Copyright (C) 1992-2003 by SNMP Research, Incorporated.
+--
+-- This software is furnished under a license and may be used and copied
+-- only in accordance with the terms of such license and with the
+-- inclusion of the above copyright notice. This software or any other
+-- copies thereof may not be provided or otherwise made available to any
+-- other person. No title to and ownership of the software is hereby
+-- transferred.
+--
+-- The information in this software is subject to change without notice
+-- and should not be construed as a commitment by SNMP Research, Incorporated.
+--
+-- Restricted Rights Legend:
+--  Use, duplication, or disclosure by the Government is subject to
+--  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+--  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+--  subparagraphs (c)(4) and (d) of the Commercial Computer
+--  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+--  clauses in the NASA FAR Supplement and other corresponding
+--  governmental regulations.
+--
+--
+
+--
+--                PROPRIETARY NOTICE
+--
+-- This software is an unpublished work subject to a confidentiality agreement
+-- and is protected by copyright and trade secret law.  Unauthorized copying,
+-- redistribution or other use of this work is prohibited.
+--
+-- The above notice of copyright on this source code product does not indicate
+-- any actual or intended publication of such source code.
+--
+--
+
+
+   --
+   -- This MIB defines the organization of SNMP Research examples, present
+   -- and future, covering the basics of SNMP in the area of conceptual
+   -- tables.
+   --
+
+   TABLE-MIB DEFINITIONS ::= BEGIN
+
+   snmpResearch                OBJECT IDENTIFIER ::= { enterprises 99 }
+
+   snmpResearchMIBs            OBJECT IDENTIFIER ::= { snmpResearch 12 }
+
+   srExamples                  OBJECT IDENTIFIER ::= { snmpResearchMIBs 19 }
+
+   srBasics                    OBJECT IDENTIFIER ::= { srExamples 1 }
+
+   srTables                    OBJECT IDENTIFIER ::= { srBasics 2 }
+
+   srIndex                     OBJECT IDENTIFIER ::= { srTables 1 }
+
+   srIntegerIndex              OBJECT IDENTIFIER ::= { srIndex 1 }
+
+   srOctetStringIndex          OBJECT IDENTIFIER ::= { srIndex 2 }
+
+   srOIDIndex                  OBJECT IDENTIFIER ::= { srIndex 3 }
+
+   srBITSIndex                 OBJECT IDENTIFIER ::= { srIndex 4 }
+
+   srIpAddressIndex            OBJECT IDENTIFIER ::= { srIndex 5 }
+
+   srCounter32Index            OBJECT IDENTIFIER ::= { srIndex 6 }
+
+   srGauge32Index              OBJECT IDENTIFIER ::= { srIndex 7 }
+
+   srTimeTicksIndex            OBJECT IDENTIFIER ::= { srIndex 8 }
+
+   srOpaqueIndex               OBJECT IDENTIFIER ::= { srIndex 9 }
+
+   srCounter64Index            OBJECT IDENTIFIER ::= { srIndex 10 }
+
+   srUnsigned32Index           OBJECT IDENTIFIER ::= { srIndex 11 }
+
+   srDisplayStringIndex        OBJECT IDENTIFIER ::= { srIndex 12 }
+
+   srPhysAddressIndex          OBJECT IDENTIFIER ::= { srIndex 13 }
+
+   srMacAddressIndex           OBJECT IDENTIFIER ::= { srIndex 14 }
+
+   srTruthValueIndex           OBJECT IDENTIFIER ::= { srIndex 15 }
+
+-- srTestAndIncrIndex          OBJECT IDENTIFIER ::= { srIndex 16 }
+
+   srAutonomousTypeIndex       OBJECT IDENTIFIER ::= { srIndex 17 }
+
+   srVariablePointerIndex      OBJECT IDENTIFIER ::= { srIndex 18 }
+
+   srRowPointerIndex           OBJECT IDENTIFIER ::= { srIndex 19 }
+
+-- srRowStatusIndex            OBJECT IDENTIFIER ::= { srIndex 20 }
+
+   srTimeStampIndex            OBJECT IDENTIFIER ::= { srIndex 21 }
+
+   srTimeIntervalIndex         OBJECT IDENTIFIER ::= { srIndex 22 }
+
+   srDateAndTimeIndex          OBJECT IDENTIFIER ::= { srIndex 23 }
+
+   srStorageTypeIndex          OBJECT IDENTIFIER ::= { srIndex 24 }
+
+   srTDomainIndex              OBJECT IDENTIFIER ::= { srIndex 25 }
+
+   srTAddressIndex             OBJECT IDENTIFIER ::= { srIndex 26 }
+
+   srTableMultiDimensional     OBJECT IDENTIFIER ::= { srTables 2 }
+
+   srTableRowCreation          OBJECT IDENTIFIER ::= { srTables 3 }
+
+   END
+

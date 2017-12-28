@@ -1,0 +1,241 @@
+
+#
+#
+# Copyright (C) 1992-2003 by SNMP Research, Incorporated.
+#
+# This software is furnished under a license and may be used and copied
+# only in accordance with the terms of such license and with the
+# inclusion of the above copyright notice. This software or any other
+# copies thereof may not be provided or otherwise made available to any
+# other person. No title to and ownership of the software is hereby
+# transferred.
+#
+# The information in this software is subject to change without notice
+# and should not be construed as a commitment by SNMP Research, Incorporated.
+#
+# Restricted Rights Legend:
+#  Use, duplication, or disclosure by the Government is subject to
+#  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+#  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+#  subparagraphs (c)(4) and (d) of the Commercial Computer
+#  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+#  clauses in the NASA FAR Supplement and other corresponding
+#  governmental regulations.
+#
+#
+
+#
+#                PROPRIETARY NOTICE
+#
+# This software is an unpublished work subject to a confidentiality agreement
+# and is protected by copyright and trade secret law.  Unauthorized copying,
+# redistribution or other use of this work is prohibited.
+#
+# The above notice of copyright on this source code product does not indicate
+# any actual or intended publication of such source code.
+#
+#
+
+
+TOPDIR = .
+
+
+# Generated on Fri Nov 21 12:57:49 EST 2003
+
+# Config file is /amd/hive/manwork/robin/rel.16.1/snmp/CONFIG/LUMA
+
+# 
+# Operating System Information
+#
+
+MOVE = move
+RMDIR = rmdir
+RM = del
+CP = copy
+CAT = type
+# PRESERVE is the flag to $(CP) to duplicate the modification time and
+# permission modes of the original file or directory.
+PRESERVE =
+
+# Extensions to certain kinds of files are set here.
+LIBEXT = a
+BINEXT =
+OBJEXT = o
+
+
+LIBPRF = lib
+
+
+ VX_VW_BASE = $(WIND_BASE)\target
+VX_HSP_BASE = $(WIND_BASE)\host\$(WIND_HOST_TYPE)
+
+         OS = -DSR_VXWORKS
+         os = vxworks_nt
+
+  SR_OSTYPE = -DCPU=4
+    OSFLAGS =
+    HOST_OS = w32
+ EXTRA_DEFS =
+
+         CC = $(VX_HSP_BASE)\bin\ccppc
+ DEBUGFLAGS = -g
+         LD = $(VX_HSP_BASE)\bin\ldppc -r
+         AR = $(VX_HSP_BASE)\bin\arppc
+     AROPTS = clr
+     RANLIB = $(VX_HSP_BASE)\bin\ranlibppc
+
+    ARC_INC_DIRS = -I$(VX_VW_BASE)\h
+IPC_DEFAULT = -DSR_TCP_IPC
+IPC_DEFAULT_LIB = tcp
+
+
+#
+# Directories
+#
+
+
+OBD_V1 = 1
+
+OBD_V2c =
+
+OBD_V3 =
+
+OSBASEDIR = v$(OBD_V1)$(OBD_V2c)$(OBD_V3)
+
+
+OSLIBDIR = $(os)$(OSBASEDIR).lib
+OSOBJDIR = $(os)$(OSBASEDIR).obj
+OSBINDIR = $(os)$(OSBASEDIR).bin
+
+SECUR_DIR = $(TOPDIR)\..\basic
+
+LIBDIR      = $(SECUR_DIR)\$(OSLIBDIR)
+BINDIR      = $(SECUR_DIR)\$(OSBINDIR)
+INSTALLDIR  = $(SECUR_DIR)\$(OSBINDIR)
+MIBS_DIR    = $(TOPDIR)\mibs
+RFCS_DIR    = $(TOPDIR)\mibs\rfcs
+IANA_DIR    = $(TOPDIR)\mibs\iana
+MIBCOMP_DIR = $(SECUR_DIR)\$(HOST_OS).bin
+
+#
+# Subordinant Makefile
+#
+
+
+BMFN_V1 = 1
+
+BMFN_V2c =
+
+BMFN_V3 =
+
+BASEMAKEFILENAME = Makev$(BMFN_V1)$(BMFN_V2c)$(BMFN_V3)
+
+
+SUBMAKEFILE = $(BASEMAKEFILENAME).$(os)
+#
+# Make Command
+#
+
+MAKECMD = make -f $(SUBMAKEFILE)
+
+all::
+
+install::
+
+clean::
+	-$(RM) $(BINDIR)\*$(BINEXT)
+	-$(RMDIR) $(BINDIR)
+
+
+$(INSTALLDIR)::
+	-mkdir $(INSTALLDIR)
+
+# User Options Section
+
+# Libraries, Agent, Emanate, and Utilities installation information
+LOCAL_DRIVE = c:
+ETCDIR = $(LOCAL_DRIVE)\etc
+
+
+CONFIGDIR = $(LOCAL_DRIVE)\etc\srconf
+
+
+# You should not need to change anything below this line.
+
+
+all::
+	( $(MAKECMD) -C engine all )
+	( $(MAKECMD) -C devkit all )
+	( $(MAKECMD) -C devkit/mibtree all )
+	( $(MAKECMD) -C devkit/mibtable all )
+clean::
+	( $(MAKECMD) -C engine clean )
+	( $(MAKECMD) -C devkit clean )
+	( $(MAKECMD) -C devkit/mibtree clean )
+	( $(MAKECMD) -C devkit/mibtable clean )
+lint::
+	-( $(MAKECMD) -C engine lint )
+	-( $(MAKECMD) -C devkit lint )
+	-( $(MAKECMD) -C devkit/mibtree lint )
+	-( $(MAKECMD) -C devkit/mibtable lint )
+
+
+all:: 
+	( $(MAKECMD) -C $(MIBS_DIR)/common all )
+clean::
+	( $(MAKECMD) -C $(MIBS_DIR)/common clean )
+
+
+all::
+	( $(MAKECMD) -C snmpd/lib all )
+clean::
+	( $(MAKECMD) -C snmpd/lib clean )
+lint::
+	-( $(MAKECMD) -C snmpd/lib lint )
+
+
+all::
+	( $(MAKECMD) -C snmpd/unix all )
+clean::
+	( $(MAKECMD) -C snmpd/unix clean )
+
+install:: $(INSTALLDIR)
+	-$(CP) snmpd\unix\$(OSOBJDIR)\snmpd$(BINEXT) $(INSTALLDIR)
+
+lint::
+	-( $(MAKECMD) -C snmpd/unix lint )
+
+
+# Configuration file installation
+
+V1 = 1
+
+V2C =
+
+V3 =
+
+# Make directories
+install::
+	-mkdir $(ETCDIR)
+	-mkdir $(CONFIGDIR)
+	-mkdir $(CONFIGDIR)\mgr
+	-mkdir $(CONFIGDIR)\agt
+
+
+install::
+	-$(CP) $(SECUR_DIR)\config\agt\v$(V1)$(V2C)$(V3).cnf \
+		$(CONFIGDIR)\agt\snmpd.cnf
+	-$(CP) $(SECUR_DIR)\config\mgr\v$(V1)$(V2C)$(V3).cnf \
+		$(CONFIGDIR)\mgr\mgr.cnf
+	-$(CP) mibs\common\$(OSOBJDIR)\snmpinfo.dat \
+		$(CONFIGDIR)\mgr\snmpinfo.dat
+
+
+# Configuration file installation finished
+
+clean::
+	-$(RMDIR) $(LIBDIR)
+
+
+all::
+	@echo "Build complete."

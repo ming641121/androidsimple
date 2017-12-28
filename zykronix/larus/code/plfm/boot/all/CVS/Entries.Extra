@@ -1,0 +1,7 @@
+/bootConfig.c////*///
+/bootInit.c////*///
+/configAll.h////*///
+/dataSegPad.c////*///
+/usrConfig.c////*///
+/version.c////*///
+/vssver.scc////*///

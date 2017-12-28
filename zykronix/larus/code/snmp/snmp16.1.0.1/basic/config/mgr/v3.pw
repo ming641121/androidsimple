@@ -1,0 +1,77 @@
+PASSWORDS FOR USERS LISTED IN v1c3.cnf
+
+v1c3.cnf (copied to mgr.cnf by the installation process) contains
+template entries for the example SNMPv3 users included with SNMP Research
+products.  The following lists the passwords used in the example
+agent configuration file v1c3.cnf distributed with SNMP Research agents
+starting with release 16.1.
+
+A '-' means that there is no password configured.
+----------------------------------------------------------------------
+root
+    Auth Password:   "authpass"
+    Priv Password:   "privpass"
+
+Administrator
+    Auth Password:   "authpass"
+    Priv Password:   "privpass"
+
+public:
+    Auth Password:   -
+    Priv Password:   -
+
+The following users are in the example agent configuration file v1c3-full.cnf
+distributed with SNMP Research agents starting with release 16.1.
+----------------------------------------------------------------------
+
+DayShiftSupervisor
+    Auth Password:   "auth password for DayShiftSupervisor"
+    Priv Password:   "priv password for DayShiftSupervisor"
+
+EveningShiftSupervisor
+    Auth Password:   "auth password for EveningShiftSupervisor"
+    Priv Password:   "priv password for EveningShiftSupervisor"
+
+NightShiftSupervisor
+    Auth Password:   "auth password for NightShiftSupervisor"
+    Priv Password:   "priv password for NightShiftSupervisor"
+
+DayOperator
+    Auth Password:   "auth password for DayOperator"
+    Priv Password:   "priv password for DayOperator"
+
+EveningOperator
+    Auth Password:   "auth password for EveningOperator"
+    Priv Password:   "priv password for EveningOperator"
+
+NightOperator
+    Auth Password:   "auth password for NightOperator"
+    Priv Password:   "priv password for NightOperator"
+
+NetworkAdministrator
+    Auth Password:   "auth password for NetworkAdministrator"
+    Priv Password:   "priv password for NetworkAdministrator"
+
+HelpDesk
+    Auth Password:   "auth password for HelpDesk"
+    Priv Password:   "priv password for HelpDesk"
+
+NetView
+    Auth Password:   "auth password for NetView"
+    Priv Password:   "priv password for NetView"
+
+OpenView
+    Auth Password:   "auth password for OpenView"
+    Priv Password:   "priv password for OpenView"
+
+Spectrum
+    Auth Password:   "auth password for Spectrum"
+    Priv Password:   "priv password for Spectrum"
+
+EnterPol
+    Auth Password:   "auth password for EnterPol"
+    Priv Password:   "priv password for EnterPol"
+
+SNMPv3ConfigWizard
+    Auth Password:   "auth password for SNMPv3 Configuration Wizard
+    Priv Password:   "priv password for SNMPv3 Configuration Wizard"

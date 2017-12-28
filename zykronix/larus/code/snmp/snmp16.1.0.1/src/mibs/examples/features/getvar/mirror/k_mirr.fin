@@ -1,0 +1,400 @@
+/*
+ *
+ * Copyright (C) 1996-2003 by SNMP Research, Incorporated.
+ *
+ * This software is furnished under a license and may be used and copied
+ * only in accordance with the terms of such license and with the
+ * inclusion of the above copyright notice. This software or any other
+ * copies thereof may not be provided or otherwise made available to any
+ * other person. No title to and ownership of the software is hereby
+ * transferred.
+ *
+ * The information in this software is subject to change without notice
+ * and should not be construed as a commitment by SNMP Research, Incorporated.
+ *
+ * Restricted Rights Legend:
+ *  Use, duplication, or disclosure by the Government is subject to
+ *  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+ *  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+ *  subparagraphs (c)(4) and (d) of the Commercial Computer
+ *  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+ *  clauses in the NASA FAR Supplement and other corresponding
+ *  governmental regulations.
+ *
+ */
+
+/*
+ *                PROPRIETARY NOTICE
+ *
+ * This software is an unpublished work subject to a confidentiality agreement
+ * and is protected by copyright and trade secret law.  Unauthorized copying,
+ * redistribution or other use of this work is prohibited.
+ *
+ * The above notice of copyright on this source code product does not indicate
+ * any actual or intended publication of such source code.
+ *
+ */
+
+
+#include "sr_conf.h"
+
+#include <stdio.h>
+
+#include <string.h>
+
+
+#include <sys/types.h>
+
+#include <sys/socket.h>
+
+#include "sr_snmp.h"
+#include "comunity.h"
+#include "v2clssc.h"
+#include "sr_trans.h"
+#include "context.h"
+#include "method.h"
+#include "mibout.h"
+#include "diag.h"
+#include "getvar.h"
+#include "oid_lib.h"
+
+#ifdef SR_FILENAME
+SR_FILENAME
+#undef SR_FILENAME
+#endif /* SR_FILENAME */
+
+#define GETVAR_SEARCHTYPE(x) (((x)==1) ? (EXACT) : (NEXT))
+
+static mirrorLoopbackTargetBefore_t    mirrorLoopbackTargetBeforeData;
+static mirrorLoopbackTargetAfter_t     mirrorLoopbackTargetAfterData;
+static OID                            *mirrorSourceIllegalTarget;
+static OID                            *mirrorTarget;
+static long                            mirrorGetVarSearchType;
+static OID                            *nullOID;
+static OctetString                    *errorOctetString;
+
+static long GetVarStatus
+    SR_PROTOTYPE(( int value ));
+
+static long
+GetVarStatus(value)
+   int value;
+{
+   long i;
+   static short table[] = { 
+      0,                            /*  1   other                        */
+      0,                            /*  2   not-attempted                */
+      0,                            /*  3   endless-loop-detected        */
+      0,                            /*  4                                */
+#ifdef SR_SNMPv2
+      NO_SUCH_OBJECT_EXCEPTION,     /*  5   no-such-object-execption     */
+      NO_SUCH_INSTANCE_EXCEPTION,   /*  6   no-such-instance-exception   */
+      END_OF_MIB_VIEW_EXCEPTION,    /*  7   end-of-mib-exception         */
+#else /* SR_SNMPv2 */
+      0,                            /*  5                                */
+      0,                            /*  6                                */
+      0,                            /*  7                                */
+#endif /* SR_SNMPv2 */
+      0,                            /*  8                                */
+      0,                            /*  9                                */
+      INTEGER_TYPE,                 /*  10  integer-type                 */
+      OCTET_PRIM_TYPE,              /*  11  octet-prim-type              */
+      OBJECT_ID_TYPE,               /*  12  object-id-type               */
+      COUNTER_TYPE,                 /*  13  counter-type                 */
+      GAUGE_TYPE,                   /*  14  gauge-type                   */
+      TIME_TICKS_TYPE,              /*  15  time-ticks-type              */
+      IP_ADDR_PRIM_TYPE,            /*  16  ip-addr-prim-type            */
+      OPAQUE_PRIM_TYPE,             /*  17  opaque-prim-type             */
+      NULL_TYPE,                    /*  18  null-type                    */
+      0,                            /*  19                               */
+      0,                            /*  20                               */
+#ifdef SR_SNMPv2
+      COUNTER_64_TYPE,              /*  21  counter64-type               */
+#else /* SR_SNMPv2 */
+      0,                            /*  21                               */
+#endif /* SR_SNMPv2 */
+      0                             /*  22                               */
+   };
+
+   if (value == 0) {
+      return 1;  /* other */
+   }
+   for (i=21; i>=0; i--) {
+      if (table[i] == value) {
+         return (i+1);
+      }
+   }
+   return 1;  /* other */
+}
+
+
+int
+#ifndef PER_FILE_INIT
+k_initialize()
+#else /* PER_FILE_INIT */
+k_mirr_initialize()
+#endif /* PER_FILE_INIT */
+{
+   /* internal use only */
+   mirrorSourceIllegalTarget =
+      MakeOIDFromDot("1.3.6.1.4.1.99.12.19.2.1.1.2");
+      /* mirrorSource -- mirrorTarget can not refer to this subtree */
+   mirrorTarget =
+      MakeOIDFromDot("1.3.6.1.4.1.99.12.19.2.1.1.1.2.0");
+      /* mirrorLoopbackOctetString1 -- the default mirrored object */
+   mirrorGetVarSearchType = 1;
+      /* exact -- the default searchType for GetVar() */
+   nullOID =
+      MakeOIDFromDot("0.0");
+      /* the null OID -- for mirrorTarget to be able to refer to nothing */
+   errorOctetString = NULL;
+
+
+   /* default values for read-only objects */
+   mirrorLoopbackTargetBeforeData.mirrorLoopbackInteger1 =
+      42;  /* random value */
+   mirrorLoopbackTargetBeforeData.mirrorLoopbackOctetString1 =
+      MakeOctetStringFromText("mirror, mirror on the wall");
+   mirrorLoopbackTargetBeforeData.mirrorLoopbackOID1 =
+      MakeOIDFromDot("1.3.6.1");  /* internet -- random value */
+   SET_ALL_VALID(mirrorLoopbackTargetBeforeData.valid);
+   mirrorLoopbackTargetAfterData.mirrorLoopbackInteger2 =
+      99;  /* random value */
+   mirrorLoopbackTargetAfterData.mirrorLoopbackOctetString2 =
+      MakeOctetStringFromText("who's the fairest of them all");
+   mirrorLoopbackTargetAfterData.mirrorLoopbackOID2 =
+      MakeOIDFromDot("1.3.6.1.2.1");  /* mib_2 -- random value */
+   SET_ALL_VALID(mirrorLoopbackTargetAfterData.valid);
+
+
+   return 1;
+}
+
+int
+#ifndef PER_FILE_INIT
+k_terminate()
+#else /* PER_FILE_INIT */
+k_mirr_terminate()
+#endif /* PER_FILE_INIT */
+{
+   return 1;
+}
+
+mirrorLoopbackTargetBefore_t *
+k_mirrorLoopbackTargetBefore_get(serialNum, contextInfo, nominator)
+   int serialNum;
+   ContextInfo *contextInfo;
+   int nominator;
+{
+   return(&mirrorLoopbackTargetBeforeData);
+}
+
+#ifdef FNAME
+#undef FNAME
+#endif /* FNAME */
+#define FNAME "k_mirrorSource_get"
+mirrorSource_t *
+k_mirrorSource_get(serialNum, contextInfo, nominator)
+   int serialNum;
+   ContextInfo *contextInfo;
+   int nominator;
+{
+   static mirrorSource_t mirrorSourceData;
+   static int last_serialNum = 0;
+   static VarBind *vb = NULL;
+   static int GetVar_in_progress = 0;
+
+   if (GetVar_in_progress) {
+      /* endless-loop-detected */
+      DPRINTF((APWARN, "%s: endless loop on GetVar() detected\n", FNAME));
+      mirrorSourceData.mirrorGetVarStatus = 3;
+      SET_VALID(I_mirrorGetVarStatus, mirrorSourceData.valid);
+      if (nominator == -1 || nominator == I_mirrorGetVarStatus) {
+         return(&mirrorSourceData);
+      } else {
+         return NULL;
+      }
+   }
+   if (serialNum > last_serialNum || serialNum == 0) {
+      ZERO_VALID(mirrorSourceData.valid);
+      last_serialNum = serialNum;
+      if (errorOctetString != NULL) {
+         FreeOctetString(errorOctetString);
+         errorOctetString = NULL;
+      }
+      mirrorSourceData.mirrorOctetString = NULL;
+      mirrorSourceData.mirrorOID = NULL;
+      if (vb != NULL) {
+         FreeVarBind(vb);
+         vb = NULL;
+      }
+   }
+
+   /* mirrorTarget and mirrorGetVarSearchType are always valid */
+   mirrorSourceData.mirrorTarget = mirrorTarget;
+   SET_VALID(I_mirrorTarget, mirrorSourceData.valid);
+   mirrorSourceData.mirrorGetVarSearchType = mirrorGetVarSearchType;
+   SET_VALID(I_mirrorGetVarSearchType, mirrorSourceData.valid);
+
+   if (nominator == I_mirrorTarget || nominator == I_mirrorGetVarSearchType) {
+      return(&mirrorSourceData);
+   }
+   if (vb == NULL) {
+      if (!CmpOID(mirrorTarget, nullOID)) {
+         DPRINTF((APWARN, "%s: mirrorTarget is 0.0\n", FNAME));
+         if (nominator == -1 || nominator == I_mirrorGetVarStatus) {
+            /* not-attempted */
+            mirrorSourceData.mirrorGetVarStatus = 2;
+            SET_VALID(I_mirrorGetVarStatus, mirrorSourceData.valid);
+            return(&mirrorSourceData);
+         } else {
+            return NULL;
+         }
+      } else {
+         GetVar_in_progress = 1;
+         vb = i_GetVar(NULL, GETVAR_SEARCHTYPE(mirrorGetVarSearchType),
+	    mirrorTarget);
+         GetVar_in_progress = 0;
+         if (vb == NULL) {
+            return NULL;
+         }
+         if (VALID(I_mirrorGetVarStatus, mirrorSourceData.valid)) {
+	    /* endless-loop-detected */
+	    if (nominator == -1 || nominator == I_mirrorGetVarStatus) {
+               return(&mirrorSourceData);
+	    } else {
+               return NULL;
+	    }
+         } else {
+            mirrorSourceData.mirrorGetVarStatus = GetVarStatus(vb->value.type);
+            SET_VALID(I_mirrorGetVarStatus, mirrorSourceData.valid);
+            mirrorSourceData.mirrorGetVarResult = vb->name;
+            SET_VALID(I_mirrorGetVarResult, mirrorSourceData.valid);
+	 }
+         switch (vb->value.type) {
+            case INTEGER_TYPE:
+               mirrorSourceData.mirrorInteger = vb->value.sl_value;
+               SET_VALID(I_mirrorInteger, mirrorSourceData.valid);
+               break;
+            case OCTET_PRIM_TYPE:
+               if (vb->value.os_value != NULL) {
+                  mirrorSourceData.mirrorOctetString = vb->value.os_value;
+                  SET_VALID(I_mirrorOctetString, mirrorSourceData.valid);
+               }
+               break;
+            case OBJECT_ID_TYPE:
+               if (vb->value.os_value != NULL) {
+                  mirrorSourceData.mirrorOID = vb->value.oid_value;
+                  SET_VALID(I_mirrorOID, mirrorSourceData.valid);
+               }
+               break;
+#ifdef SR_SNMPv2
+            case NO_SUCH_OBJECT_EXCEPTION:
+            case NO_SUCH_INSTANCE_EXCEPTION:
+            case END_OF_MIB_VIEW_EXCEPTION:
+#endif /* SR_SNMPv2 */
+            case COUNTER_TYPE:
+            case GAUGE_TYPE:
+            case TIME_TICKS_TYPE:
+            case IP_ADDR_PRIM_TYPE:
+            case OPAQUE_PRIM_TYPE:
+            case NULL_TYPE:
+#ifdef SR_SNMPv2
+            case COUNTER_64_TYPE:
+#endif /* SR_SNMPv2 */
+	       break;
+            default:
+               DPRINTF((APERROR, "%s: i_GetVar(): illegal type: 0x%x\n",
+                  FNAME, vb->value.type));
+         }
+      }
+   }
+   if (nominator == -1 || VALID(nominator, mirrorSourceData.valid)) {
+      return(&mirrorSourceData);
+   } else {
+      return NULL;
+   }
+}
+
+#ifdef SETS
+int
+k_mirrorSource_test(object, value, dp, contextInfo)
+    ObjectInfo     *object;
+    ObjectSyntax   *value;
+    doList_t       *dp;
+    ContextInfo    *contextInfo;
+{
+    if (object->nominator == I_mirrorTarget) {
+       if (CmpOID(value->oid_value, mirrorSourceIllegalTarget) >= 0) {
+          if (!CmpOIDClass(value->oid_value, mirrorSourceIllegalTarget)) {
+             return WRONG_VALUE_ERROR;
+          }
+       }
+    }
+    
+    return NO_ERROR;
+}
+
+int
+k_mirrorSource_ready(object, value, doHead, dp)
+    ObjectInfo     *object;
+    ObjectSyntax   *value;
+    doList_t       *doHead;
+    doList_t       *dp;
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_mirrorSource_set(data, contextInfo, function)
+   mirrorSource_t *data;
+   ContextInfo *contextInfo;
+   int function;
+{
+   OID *tempOID;
+
+   if (VALID(I_mirrorTarget, data->valid)) {
+      tempOID = CloneOID(data->mirrorTarget);
+      if (tempOID == NULL) {
+         return GEN_ERROR;
+      }
+      FreeOID(mirrorTarget);
+      mirrorTarget = tempOID;
+   }
+
+   if (VALID(I_mirrorGetVarSearchType, data->valid)) {
+      mirrorGetVarSearchType = data->mirrorGetVarSearchType;
+   }
+
+   return NO_ERROR;
+
+}
+#endif /* SETS */
+
+#ifdef SR_SNMPv2
+#ifdef SR_mirrorSource_UNDO
+/* add #define SR_mirrorSource_UNDO in sitedefs.h to
+ * include the undo routine for the mirrorSource family.
+ */
+int
+mirrorSource_undo(doHead, doCur, contextInfo)
+    doList_t       *doHead;
+    doList_t       *doCur;
+    ContextInfo    *contextInfo;
+{
+   return NO_ERROR;
+}
+#endif /* SR_mirrorSource_UNDO */
+#endif /* SR_SNMPv2 */
+
+mirrorLoopbackTargetAfter_t *
+k_mirrorLoopbackTargetAfter_get(serialNum, contextInfo, nominator)
+   int serialNum;
+   ContextInfo *contextInfo;
+   int nominator;
+{
+   return(&mirrorLoopbackTargetAfterData);
+}
+

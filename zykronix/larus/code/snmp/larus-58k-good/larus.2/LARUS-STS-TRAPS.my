@@ -1,0 +1,697 @@
+-- *****************************************************************
+-- LARUS-TRAPS-MIB
+--
+-- 
+--
+--************************************************************
+
+LARUS-TRAPS-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+  
+        NOTIFICATION-TYPE  FROM SNMPv2-SMI
+
+	larusMib FROM LARUS-MIB
+ 
+               stsSystemId,
+               stsSystemMgmtIpOption,
+               stsSystemMgmtIpAddress,
+               stsSystemMgmtIpSubnetMask,
+               stsSystemMgmtIpGatewayAddress,
+               stsSystemSntpIpOption,
+               stsSystemSntpIpAddress,
+               stsSystemSntpIpSubnetMask,
+               stsSystemSntpIpGatewayAddress,
+               stsSystemTime,
+               stsSystemTimeZone,
+               stsSystemMgmtIpSubnetMask,
+               stsSystemAlarmAcoMode,
+               stsSystemAlarmAcoCutOff,
+               stsSystemAlarmEscalatingTime,
+               stsSystemWarmReset,
+               stsSystemColdReset,
+               stsSystemConfigReset,
+               stsSystemIntegratedAlarm,
+               stsSystemAlarmAcoLed,
+               stsSystemMinorLED,
+               stsSystemMajorLED,
+               stsSystemCriticalLED,
+               stsSystemCurrentSWVersion,
+               stsClockInputManualSelect,
+               stsClockInputOperMode,
+               stsClockInputProtectedPri,
+               stsClockInputSetSlip,
+               stsClockInputSSMSelect,
+               stsClockInputType,
+               stsTopSourceIpOption,
+               stsTopSourceIpAddress,
+               stsTopSourceIpSubnetMask,
+               stsTopSourceIpGatewayAddress,
+               stsTopPacketRate,
+               stsTopInputSelect,
+               stsTopDestNumber,
+               stsTopDestIp,
+               stsTopDestUdpPort,
+	           stsTopDestVlanId,
+               stsClockInputStatusIndex,
+               stsClockInputState,
+               stsClockInputSSMIndex,
+               stsClockInputSSMType,
+               stsClockInputSSMValue,
+               stsCardShelf,
+               stsCardIndex,
+               stsCardType,
+               stsCardOperStatus,
+               stsOscillatorIndex,
+               stsOscillatorModuleType,
+               stsOscillatorStatus,
+               stsGpsIndex,
+               stsGpsSPOS,
+               stsGpsTRMO,
+               stsGpsStatus,
+               stsLinkIndex,
+               stsLinkType,
+               stsLinkEnable,
+               stsLinkLineCode,
+               stsLinkFMT,
+               stsLinkTermination,
+               stsLinkMFCHK,
+               stsLinkId,
+               stsAlarmThresholdCurrentMon,
+               stsAlarmThresholdType,
+               stsAlarmThresholdValue,
+               stsAlarmThresholdTimeInterval,
+               stsLinkAlarmSettingLinkType,
+               stsLinkAlarmSettingType,
+               stsLinkAlarmSettingSevirity,
+               stsLinkAlarmSevirity,
+               stsOscillatorAlarmSettingClock,
+               stsOscillatorAlarmSettingType,
+               stsOscillatorAlarmSettingSeverity,
+               stsOscillatorAlarmSeverity,
+               stssPwrAlarmSettingShelf,
+               stsOsPwrAlarmSettingOsPwr,
+               stsOsPwrAlarmSettingSeverity,
+               stsOsPwrAlarmSeverity,
+               stsOutputAlarmSettingShelf,
+               stsOutputAlarmSettingSlot,
+               stsOutputAlarmSettingPort,
+               stsOutputAlarmSettingType,
+               stsOutputAlarmSettingSeverity,
+               stsOutputAlarmSeverity,
+	         stsOutputTiuSettingShelf,
+	         stsOutputTiuSettingSlot,
+               stsOutputTiuSettingPort,
+               stsOutputTiuSettingLineCoding,
+               stsOutputTiuSettingFMT,
+               stsOutputTiuSettingTermination,
+               stsAlarmSource,
+               stsAlarmSourceType,
+               stsAlarmSeverity,
+               stsAlarmSrvEff,
+               stsOutputShelf,
+               stsOutputSlot,
+               stsOutputRedState,
+               stsOutputCRCCHK,
+               stsOutputCAS,
+               stsOutputSSM,
+               stsOutputSSMValue,
+               stsOutputTimingFormat,
+               stsEmmShelf,
+               stsEmmUnitId,
+               stsEmmSensorType,
+               stsEmmAlarmStatus,
+               stsEmmSensorReading,
+               stsEmmShelf,
+               stsEmmUnitId,
+               stsEmmSensorType,
+               stsEmmMajorAlmHiThresh,
+               stsEmmMajorAlmLoThresh,
+               stsEmmMinorAlmHiThresh,
+               stsEmmMinorAlmLoThresh,
+               stsAntIndex,
+               stsAntStatus,
+               stsTrapRegMgrNumber,
+               stsTrapRegMgrIp,
+               stsTrapRegMgrUdpPort,
+               stsTrapRegCommunityStr,
+               stsTrapRegState  FROM LARUS-58k-MIB;              
+
+
+stsTrap MODULE-IDENTITY
+	LAST-UPDATED "0307300000Z"  -- Oct 28, 2005
+	ORGANIZATION 
+  		"CXR LARUS"
+	CONTACT-INFO
+		"CXR Larus
+		A Subsidiary of EMRISE CORPORATION
+		894 Faulstich Court,
+		San Jose, CA 95112
+		Tel: +1 408-200-2561
+		LARUS, Inc.
+		"
+	DESCRIPTION
+    	"The LARUS STS58k Enterprise MIB.
+    	"
+		::= { larusMib 101 }   
+
+
+stsSystemIpConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsSystemMgmtIpOption,
+               stsSystemMgmtIpAddress,
+               stsSystemMgmtIpSubnetMask,
+               stsSystemMgmtIpGatewayAddress,
+               stsSystemSntpIpOption,
+               stsSystemSntpIpAddress,
+               stsSystemSntpIpSubnetMask,
+               stsSystemSntpIpGatewayAddress
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when IP address configurations were changed
+          .
+         "
+
+     ::= { stsTrap 1001 }
+
+stsSystemConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsSystemTime,
+               stsSystemTimeZone,
+               stsSystemMgmtIpSubnetMask,
+               stsSystemAlarmAcoMode,
+               stsSystemAlarmAcoCutOff,
+               stsSystemAlarmEscalatingTime
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when system configurations were changed
+          .
+         "
+
+     ::= { stsTrap 1002 }
+
+stsSystemReset NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsSystemWarmReset,
+               stsSystemColdReset,
+               stsSystemConfigReset
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when system was reset. From the values of the reset types
+          indicating it was warm, cold or config reset - reset(2). noAction(1) means not
+          this reset type.
+          .
+         "
+
+     ::= { stsTrap 1003 }
+
+stsSystemAlarmStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsSystemIntegratedAlarm,
+               stsSystemAlarmAcoLed,
+               stsSystemMinorLED,
+               stsSystemMajorLED,
+               stsSystemCriticalLED
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when system alarm status was changed
+          .
+         "
+
+     ::= { stsTrap 1004 }
+
+stsSystemSWVersionChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsSystemCurrentSWVersion
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when system software image was changed
+          .
+         "
+
+     ::= { stsTrap 1005 }
+
+
+stsClockInputChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsClockInputManualSelect,
+               stsClockInputOperMode,
+               stsClockInputProtectedPri,
+               stsClockInputSetSlip,
+               stsClockInputSSMSelect,
+               stsClockInputType
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when clock input configuration was changed
+          .
+         "
+
+     ::= { stsTrap 1101 }
+
+stsClockInputStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsClockInputStatusIndex,
+               stsClockInputState
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when clock input state was changed
+          .
+         "
+
+     ::= { stsTrap 1102 }
+
+
+stsClockInputSSMConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsClockInputSSMIndex,
+               stsClockInputSSMType,
+               stsClockInputSSMValue
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when clock input SSM configuration was changed
+          .
+         "
+
+     ::= { stsTrap 1103 }
+
+stsTopConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsTopSourceIpOption,
+               stsTopSourceIpAddress,
+               stsTopSourceIpSubnetMask ,
+               stsTopSourceIpGatewayAddress,
+               stsTopPacketRate,
+               stsTopInputSelect
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when TOP configuration was changed
+          .
+         "
+
+     ::= { stsTrap 1104 }
+
+
+stsTopDestConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsTopDestNumber,
+               stsTopDestIp,
+               stsTopDestUdpPort,
+	         stsTopDestVlanId
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when a TOP destination configuration was changed.
+          .
+         "
+
+     ::= { stsTrap 1105 }
+
+stsCardStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsCardShelf,
+               stsCardIndex,
+               stsCardType,
+               stsCardOperStatus
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when a card (module) operational status was changed
+          .
+         "
+
+     ::= { stsTrap 1201 }
+
+stsOscillatorStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsOscillatorIndex,
+               stsOscillatorModuleType,
+               stsOscillatorStatus
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when an oscillator operational status was changed
+          .
+         "
+
+     ::= { stsTrap 1301 }
+
+stsGpsStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsGpsIndex,
+               stsGpsSPOS,
+               stsGpsTRMO,
+               stsGpsStatus
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when an GPS operational status was changed
+          .
+         "
+
+     ::= { stsTrap 1401 }
+
+
+stsLinkConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsLinkIndex,
+               stsLinkType,
+               stsLinkEnable,
+               stsLinkLineCode,
+               stsLinkFMT,
+               stsLinkTermination,
+               stsLinkMFCHK,
+               stsLinkId
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when a link's configuration was changed
+          .
+         "
+
+     ::= { stsTrap 1501 }
+
+stsAlarmThresholdConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsAlarmThresholdCurrentMon,
+               stsAlarmThresholdType,
+               stsAlarmThresholdValue,
+               stsAlarmThresholdTimeInterval
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when monitor alarm threshold configuration was changed
+          .
+         "
+
+     ::= { stsTrap 1601 }
+
+
+stsLinkAlarmSettingConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsLinkAlarmSettingLinkType,
+               stsLinkAlarmSettingType,
+               stsLinkAlarmSettingSevirity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when link alarm severity setting configuration was changed
+          .
+         "
+
+     ::= { stsTrap 1701 }
+
+stsLinkAlarmStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsLinkAlarmSettingLinkType,
+               stsLinkAlarmSettingType,
+               stsLinkAlarmSevirity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when link alarm severity status was changed
+          .
+         "
+
+     ::= { stsTrap 1702 }
+
+stsOscillatorAlarmSettingConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsOscillatorAlarmSettingClock,
+               stsOscillatorAlarmSettingType,
+               stsOscillatorAlarmSettingSeverity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when oscillator alarm severity setting configuration was changed
+          .
+         "
+
+     ::= { stsTrap 1801 }
+
+stsOscillatorAlarmStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsOscillatorAlarmSettingClock,
+               stsOscillatorAlarmSettingType,
+               stsOscillatorAlarmSeverity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when oscillator alarm severity status was changed
+          .
+         "
+
+     ::= { stsTrap 1802 }
+
+stsOsPwrAlarmSettingConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stssPwrAlarmSettingShelf,
+               stsOsPwrAlarmSettingOsPwr,
+               stsOsPwrAlarmSettingSeverity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when OS and power alarm severity setting configuration was changed
+          .
+         "
+
+     ::= { stsTrap 1901 }
+
+stsOsPwrAlarmStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stssPwrAlarmSettingShelf,
+               stsOsPwrAlarmSettingOsPwr,
+               stsOsPwrAlarmSeverity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when OS and power alarm severity status was changed
+          .
+         "
+
+     ::= { stsTrap 1902 }
+
+stsOutputAlarmSettingConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsOutputAlarmSettingShelf,
+               stsOutputAlarmSettingSlot,
+               stsOutputAlarmSettingPort,
+               stsOutputAlarmSettingType,
+               stsOutputAlarmSettingSeverity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when output alarm severity setting configuration was changed
+          .
+         "
+
+     ::= { stsTrap 2001 }
+
+stsOutputAlarmStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsOutputAlarmSettingShelf,
+               stsOutputAlarmSettingSlot,
+               stsOutputAlarmSettingPort,
+               stsOutputAlarmSettingType,
+               stsOutputAlarmSeverity
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when output alarm severity status was changed
+          .
+         "
+
+     ::= { stsTrap 2002 }
+
+stsOutputTiuSettingConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+ 	         stsOutputTiuSettingShelf,
+	         stsOutputTiuSettingSlot,
+               stsOutputTiuSettingPort,
+               stsOutputTiuSettingLineCoding,
+               stsOutputTiuSettingFMT,
+               stsOutputTiuSettingTermination
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when output tiu setting configuration was changed
+          .
+         "
+
+     ::= { stsTrap 2003 }
+
+
+stsAlarmStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsAlarmSource,
+               stsAlarmSourceType,
+               stsAlarmSeverity,
+               stsAlarmSrvEff
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when alarm status was changed
+          .
+         "
+
+     ::= { stsTrap 2101 }
+
+stsOutputCardConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsOutputShelf,
+               stsOutputSlot,
+               stsOutputRedState,
+               stsOutputCRCCHK,
+               stsOutputCAS,
+               stsOutputSSM,
+               stsOutputSSMValue,
+               stsOutputTimingFormat
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when output card configuration was changed
+          .
+         "
+
+     ::= { stsTrap 2201 }
+
+
+
+stsEMMAlarmStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsEmmShelf,
+               stsEmmUnitId,
+               stsEmmSensorType,
+               stsEmmAlarmStatus,
+               stsEmmSensorReading
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when EMM alarm status was changed
+          .
+         "
+
+     ::= { stsTrap 2301 }
+
+
+
+stsEMMAlarmThresholdChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsEmmShelf,
+               stsEmmUnitId,
+               stsEmmSensorType,
+               stsEmmMajorAlmHiThresh,
+               stsEmmMajorAlmLoThresh,
+               stsEmmMinorAlmHiThresh,
+               stsEmmMinorAlmLoThresh
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when EMM alarm threshold configuration was changed
+          .
+         "
+
+     ::= { stsTrap 2302 }
+
+
+stsAntStatusChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsAntIndex,
+               stsAntStatus
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when Antenna status was changed
+          .
+         "
+
+     ::= { stsTrap 2401 }
+
+
+stsTrapRegMgrConfigChange NOTIFICATION-TYPE
+     OBJECTS { 
+               stsSystemId,
+               stsTrapRegMgrNumber,
+               stsTrapRegMgrIp,
+               stsTrapRegMgrUdpPort,
+               stsTrapRegCommunityStr,
+               stsTrapRegState
+
+             }
+
+     STATUS    current
+     DESCRIPTION
+         "This notification is sent when a trap receiver IP state  was changed.
+          .
+         "
+
+     ::= { stsTrap 2501 }
+
+	 END

@@ -1,0 +1,77 @@
+diff --git a/kernel/arch/arm64/boot/dts/rk3368-tb_mipi.dts b/kernel/arch/arm64/boot/dts/rk3368-tb_mipi.dts
+index 1611f69313..bb3907ae53 100644
+--- a/kernel/arch/arm64/boot/dts/rk3368-tb_mipi.dts
++++ b/kernel/arch/arm64/boot/dts/rk3368-tb_mipi.dts
+@@ -6,8 +6,8 @@
+ #include "../../../arm/boot/dts/vtl_ts_sdk8846.dtsi"
+ //#include "../../../arm/boot/dts/lcd-b101ew05.dtsi"
+ //#include "../../../arm/boot/dts/lcd-tv080wum-mipi.dtsi"
+-#include "../../../arm/boot/dts/my-mipi-lcd.dtsi"
+-//#include "../../../arm/boot/dts/my-mipi-lcd-1080x1920.dtsi"
++//#include "../../../arm/boot/dts/my-mipi-lcd.dtsi"
++#include "../../../arm/boot/dts/my-mipi-lcd-1080x1920.dtsi"
+ //#include "rk3368-cif-sensor.dtsi" // betta masked
+ #include <dt-bindings/suspend/rockchip-rk3368.h>
+ 
+@@ -595,13 +595,13 @@
+                focaltech,reset-gpio = <&gpio0 GPIO_B3 0>;
+                focaltech,irq-gpio = <&gpio0 GPIO_B4 0>;
+                focaltech,max-touch-number = <5>;
+-               focaltech,display-coords =  <0 0 800 1280>;
++               focaltech,display-coords =  <0 0 1080 1920>;
+        };
+ #endif
+ };
+ 
+ &i2c3 {
+-       status = "okay";
++       status = "disabled";
+ /*
+        pn547: pn547@28 {
+        compatible = "nxp,pn547";
+diff --git a/kernel/arch/arm64/boot/dts/rk3368.dtsi b/kernel/arch/arm64/boot/dts/rk3368.dtsi
+index 3b93c4afa4..4441bad357 100644
+--- a/kernel/arch/arm64/boot/dts/rk3368.dtsi
++++ b/kernel/arch/arm64/boot/dts/rk3368.dtsi
+@@ -1138,7 +1138,7 @@
+                                                /* KHz    uV */
+                                                200000 1200000
+                                                300000 1200000
+-                                               400000 1200000
++                                               400000 1100000
+                                                >;
+                                        bd-freq-table = <
+                                                /* bandwidth   freq */
+@@ -1350,7 +1350,7 @@
+                clocks = <&clk_gates16 0>, <&clk_gates16 14>, <&clk_isp>, <&clk_isp>, <&pclk_isp>, <&clk_vip>, <&clk_vip_pll>, <&clk_gates17 4>, <&clk_gates22 11>, <&pd_isp>, <&clk_gates16 9>;
+                clock-names = "aclk_isp", "hclk_isp", "clk_isp", "clk_isp_jpe", "pclkin_isp", "clk_cif_out", "clk_cif_pll", "hclk_mipiphy1", "pclk_dphyrx", "pd_isp", "clk_vio0_noc";
+ #if 1  /* neko modified, These confict with spi1_clk: spi1-clk,sensor PWDN pin and Ethernet MAC related pins. */
+-               pinctrl-names = "default";
++               pinctrl-names = "default", "isp_mipi_fl";
+ #else
+                pinctrl-names = "default", "isp_dvp8bit2", "isp_dvp10bit", "isp_dvp12bit", "isp_dvp8bit0", "isp_dvp8bit4", "isp_mipi_fl", "isp_mipi_fl_prefl","isp_flash_as_gpio","isp_flash_as_trigger_out";
+ #endif /* neko modified, These confict with spi1_clk: spi1-clk and Ethernet MAC related pins. */
+@@ -1365,6 +1365,8 @@
+                pinctrl-7 = <&cif_clkout &isp_prelight>;
+                pinctrl-8 = <&isp_flash_trigger_as_gpio>;
+                pinctrl-9 = <&isp_flash_trigger>;
++#else
++               pinctrl-1 = <&cif_clkout>;
+ #endif /* neko modified, These confict with spi1_clk: spi1-clk and Ethernet MAC related pins. */
+                rockchip,isp,mipiphy = <2>;
+                rockchip,isp,cifphy = <1>;
+@@ -1378,7 +1380,7 @@
+                rockchip,isp,iommu_enable = <1>;
+                status = "okay";
+        };
+-
++#if 0
+        cif: cif@ff950000 {
+                compatible = "rockchip,cif";
+                reg = <0x0 0xff950000 0x0 0x10000>;
+@@ -1396,7 +1398,7 @@
+                rockchip,cru = <&cru>;
+                status = "okay";
+        };
+-
++#endif

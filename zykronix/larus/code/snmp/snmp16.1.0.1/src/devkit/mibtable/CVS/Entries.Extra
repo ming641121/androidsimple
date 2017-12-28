@@ -1,0 +1,7 @@
+/Makefile.vxworks_nt////*///
+/Makev1.vxworks_nt////*///
+/Makev1c.vxworks_nt////*///
+/mib_tabl.c////*///
+/oidtran.c////*///
+/oidtranh.c////*///
+/prse_sid.c////*///

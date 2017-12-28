@@ -1,0 +1,87 @@
+# Standard Project file created by RVDEBUG. Do not hand edit unless
+# you know what you are doing. Use the Settings Window
+# Copyright (c) 2002 - ARM Ltd
+$sARM_C21.stp
+[PROJECT] 
+author_=hlchang
+Modification_History.create={\
+  user_=hlchang:date_="Mon Mar 07 10:28:27 2005":\
+	description="Created as Project M005"\
+}
+type_=Standard
+processor_=ARM-C21
+description="Standard project"
+source_search="D:\ARM\M005\DiagTest_test"
+source_mapping="D:\ARM\M005\DiagTest_test\For_Diag->D:\ARM\M005\DiagTest_test"
+[SETTINGS] 
+[CONFIGURATION] 
+config=For_BB
+active_config=For_Diag
+config=For_NAND
+config=For_NOR
+config=For_Diag
+[COMPILE=arm] 
+Preprocessor.include="include"
+Optimization.cpu=ARM926EJ-S
+%For_BB%Preprocessor.define="_For_BB"
+%For_NAND%Preprocessor.define="_For_NAND"
+%For_NOR%Preprocessor.define="_For_NOR"
+%For_Diag%Preprocessor.define="_For_Diag"
+Sources.files=".\sources\SYSUtility.c"
+Sources.files=".\sources\SPI.c"
+Sources.files=".\sources\main.c"
+Sources.files=".\sources\retarget.c"
+[COMPILE=arm_cpp] 
+Compilation.compiler=ARM_Cpp
+Compilation.Checking.source_language=CPlusPlus
+Preprocessor.include="include"
+[COMPILE=thumb] 
+Compilation.compiler=Thumb_C
+[COMPILE=thumb_cpp] 
+Compilation.compiler=Thumb_Cpp
+Compilation.Checking.source_language=CPlusPlus
+[ASSEMBLE=arm] 
+Assembly.cpu=ARM926EJ-S
+Sources.files=".\sources\heap.s"
+Sources.files=".\sources\init.s"
+Sources.files=".\sources\stack.s"
+Sources.files=".\sources\vectors.s"
+Preprocessor.include="include"
+%For_BB%Preprocessor.directives="For_BB SETL {TRUE}"
+%For_NAND%Preprocessor.directives="For_NAND SETL {TRUE}"
+%For_NOR%Preprocessor.directives="For_NOR SETL {TRUE}"
+%For_Diag%Preprocessor.directives="For_Diag SETL {TRUE}"
+[ASSEMBLE=thumb] 
+disable=True
+Assembly.assemble_mode=Thumb
+[CUSTOM=default] 
+[BUILD] 
+application="M005.axf"
+makefile="M005.mk"
+%For_NAND%Link_Advanced.scatter_file="scat_RAM_0.scf"
+%For_NAND%Link_Advanced.entry="0x00000000"
+%For_NOR%Link_Advanced.entry="0xFFFF0000"
+%For_NOR%Link_Advanced.scatter_file="scat_ROM_Hi.scf"
+%For_NOR%Pre_Post_Link.post_link="fromelf -c -o .\For_NOR\M005.dis .\For_NOR\M\
+	005.axf"
+%For_NAND%Pre_Post_Link.post_link="fromelf -c -o .\For_NAND\M005.dis .\For_NAN\
+	D\M005.axf"
+%For_NAND%Pre_Post_Link.post_link="fromelf --bin -o .\For_NAND\M005.bin .\For_\
+	NAND\M005.axf"
+%For_Diag%Pre_Post_Link.post_link="fromelf -c -o .\For_Diag\M005.dis .\For_Dia\
+	g\M005.axf"
+%For_NOR%Pre_Post_Link.post_link="fromelf --bin -o .\For_NOR\M005.bin .\For_NO\
+	R\M005.axf"
+%For_NOR%Pre_Post_Link.post_link="fromelf --vhx --16x1 -o .\For_NOR\M005_16.vh\
+	x .\For_NOR\M005.axf"
+%For_BB%Link_Advanced.entry="0x00000000"
+%For_BB%Link_Advanced.scatter_file="scat_RAM_0.scf"
+%For_BB%Pre_Post_Link.post_link="fromelf -c -o .\For_BB\M005.dis .\For_BB\M005\
+	.axf"
+%For_BB%Pre_Post_Link.post_link="fromelf --nodebug --elf -o .\For_BB\M005.elf \
+	.\For_BB\M005.axf"
+Messages.sizes=totals
+%For_Diag%Link_Advanced.entry="0x00000000"
+%For_Diag%Link_Advanced.scatter_file="scat_RAM_diag.scf"
+
+

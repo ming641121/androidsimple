@@ -1,0 +1,228 @@
+;;; Copyright MagicPixel Inc. 2005-2006. All rights reserved.
+;;; By HL Chang, 2006/06/22
+;
+;
+; Regions marked UNINIT will be left uninitialized, i.e. they will not be 
+; zero-initialized by the C library when it starts-up.
+;
+; For MP323 HAPS, due to MP321 DRAI limitation, the max. columns/row is 256
+;	Then set to 256 columns/row
+;
+;
+; Assume uses 2 pcs of ESMT M12L128168A SDRAM, it should (4_banks x 4K_row x 512_column x 16_bits ) x 2 = 32M Bytes.
+; Due to MP323 setting is 256 column, it becomes (4_banks x 4K_row x 256_column x 16_bits ) x 2 = 16M Bytes.
+; Or uses 4Mx32 bits DRAM (4_banks x 4K_row x 256_column x 32_bits ) = 16M Bytes.
+; Or any DRAM with 4 banks, 4M Bytes per bank, 256 columns. Only test areas addresses in bank 1 change.
+; The total size is 16M bytes here: 0x0000_0000~0x00FF_FFFF (16M Bytes)
+;
+;	                       BANK 0         		                  BANK 1
+;
+;	0x0000_0000 -->	--------------------	0x0040_0000 --> --------------------
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |  Code 1.5M bytes |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	0x0018_0000 --> |------------------|	0x0058_0000 --> --------------------
+;	                |                  |	                |                  |
+;	                |  Test 0.5M bytes |	                |  Test 0.5M bytes |
+;	                |                  |	                |                  |
+;	0x0020_0000 --> --------------------	0x0060_0000 --> --------------------
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |  RAM 768K bytes  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	0x002C_0000 --> |------------------|	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |  Heap 640K bytes |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	0x0036_0000 --> |------------------|	                |                  |
+;	                | Stack 128K bytes |	                |                  |
+;	0x0038_0000 --> |------------------|	0x0078_0000 --> --------------------
+;	                |                  |	                |                  |
+;	                |  Test 0.5M bytes |	                |  Test 0.5M bytes |
+;	                |                  |	                |                  |
+;	0x003F_FFFF --> --------------------	0x007F_FFFF --> --------------------
+;
+;
+;
+;
+;	                       BANK 2         		                  BANK 3
+;
+;	0x0080_0000 -->	--------------------	0x00C0_0000 --> --------------------
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	0x00BF_FFFF --> |------------------|	0x00FF_FFFF --> --------------------
+;
+;
+;
+;****************************************************************************************
+;
+; Assume uses 2Mx32 bits DRAM (4_banks x 2K_row x 256_column x 32_bits ) = 8M Bytes.
+; Or any DRAM with 4 banks, 2M Bytes per bank, 256 columns.
+; The total size is 8M bytes here: 0x0000_0000~0x007F_FFFF (8M Bytes)
+;
+;	                      BANK 0         		                    BANK 1
+;
+;	0x0000_0000 -->	--------------------	0x0020_0000 --> --------------------
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |  Code 1.5M bytes |	                |  RAM 768K bytes  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	0x002C_0000 --> |------------------|
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |  Heap 640K bytes |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	0x0036_0000 --> |------------------|
+;	                |                  |	                | Stack 128K bytes |
+;	0x0018_0000 --> |------------------|	0x0038_0000 --> |------------------|
+;	                |                  |	                |                  |
+;	                |  Test 0.5M bytes |	                |  Test 0.5M bytes |
+;	                |                  |	                |                  |
+;	0x001F_FFFF --> --------------------	0x003F_FFFF --> --------------------
+;
+;
+;	                      BANK 2         		                    BANK 3
+;
+;	0x0040_0000 -->	--------------------	0x0060_0000 --> --------------------
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	0x005F_FFFF --> --------------------	0x007F_FFFF ->  --------------------
+;
+;
+;****************************************************************************************
+;
+; Assume uses 1Mx32 bits DRAM (2_banks x 2K_row x 256_column x 32_bits ) = 4M Bytes.
+; Or any DRAM with 2 banks, 2M Bytes per bank, 256 columns.
+; The total size is 4M bytes here: 0x0000_0000~0x003F_FFFF (4M Bytes)
+;
+;	                      BANK 0         		                    BANK 1
+;
+;	0x0000_0000 -->	--------------------	0x0020_0000 --> --------------------
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |  Code 1.5M bytes |	                |  RAM 768K bytes  |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	0x002C_0000 --> |------------------|
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	                |  Heap 640K bytes |
+;	                |                  |	                |                  |
+;	                |                  |	                |                  |
+;	                |                  |	0x0036_0000 --> |------------------|
+;	                |                  |	                | Stack 128K bytes |
+;	0x0018_0000 --> |------------------|	0x0038_0000 --> |------------------|
+;	                |                  |	                |                  |
+;	                |  Test 0.5M bytes |	                |  Test 0.5M bytes |
+;	                |                  |	                |                  |
+;	0x001F_FFFF --> --------------------	0x003F_FFFF --> --------------------
+;
+;****************************************************************************************
+;
+;
+; For Code: 	0x00000000~0x0017FFFF (1.5M Bytes)
+; For Test:		0x00180000~0x001FFFFF (512K Bytes)
+; For RAM:		0x00200000~0x002BFFFF (768K Bytes)
+; For HEAP:		0x002C0000~0x0035FFFF (640K Bytes)
+; For STACK:	0x00360000~0x0037FFFF (128K Bytes)
+; For Test:		0x00380000~0x003FFFFF (512K Bytes)
+;
+;
+; ROM address is last 32MB, ie, 0xFE000000~FFFFFFFF
+; ARM926EJ-S Hi Vector boot from 0xFFFF0000
+;
+; Assume uses 2M Bytes ROM (MX29LV160), start from 0xFFE00000
+;
+; SRAM : 0xB0000000~0xB0000FFF (4K Bytes)
+; For Test:		0xB8000000~0xB80003FF (1K Bytes)
+; For RAM:		0xB8000400~0xB80007FF (1K Bytes)
+; For HEAP:		0xB8000800~0xB8000BFF (1K Bytes)
+; For STACK:	0xB8000C00~0xB8000FFF (1K Bytes)
+;
+;****************************************************************************************
+;
+; For program that run from diag, uses free area for all code, RAM, HEAP & STACK
+;
+; For Code: 	0x00000000~0x000FFFFF (1M Bytes)
+; For RAM:		0x00100000~0x0011FFFF (128K Bytes)
+; For HEAP:		0x00120000~0x0015FFFF (256K Bytes)
+; For STACK:	0x00160000~0x0017FFFF (128K Bytes)
+; For Test:		0x00180000~0x001FFFFF (512K Bytes)
+; For Test:		0x00380000~0x003FFFFF (512K Bytes)
+;
+;
+
+ADDR_LOAD 0x00000000 0x100000
+{
+    ADDR_EXEC 0x00000000 0x100000
+    {
+        vectors.o (Vect, +First)
+        * (+RO)
+    }
+
+    RAM 0x00100000 0x20000
+    {
+        * (+RW,+ZI)
+    }
+
+    HEAP 0x00120000 UNINIT 0x40000
+    {
+        heap.o (+ZI)
+    }
+
+;	inherit SP from the execution environment
+;    STACKS 0x00180000 UNINIT
+;    {
+;        stack.o (+ZI)
+;    }
+
+}
+
+

@@ -1,0 +1,915 @@
+Last Updated August 2003
+
+1155 Structure and identification of management information for
+     TCP/IP-based internets. M.T. Rose, K. McCloghrie. May-01-1990.
+     (Format: TXT=40927 bytes) (Obsoletes RFC1065) (Also STD0016) (Status:
+     STANDARD)
+
+1157 Simple Network Management Protocol (SNMP). J.D. Case, M. Fedor,
+     M.L. Schoffstall, C. Davin. May-01-1990. (Format: TXT=74894 bytes)
+     (Obsoletes RFC1098) (Also STD0015) (Status: HISTORIC)
+     
+1213 Management Information Base for Network Management of 
+     TCP/IP-based internets:MIB-II. K. McCloghrie, M.T. Rose. Mar-01-1991.
+     (Format: TXT=146080 bytes) (Obsoletes RFC1158) (Updated by RFC2011,
+     RFC2012, RFC2013) (Also STD0017) (Status: STANDARD)
+
+1227 SNMP MUX protocol and MIB. M.T. Rose. May-01-1991. (Format:
+     TXT=25868 bytes) (Status: HISTORIC)
+ 
+1230 IEEE 802.4 Token Bus MIB. K. McCloghrie, R. Fox. May-01-1991.
+     (Format: TXT=53100 bytes) (Updated by RFC1239) (Status: HISTORIC)
+     
+1238 CLNS MIB for use with Connectionless Network Protocol (ISO 8473)
+     and End System to Intermediate System (ISO 9542). G. Satz.
+     Jun-01-1991. (Format: TXT=65159 bytes) (Obsoletes RFC1162) (Status:
+     EXPERIMENTAL)
+ 
+1239 Reassignment of experimental MIBs to standard MIBs. J.K.
+     Reynolds. Jun-01-1991. (Format: TXT=3656 bytes) (Updates RFC1229,
+     RFC1230, RFC1231, RFC1232, RFC1233) (Status: PROPOSED STANDARD)
+ 
+1269 Definitions of Managed Objects for the Border Gateway Protocol:
+     Version 3. S. Willis, J.W. Burruss. Oct-01-1991. (Format: TXT=25717
+     bytes) (Status: PROPOSED STANDARD)
+ 
+1270 SNMP Communications Services. F. Kastenholz. Oct-01-1991.
+     (Format: TXT=26167 bytes) (Status: INFORMATIONAL)
+ 
+1271 Remote Network Monitoring Management Information Base. S.
+     Waldbusser. Nov-01-1991. (Format: TXT=184111 bytes) (Obsoleted by
+     RFC1757) (Updated by RFC1513) (Status: PROPOSED STANDARD)
+ 
+1285 FDDI Management Information Base. J. Case. January 1992. (Format:
+     TXT=99747 bytes) (Updated by RFC1512) (Status: PROPOSED STANDARD)  
+ 
+1299 Summary of 1200-1299. M. Kennedy. January 1997. (Format: 
+     TXT=36594 bytes) (Status: INFORMATIONAL)
+ 
+1315 Management Information Base for Frame Relay DTEs. C. Brown, F.
+     Baker, C. Carvalho. April 1992. (Format: TXT=33825 bytes) (Obsoleted
+     by RFC2115) (Status: PROPOSED STANDARD)
+1321 The MD5 Message-Digest Algorithm. R. Rivest. April 1992. (Format:
+     TXT=35222 bytes) (Status: INFORMATIONAL)
+     
+1369 Implementation Notes and Experience for the Internet Ethernet  
+     MIB. F. Kastenholz. October 1992. (Format: TXT=13961 bytes) (Status:
+     INFORMATIONAL)
+ 
+1381 SNMP MIB Extension for X.25 LAPB. D. Throop, F. Baker. November
+     1992. (Format: TXT=71253 bytes) (Status: PROPOSED STANDARD)
+ 
+1382 SNMP MIB Extension for the X.25 Packet Layer. D. Throop, Ed..
+     November 1992. (Format: TXT=153877 bytes) (Status: PROPOSED STANDARD)
+ 
+1399 Summary of 1300-1399. J. Elliott. January 1997. (Format:
+     TXT=43662 bytes) (Status: INFORMATIONAL)
+ 
+1406 Definitions of Managed Objects for the DS1 and E1 Interface
+     Types. F. Baker, J. Watt, Eds.. January 1993. (Format: TXT=97559
+     bytes) (Obsoletes RFC1232) (Obsoleted by RFC2495) (Status: PROPOSED
+     STANDARD)
+ 
+1407 Definitions of Managed Objects for the DS3/E3 Interface Type. T.
+     Cox, K. Tesink. January 1993. (Format: TXT=90682 bytes) (Obsoletes
+     RFC1233) (Obsoleted by RFC2496) (Status: PROPOSED STANDARD)
+ 
+1414 Identification MIB. M. St. Johns, M. Rose. February 1993.
+     (Format: TXT=14165 bytes) (Status: PROPOSED STANDARD)
+ 
+1418 SNMP over OSI. M. Rose. March 1993. (Format: TXT=7721 bytes)
+     (Obsoletes RFC1161, RFC1283) (Status: PROPOSED STANDARD)
+
+1419 SNMP over AppleTalk. G. Minshall, M. Ritter. March 1993. (Format:
+     TXT=16470 bytes) (Status: PROPOSED STANDARD)
+ 
+1420 SNMP over IPX. S. Bostock. March 1993. (Format: TXT=6762 bytes)
+     (Obsoletes RFC1298) (Status: PROPOSED STANDARD)
+ 
+1461 SNMP MIB extension for Multiprotocol Interconnect over X.25. D.
+     Throop. May 1993. (Format: TXT=47945 bytes) (Status: PROPOSED
+     STANDARD)
+ 
+1470 FYI on a Network Management Tool Catalog: Tools for Monitoring
+     and Debugging TCP/IP Internets and Interconnected Devices. R. Enger,
+     J. Reynolds. June 1993. (Format: TXT=308528 bytes) (Obsoletes
+     RFC1147) (Also FYI0002) (Status: INFORMATIONAL)
+ 
+1471 The Definitions of Managed Objects for the Link Control Protocol
+     of the Point-to-Point Protocol. F. Kastenholz. June 1993. (Format:
+     TXT=53558 bytes) (Status: PROPOSED STANDARD)
+ 
+1472 The Definitions of Managed Objects for the Security Protocols of
+     the Point-to-Point Protocol. F. Kastenholz. June 1993. (Format:
+     TXT=27152 bytes) (Status: PROPOSED STANDARD)
+ 
+1473 The Definitions of Managed Objects for the IP Network Control
+     Protocol of the Point-to-Point Protocol. F. Kastenholz. June 1993.
+     (Format: TXT=20484 bytes) (Status: PROPOSED STANDARD)
+ 
+1474 The Definitions of Managed Objects for the Bridge Network Control
+     Protocol of the Point-to-Point Protocol. F. Kastenholz. June 1993.
+     (Format: TXT=31846 bytes) (Status: PROPOSED STANDARD)
+ 
+1493 Definitions of Managed Objects for Bridges. E. Decker, P.
+     Langille, A. Rijsinghani, K. McCloghrie. July 1993. (Format: 
+     TXT=74493 bytes) (Obsoletes RFC1286) (Status: DRAFT STANDARD)
+ 
+1499 Summary of 1400-1499. J. Elliott. January 1997. (Format:
+     TXT=40923 bytes) (Status: INFORMATIONAL)
+     
+1512 FDDI Management Information Base. J. Case, A. Rijsinghani.
+     September 1993. (Format: TXT=108589 bytes) (Updates RFC1285) (Status:
+     PROPOSED STANDARD)
+ 
+1513 Token Ring Extensions to the Remote Network Monitoring MIB. S.  
+     Waldbusser. September 1993. (Format: TXT=121974 bytes) (Updates
+     RFC1271) (Status: PROPOSED STANDARD)
+ 
+1514 Host Resources MIB. P. Grillo, S. Waldbusser. September 1993.
+     (Format: TXT=63775 bytes) (Obsoleted by RFC2790) (Status: PROPOSED
+     STANDARD) 
+ 
+1515 Definitions of Managed Objects for IEEE 802.3 Medium Attachment
+     Units (MAUs). D. McMaster, K. McCloghrie, S. Roberts. September 1993.
+     (Format: TXT=52828 bytes) (Status: PROPOSED STANDARD)
+ 
+1525 Definitions of Managed Objects for Source Routing Bridges. E.   
+     Decker, K. McCloghrie, P. Langille, A. Rijsinghani. September 1993.
+     (Format: TXT=38100 bytes) (Obsoletes RFC1286) (Status: PROPOSED
+     STANDARD)
+ 
+1559 DECnet Phase IV MIB Extensions. J. Saperia. December 1993.
+     (Format: TXT=125427 bytes) (Obsoletes RFC1289) (Status: DRAFT
+     STANDARD)
+ 
+1567 X.500 Directory Monitoring MIB. G. Mansfield, S. Kille. January
+     1994. (Format: TXT=33527 bytes) (Obsoleted by RFC2605) (Status:
+     PROPOSED STANDARD)
+ 
+1573 Evolution of the Interfaces Group of MIB-II. K. McCloghrie, F.
+     Kastenholz. January 1994. (Format: TXT=123057 bytes) (Obsoletes
+     RFC1229) (Obsoleted by RFC2233) (Status: PROPOSED STANDARD)
+ 
+1592 Simple Network Management Protocol Distributed Protocol Interface
+     Version 2.0. B. Wijnen, G. Carpenter, K. Curran, A. Sehgal, G.
+     Waters. March 1994. (Format: TXT=135259 bytes) (Obsoletes RFC1228)
+     (Status: EXPERIMENTAL)
+ 
+1593 SNA APPN Node MIB. W. McKenzie, J. Cheng. March 1994. (Format:
+     TXT=207882 bytes) (Status: INFORMATIONAL)
+     
+1595 Definitions of Managed Objects for the SONET/SDH Interface Type.
+     T. Brown, K. Tesink. March 1994. (Format: TXT=121937 bytes)
+     (Obsoleted by RFC2558) (Status: PROPOSED STANDARD) 
+ 
+1599 Summary of 1500-1599. M. Kennedy. January 1997. (Format:
+     TXT=43761 bytes) (Status: INFORMATIONAL)
+ 
+1604 Definitions of Managed Objects for Frame Relay Service. T. Brown,
+     Ed.. March 1994. (Format: TXT=88770 bytes) (Obsoletes RFC1596)
+     (Obsoleted by RFC2954) (Status: PROPOSED STANDARD)
+ 
+1611 DNS Server MIB Extensions. R. Austein, J. Saperia. May 1994.
+     (Format: TXT=58700 bytes) (Status: HISTORIC)
+ 
+1612 DNS Resolver MIB Extensions. R. Austein, J. Saperia. May 1994.
+     (Format: TXT=61382 bytes) (Status: HISTORIC)
+ 
+1628 UPS Management Information Base. J. Case, Ed.. May 1994. (Format:
+     TXT=83439 bytes) (Status: PROPOSED STANDARD)
+ 
+1643 Definitions of Managed Objects for the Ethernet-like Interface
+     Types. F. Kastenholz. July 1994. (Format: TXT=39008 bytes) (Obsoletes
+     RFC1623) (Also STD0050) (Status: STANDARD)
+ 
+1657 Definitions of Managed Objects for the Fourth Version of the  
+     Border Gateway Protocol (BGP-4) using SMIv2. S. Willis, J. Burruss,  
+     J. Chu, Ed.. July 1994. (Format: TXT=45505 bytes) (Status: DRAFT
+     STANDARD)
+ 
+1658 Definitions of Managed Objects for Character Stream Devices using
+     SMIv2. B. Stewart. July 1994. (Format: TXT=32579 bytes) (Obsoletes
+     RFC1316) (Status: DRAFT STANDARD)
+ 
+1659 Definitions of Managed Objects for RS-232-like Hardware Devices
+     using SMIv2. B. Stewart. July 1994. (Format: TXT=36479 bytes)
+     (Obsoletes RFC1317) (Status: DRAFT STANDARD)
+ 
+1660 Definitions of Managed Objects for Parallel-printer-like Hardware
+     Devices using SMIv2. B. Stewart. July 1994. (Format: TXT=16784 bytes)
+     (Obsoletes RFC1318) (Status: DRAFT STANDARD)
+ 
+1665 Definitions of Managed Objects for SNA NAUs using SMIv2. Z.
+     Kielczewski, D. Kostick, K. Shih, Eds.. July 1994. (Format:
+     TXT=133381 bytes) (Obsoleted by RFC1666) (Status: PROPOSED STANDARD)
+ 
+1666 Definitions of Managed Objects for SNA NAUs using SMIv2. Z.
+     Kielczewski, D. Kostick, K. Shih, Eds.. August 1994. (Format:
+     TXT=134385 bytes) (Obsoletes RFC1665) (Status: PROPOSED STANDARD)
+ 
+1694 Definitions of Managed Objects for SMDS Interfaces using SMIv2.
+     T. Brown, K. Tesink, Eds.. August 1994. (Format: TXT=70856 bytes)
+     (Obsoletes RFC1304) (Status: DRAFT STANDARD)
+ 
+1696 Modem Management Information Base (MIB) using SMIv2. J. Barnes, 
+     L. Brown, R. Royston, S. Waldbusser. August 1994. (Format: TXT=54054
+     bytes) (Status: PROPOSED STANDARD)
+ 
+1697 Relational Database Management System (RDBMS) Management
+     Information Base (MIB) using SMIv2. D. Brower, Ed., B. Purvy, A.
+     Daniel, M. Sinykin, J. Smith. August 1994. (Format: TXT=76202 bytes)
+     (Status: PROPOSED STANDARD)
+ 
+1699 Summary of 1600-1699. J. Elliott. January 1997. (Format: 
+     TXT=40674 bytes) (Status: INFORMATIONAL)
+ 
+1700 Assigned Numbers. J. Reynolds, J. Postel. October 1994. (Format:
+     TXT=458860 bytes) (Obsoletes RFC1340) (Obsoleted by RFC3232) (Also
+     STD0002) (Status: HISTORIC)
+ 
+1724 RIP Version 2 MIB Extension. G. Malkin, F. Baker. November 1994.
+     (Format: TXT=29645 bytes) (Obsoletes RFC1389) (Status: DRAFT 
+     STANDARD)
+
+1742 AppleTalk Management Information Base II. S. Waldbusser, K.
+     Frisa. January 1995. (Format: TXT=168306 bytes) (Obsoletes RFC1243)
+     (Status: PROPOSED STANDARD)
+ 
+1743 IEEE 802.5 MIB using SMIv2. K. McCloghrie, E. Decker. December
+     1994. (Format: TXT=43224 bytes) (Obsoletes RFC1231) (Obsoleted by  
+     RFC1748) (Status: DRAFT STANDARD)
+ 
+1747 Definitions of Managed Objects for SNA Data Link Control (SDLC)
+     using SMIv2. J. Hilgeman, Chair, S. Nix, A. Bartky, W. Clark, Ed..
+     January 1995. (Format: TXT=147388 bytes) (Status: PROPOSED STANDARD)
+ 
+1748 IEEE 802.5 MIB using SMIv2. K. McCloghrie, E. Decker. December
+     1994. (Format: TXT=43224 bytes) (Obsoletes RFC1743, RFC1231) (Updated
+     by RFC1749) (Status: DRAFT STANDARD)
+ 
+1749 IEEE 802.5 Station Source Routing MIB using SMIv2. K. McCloghrie,
+     F. Baker, E. Decker. December 1994. (Format: TXT=17563 bytes)
+     (Updates RFC1748) (Status: PROPOSED STANDARD)
+ 
+1757 Remote Network Monitoring Management Information Base. S.
+     Waldbusser. February 1995. (Format: TXT=208117 bytes) (Obsoletes
+     RFC1271) (Obsoleted by RFC2819) (Status: DRAFT STANDARD)
+ 
+1759 Printer MIB. R. Smith, F. Wright, T. Hastings, S. Zilles, J.
+     Gyllenskog. March 1995. (Format: TXT=239228 bytes) (Status: PROPOSED
+     STANDARD)
+ 
+1792 TCP/IPX Connection Mib Specification. T. Sung. April 1995.
+     (Format: TXT=16389 bytes) (Status: EXPERIMENTAL)
+ 
+1799 Request for Comments Summary RFC Numbers 1700-1799. M. Kennedy.
+     January 1997. (Format: TXT=42038 bytes) (Status: INFORMATIONAL)
+ 
+1850 OSPF Version 2 Management Information Base. F. Baker, R. Coltun.
+     November 1995. (Format: TXT=140255 bytes) (Obsoletes RFC1253)
+     (Status: DRAFT STANDARD)
+ 
+1899 Request for Comments Summary RFC Numbers 1800-1899. J. Elliott. 
+     January 1997. (Format: TXT=37984 bytes) (Status: INFORMATIONAL)
+ 
+1901 Introduction to Community-based SNMPv2. J. Case, K. McCloghrie,
+     M. Rose, S. Waldbusser. January 1996. (Format: TXT=15903 bytes)
+     (Status: HISTORIC)
+     
+1902 Structure of Management Information for Version 2 of the Simple
+     Network Management Protocol (SNMPv2). J. Case, K. McCloghrie, M.
+     Rose, S. Waldbusser. January 1996. (Format: TXT=77453 bytes)
+     (Obsoletes RFC1442) (Obsoleted by RFC2578) (Status: DRAFT STANDARD)
+ 
+1903 Textual Conventions for Version 2 of the Simple Network
+     Management Protocol (SNMPv2). J. Case, K. McCloghrie, M. Rose, S.
+     Waldbusser. January 1996. (Format: TXT=52652 bytes) (Obsoletes
+     RFC1443) (Obsoleted by RFC2579) (Status: DRAFT STANDARD)
+ 
+1904 Conformance Statements for Version 2 of the Simple Network
+     Management Protocol (SNMPv2). J. Case, K. McCloghrie, M. Rose, S.
+     Waldbusser. January 1996. (Format: TXT=47083 bytes) (Obsoletes
+     RFC1444) (Obsoleted by RFC2580) (Status: DRAFT STANDARD)
+ 
+1905 Protocol Operations for Version 2 of the Simple Network
+     Management Protocol (SNMPv2). J. Case, K. McCloghrie, M. Rose, S.
+     Waldbusser. January 1996. (Format: TXT=55526 bytes) (Obsoletes
+     RFC1448) (Obsoleted by RFC3416) (Status: DRAFT STANDARD)
+ 
+1906 Transport Mappings for Version 2 of the Simple Network Management
+     Protocol (SNMPv2). J. Case, K. McCloghrie, M. Rose, S. Waldbusser.
+     January 1996. (Format: TXT=27465 bytes) (Obsoletes RFC1449)
+     (Obsoleted by RFC3417) (Status: DRAFT STANDARD)
+ 
+1907 Management Information Base for Version 2 of the Simple Network
+     Management Protocol (SNMPv2). J. Case, K. McCloghrie, M. Rose, S.
+     Waldbusser. January 1996. (Format: TXT=34881 bytes) (Obsoletes
+     RFC1450) (Obsoleted by RFC3418) (Status: DRAFT STANDARD)
+ 
+1908 Coexistence between Version 1 and Version 2 of the
+     Internet-standard Network Management Framework. J. Case, K.
+     McCloghrie, M. Rose, S. Waldbusser. January 1996. (Format: TXT=21463
+     bytes) (Obsoletes RFC1452) (Obsoleted by RFC2576) (Status: DRAFT
+     STANDARD)
+ 
+1999 Request for Comments Summary RFC Numbers 1900-1999. J. Elliott.
+     January 1997. (Format: TXT=39819 bytes) (Status: INFORMATIONAL)
+ 
+2006 The Definitions of Managed Objects for IP Mobility Support using
+     SMIv2. D. Cong, M. Hamlen, C. Perkins. October 1996. (Format:
+     TXT=95030 bytes) (Status: PROPOSED STANDARD)
+ 
+2011 SNMPv2 Management Information Base for the Internet Protocol 
+     using SMIv2. K. McCloghrie, Ed.. November 1996. (Format: TXT=31168
+     bytes) (Updates RFC1213) (Status: PROPOSED STANDARD)
+ 
+2012 SNMPv2 Management Information Base for the Transmission Control
+     Protocol using SMIv2. K. McCloghrie, Ed.. November 1996. (Format:
+     TXT=16792 bytes) (Updates RFC1213) (Status: PROPOSED STANDARD)
+     
+2013 SNMPv2 Management Information Base for the User Datagram Protocol
+     using SMIv2. K. McCloghrie, Ed.. November 1996. (Format: TXT=9333
+     bytes) (Updates RFC1213) (Status: PROPOSED STANDARD)
+ 
+2020 IEEE 802.12 Interface MIB. J. Flick. October 1996. (Format:
+     TXT=72135 bytes) (Status: PROPOSED STANDARD)
+ 
+2021 Remote Network Monitoring Management Information Base Version 2
+     using SMIv2. S. Waldbusser. January 1997. (Format: TXT=262223 bytes)
+     (Status: PROPOSED STANDARD)
+ 
+2024 Definitions of Managed Objects for Data Link Switching using
+     SMIv2. D. Chen, Ed., P. Gayek, S. Nix. October 1996. (Format:
+     TXT=173952 bytes) (Status: PROPOSED STANDARD) 
+ 
+2037 Entity MIB using SMIv2. K. McCloghrie, A. Bierman. October 1996.
+     (Format: TXT=74362 bytes) (Obsoleted by RFC2737) (Status: PROPOSED
+     STANDARD)
+ 
+2039 Applicability of Standards Track MIBs to Management of World Wide
+     Web Servers. C. Kalbfleisch. November 1996. (Format: TXT=31966 bytes)
+     (Status: INFORMATIONAL)
+ 
+2051 Definitions of Managed Objects for APPC using SMIv2. M. Allen, B. 
+     Clouston, Z. Kielczewski, W. Kwan, B. Moore. October 1996. (Format:
+     TXT=239359 bytes) (Status: PROPOSED STANDARD)
+ 
+2064 Traffic Flow Measurement: Meter MIB. N. Brownlee. January 1997.
+     (Format: TXT=67520 bytes) (Obsoleted by RFC2720) (Status:
+     EXPERIMENTAL)
+ 
+2074 Remote Network Monitoring MIB Protocol Identifiers. A. Bierman,
+     R. Iddon. January 1997. (Format: TXT=81262 bytes) (Obsoleted by
+     RFC2895) (Status: PROPOSED STANDARD)
+ 
+2089 V2ToV1 Mapping SNMPv2 onto SNMPv1 within a bi-lingual SNMP agent.
+     B. Wijnen, D. Levi. January 1997. (Format: TXT=23814 bytes)
+     (Obsoleted by RFC2576) (Status: INFORMATIONAL)
+ 
+2096 IP Forwarding Table MIB. F. Baker. January 1997. (Format:
+     TXT=35930 bytes) (Obsoletes RFC1354) (Status: PROPOSED STANDARD)
+ 
+2099 Request for Comments Summary RFC Numbers 2000-2099. J. Elliott.
+     March 1997. (Format: TXT=40763 bytes) (Status: INFORMATIONAL)
+ 
+2108 Definitions of Managed Objects for IEEE 802.3 Repeater Devices
+     using SMIv2. K. de Graaf, D. Romascanu, D. McMaster, K. McCloghrie.
+     February 1997. (Format: TXT=166336 bytes) (Obsoletes RFC1516)
+     (Status: PROPOSED STANDARD)
+ 
+2127 ISDN Management Information Base using SMIv2. G. Roeck, Ed..
+     March 1997. (Format: TXT=95994 bytes) (Status: PROPOSED STANDARD)
+ 
+2128 Dial Control Management Information Base using SMIv2. G. Roeck,
+     Ed.. March 1997. (Format: TXT=66153 bytes) (Status: PROPOSED
+     STANDARD)
+ 
+2155 Definitions of Managed Objects for APPN using SMIv2. B. Clouston,
+     B. Moore. June 1997. (Format: TXT=213809 bytes) (Obsoleted by
+     RFC2455) (Status: PROPOSED STANDARD)
+ 
+2206 RSVP Management Information Base using SMIv2. F. Baker, J.
+     Krawczyk, A. Sastry. September 1997. (Format: TXT=112937 bytes)
+     (Status: PROPOSED STANDARD)
+ 
+2213 Integrated Services Management Information Base using SMIv2. F.
+     Baker, J. Krawczyk, A. Sastry. September 1997. (Format: TXT=36147
+     bytes) (Status: PROPOSED STANDARD)
+ 
+2214 Integrated Services Management Information Base Guaranteed
+     Service Extensions using SMIv2. F. Baker, J. Krawczyk, A. Sastry.
+     September 1997. (Format: TXT=15971 bytes) (Status: PROPOSED STANDARD)
+ 
+2232 Definitions of Managed Objects for DLUR using SMIv2. B. Clouston,
+     Ed., B. Moore, Ed.. November 1997. (Format: TXT=37955 bytes) (Status:
+     PROPOSED STANDARD)
+ 
+2233 The Interfaces Group MIB using SMIv2. K. McCloghrie, F.
+     Kastenholz. November 1997. (Format: TXT=148033 bytes) (Obsoletes
+     RFC1573) (Obsoleted by RFC2863) (Status: PROPOSED STANDARD)
+ 
+2238 Definitions of Managed Objects for HPR using SMIv2. B. Clouston,
+     Ed., B. Moore, Ed.. November 1997. (Format: TXT=65498 bytes) (Status:
+     PROPOSED STANDARD)
+ 
+2239 Definitions of Managed Objects for IEEE 802.3 Medium Attachment
+     Units (MAUs) using SMIv2. K. de Graaf, D. Romascanu, D. McMaster, K.
+     McCloghrie, S. Roberts. November 1997. (Format: TXT=80651 bytes)
+     (Obsoleted by RFC2668) (Status: PROPOSED STANDARD)
+ 
+2248 Network Services Monitoring MIB. N. Freed, S. Kille. January
+     1998. (Format: TXT=34106 bytes) (Obsoletes RFC1565) (Obsoleted by
+     RFC2788) (Status: PROPOSED STANDARD)
+ 
+2249 Mail Monitoring MIB. N. Freed, S. Kille. January 1998. (Format:
+     TXT=52334 bytes) (Obsoletes RFC1566) (Obsoleted by RFC2789) (Status:
+     PROPOSED STANDARD)
+ 
+2257 Agent Extensibility (AgentX) Protocol Version 1. M. Daniele, B.
+     Wijnen, D. Francisco. January 1998. (Format: TXT=177452 bytes)
+     (Obsoleted by RFC2741) (Status: PROPOSED STANDARD)
+ 
+2266 Definitions of Managed Objects for IEEE 802.12 Repeater Devices.
+     J. Flick. January 1998. (Format: TXT=134027 bytes) (Status: PROPOSED
+     STANDARD)
+ 
+2287 Definitions of System-Level Managed Objects for Applications. C.
+     Krupczak, J. Saperia. February 1998. (Format: TXT=98210 bytes)
+     (Status: PROPOSED STANDARD)
+ 
+2320 Definitions of Managed Objects for Classical IP and ARP Over ATM
+     Using SMIv2 (IPOA-MIB). M. Greene, J. Luciani, K. White, T. Kuo.
+     April 1998. (Format: TXT=102116 bytes) (Status: PROPOSED STANDARD)
+ 
+2358 Definitions of Managed Objects for the Ethernet-like Interface
+     Types. J. Flick, J. Johnson. June 1998. (Format: TXT=87891 bytes)
+     (Obsoletes RFC1650) (Obsoleted by RFC2665) (Status: PROPOSED
+     STANDARD)
+ 
+2400 Internet Official Protocol Standards. J. Postel, J. Reynolds.
+     September 1998. (Format: TXT=110969 bytes) (Obsoletes RFC2300)
+     (Obsoleted by RFC2500) (Status: HISTORIC)
+ 
+2417 Definitions of Managed Objects for Multicast over UNI 3.0/3.1
+     based ATM Networks. C. Chung, M. Greene. September 1998. (Format:
+     TXT=134862 bytes) (Obsoletes RFC2366) (Status: PROPOSED STANDARD)
+ 
+2438 Advancement of MIB specifications on the IETF Standards Track. M.
+     O'Dell, H. Alvestrand, B. Wijnen, S. Bradner. October 1998. (Format:
+     TXT=13633 bytes) (Also BCP0027) (Status: BEST CURRENT PRACTICE)
+ 
+2452 IP Version 6 Management Information Base for the Transmission
+     Control Protocol. M. Daniele. December 1998. (Format: TXT=19066
+     bytes) (Status: PROPOSED STANDARD)
+ 
+2454 IP Version 6 Management Information Base for the User Datagram
+     Protocol. M. Daniele. December 1998. (Format: TXT=15862 bytes)
+     (Status: PROPOSED STANDARD)
+ 
+2455 Definitions of Managed Objects for APPN. B. Clouston, B. Moore.
+     November 1998. (Format: TXT=251061 bytes) (Obsoletes RFC2155)
+     (Status: PROPOSED STANDARD)
+ 
+2456 Definitions of Managed Objects for APPN TRAPS. B. Clouston, B.
+     Moore. November 1998. (Format: TXT=44023 bytes) (Status: PROPOSED
+     STANDARD)
+ 
+2457 Definitions of Managed Objects for Extended Border Node. B.
+     Clouston, B. Moore. November 1998. (Format: TXT=54380 bytes) (Status:
+     PROPOSED STANDARD)
+ 
+2465 Management Information Base for IP Version 6: Textual Conventions
+     and General Group. D. Haskin, S. Onishi. December 1998. (Format:
+     TXT=77339 bytes) (Status: PROPOSED STANDARD)
+ 
+2466 Management Information Base for IP Version 6: ICMPv6 Group. D.
+     Haskin, S. Onishi. December 1998. (Format: TXT=27547 bytes) (Status:
+     PROPOSED STANDARD)
+
+2493 Textual Conventions for MIB Modules Using Performance History
+     Based on 15 Minute Intervals. K. Tesink, Ed.. January 1999. (Format:
+     TXT=18749 bytes) (Status: PROPOSED STANDARD)
+ 
+2494 Definitions of Managed Objects for the DS0 and DS0 Bundle
+     Interface Type. D. Fowler, Ed.. January 1999. (Format: TXT=47208
+     bytes) (Status: PROPOSED STANDARD)
+ 
+2495 Definitions of Managed Objects for the DS1, E1, DS2 and E2
+     Interface Types. D. Fowler, Ed.. January 1999. (Format: TXT=155560
+     bytes) (Obsoletes RFC1406) (Status: PROPOSED STANDARD)
+ 
+2496 Definitions of Managed Object for the DS3/E3 Interface Type. D.
+     Fowler, Ed.. January 1999. (Format: TXT=124251 bytes) (Obsoletes
+     RFC1407) (Status: PROPOSED STANDARD)
+ 
+2512 Accounting Information for ATM Networks. K. McCloghrie, J.
+     Heinanen, W. Greene, A. Prasad. February 1999. (Format: TXT=29119
+     bytes) (Status: PROPOSED STANDARD)
+ 
+2513 Managed Objects for Controlling the Collection and Storage of
+     Accounting Information for Connection-Oriented Networks. K.
+     McCloghrie, J. Heinanen, W. Greene, A. Prasad. February 1999.
+     (Format: TXT=60789 bytes) (Status: PROPOSED STANDARD)
+ 
+2514 Definitions of Textual Conventions and OBJECT-IDENTITIES for ATM
+     Management. M. Noto, E. Spiegel, K. Tesink. February 1999. (Format:
+     TXT=37583 bytes) (Status: PROPOSED STANDARD)
+ 
+2515 Definitions of Managed Objects for ATM Management. K. Tesink, Ed.
+     February 1999. (Format: TXT=179993 bytes) (Obsoletes RFC1695)
+     (Status: PROPOSED STANDARD)
+ 
+2558 Definitions of Managed Objects for the SONET/SDH Interface Type.
+     K. Tesink. March 1999. (Format: TXT=138550 bytes) (Obsoletes RFC1595)
+     (Status: PROPOSED STANDARD)
+ 
+2561 Base Definitions of Managed Objects for TN3270E Using SMIv2. K.
+     White, R. Moore. April 1999. (Format: TXT=113705 bytes) (Status:
+     PROPOSED STANDARD)
+ 
+2562 Definitions of Protocol and Managed Objects for TN3270E Response
+     Time Collection Using SMIv2 (TN3270E-RT-MIB). K. White, R. Moore.
+     April 1999. (Format: TXT=110633 bytes) (Status: PROPOSED STANDARD)
+ 
+2564 Application Management MIB. C. Kalbfleisch, C. Krupczak, R.
+     Presuhn, J. Saperia. May 1999. (Format: TXT=183314 bytes) (Status:
+     PROPOSED STANDARD)
+ 
+2570 Introduction to Version 3 of the Internet-standard Network
+     Management Framework. J. Case, R. Mundy, D. Partain, B. Stewart.
+     April 1999. (Format: TXT=50381 bytes) (Obsoleted by RFC3410) (Status:
+     INFORMATIONAL)
+ 
+2571 An Architecture for Describing SNMP Management Frameworks. B.
+     Wijnen, D. Harrington, R. Presuhn. April 1999. (Format: TXT=139260
+     bytes) (Obsoletes RFC2271) (Obsoleted by RFC3411) (Status: DRAFT
+     STANDARD)
+ 
+2572 Message Processing and Dispatching for the Simple Network
+     Management Protocol (SNMP). J. Case, D. Harrington, R. Presuhn, B.
+     Wijnen. April 1999. (Format: TXT=96035 bytes) (Obsoletes RFC2272)
+     (Obsoleted by RFC3412) (Status: DRAFT STANDARD)
+ 
+2573 SNMP Applications. D. Levi, P. Meyer, B. Stewart. April 1999.
+     (Format: TXT=150427 bytes) (Obsoletes RFC2273) (Obsoleted by RFC3413)
+     (Status: DRAFT STANDARD)
+ 
+2574 User-based Security Model (USM) for version 3 of the Simple
+     Network Management Protocol (SNMPv3). U. Blumenthal, B. Wijnen. April
+     1999. (Format: TXT=190755 bytes) (Obsoletes RFC2274) (Obsoleted by
+     RFC3414) (Status: DRAFT STANDARD)
+ 
+2575 View-based Access Control Model (VACM) for the Simple Network
+     Management Protocol (SNMP). B. Wijnen, R. Presuhn, K. McCloghrie.
+     April 1999. (Format: TXT=79642 bytes) (Obsoletes RFC2275) (Obsoleted
+     by RFC3415) (Status: DRAFT STANDARD)
+ 
+2576 Coexistence between Version 1, Version 2, and Version 3 of the
+     Internet-standard Network Management Framework. R. Frye, D. Levi, S.
+     Routhier, B. Wijnen. March 2000. (Format: TXT=98589 bytes) (Obsoletes
+     RFC1908, RFC2089) (Status: PROPOSED STANDARD)
+
+2584 Definitions of Managed Objects for APPN/HPR in IP Networks. B.
+     Clouston, B. Moore. May 1999. (Format: TXT=40187 bytes) (Status:
+     PROPOSED STANDARD)
+ 
+2591 Definitions of Managed Objects for Scheduling Management
+     Operations. D. Levi, J. Schoenwaelder. May 1999. (Format: TXT=52920
+     bytes) (Obsoleted by RFC3231) (Status: PROPOSED STANDARD)
+ 
+2592 Definitions of Managed Objects for the Delegation of Management
+     Script. D. Levi, J. Schoenwaelder. May 1999. (Format: TXT=110629
+     bytes) (Obsoleted by RFC3165) (Status: PROPOSED STANDARD)
+ 
+2594 Definitions of Managed Objects for WWW Services. H. Hazewinkel,
+     C. Kalbfleisch, J. Schoenwaelder. May 1999. (Format: TXT=88876 bytes)
+     (Status: PROPOSED STANDARD)
+ 
+2605 Directory Server Monitoring MIB. G. Mansfield, S. Kille. June
+     1999. (Format: TXT=49166 bytes) (Obsoletes RFC1567) (Status: PROPOSED
+     STANDARD)
+ 
+2613 Remote Network Monitoring MIB Extensions for Switched Networks
+     Version 1.0. R. Waterman, B. Lahaye, D. Romascanu, S. Waldbusser.
+     June 1999. (Format: TXT=88701 bytes) (Status: PROPOSED STANDARD)
+ 
+2618 RADIUS Authentication Client MIB. B. Aboba, G. Zorn. June 1999.
+     (Format: TXT=26889 bytes) (Status: PROPOSED STANDARD)
+ 
+2619 RADIUS Authentication Server MIB. G. Zorn, B. Aboba. June 1999.
+     (Format: TXT=30464 bytes) (Status: PROPOSED STANDARD)
+ 
+2620 RADIUS Accounting Client MIB. B. Aboba, G. Zorn. June 1999.
+     (Format: TXT=23960 bytes) (Status: INFORMATIONAL)
+ 
+2621 RADIUS Accounting Server MIB. G. Zorn, B. Aboba. June 1999.
+     (Format: TXT=27768 bytes) (Status: INFORMATIONAL)
+ 
+2662 Definitions of Managed Objects for the ADSL Lines. G. Bathrick,
+     F. Ly. August 1999. (Format: TXT=247122 bytes) (Status: PROPOSED
+     STANDARD)
+ 
+2665 Definitions of Managed Objects for the Ethernet-like Interface
+     Types. J. Flick, J. Johnson. August 1999. (Format: TXT=110038 bytes)
+     (Obsoletes RFC2358) (Status: PROPOSED STANDARD)
+ 
+2666 Definitions of Object Identifiers for Identifying Ethernet Chip
+     Sets. J. Flick. August 1999. (Format: TXT=37699 bytes) (Status:
+     INFORMATIONAL)
+ 
+2667 IP Tunnel MIB. D. Thaler. August 1999. (Format: TXT=32770 bytes)
+     (Status: PROPOSED STANDARD)
+ 
+2668 Definitions of Managed Objects for IEEE 802.3 Medium Attachment
+     Units (MAUs). A. Smith, J. Flick, K. de Graaf, D. Romascanu, D.
+     McMaster, K. McCloghrie, S. Roberts. August 1999. (Format: TXT=121843
+     bytes) (Obsoletes RFC2239) (Status: PROPOSED STANDARD)
+ 
+2669 DOCSIS Cable Device MIB Cable Device Management Information Base
+     for DOCSIS compliant Cable Modems and Cable Modem Termination
+     Systems. M. St. Johns, Ed.. August 1999. (Format: TXT=112880 bytes)
+     (Status: PROPOSED STANDARD)
+ 
+2670 Radio Frequency (RF) Interface Management Information Base for
+     MCNS/DOCSIS compliant RF interfaces. M. St. Johns, Ed.. August 1999.
+     (Format: TXT=141077 bytes) (Status: PROPOSED STANDARD)
+ 
+2674 Definitions of Managed Objects for Bridges with Traffic Classes,
+     Multicast Filtering and Virtual LAN Extensions. E. Bell, A. Smith, P.
+     Langille, A. Rijhsinghani, K. McCloghrie. August 1999. (Format:
+     TXT=159971 bytes) (Status: PROPOSED STANDARD)
+ 
+2677 Definitions of Managed Objects for the NBMA Next Hop Resolution
+     Protocol (NHRP). M. Greene, J. Cucchiara, J. Luciani. August 1999.
+     (Format: TXT=129699 bytes) (Status: PROPOSED STANDARD)
+ 
+2707 Job Monitoring MIB - V1.0. R. Bergman, T. Hastings, S. Isaacson,
+     H. Lewis. November 1999. (Format: TXT=255685 bytes) (Status:
+     INFORMATIONAL)
+ 
+2720 Traffic Flow Measurement: Meter MIB. N. Brownlee. October 1999.
+     (Format: TXT=103781 bytes) (Obsoletes RFC2064) (Status: PROPOSED
+     STANDARD)
+ 
+2737 Entity MIB (Version 2). K. McCloghrie, A. Bierman. December 1999.
+     (Format: TXT=125141 bytes) (Obsoletes RFC2037) (Status: PROPOSED
+     STANDARD)
+ 
+2742 Definitions of Managed Objects for Extensible SNMP Agents. L.
+     Heintz, S. Gudur, M. Ellison. January 2000. (Format: TXT=36644 bytes)
+     (Status: DRAFT STANDARD)
+ 
+2758 Definitions of Managed Objects for Service Level Agreements
+     Performance Monitoring. K. White. February 2000. (Format: TXT=145581
+     bytes) (Status: EXPERIMENTAL)
+ 
+2786 Diffie-Helman USM Key Management Information Base and Textual
+     Convention. M. St. Johns. March 2000. (Format: TXT=43280 bytes)
+     (Status: EXPERIMENTAL)
+
+2787 Definitions of Managed Objects for the Virtual Router Redundancy
+     Protocol. B. Jewell, D. Chuang. March 2000. (Format: TXT=56672 bytes)
+     (Status: PROPOSED STANDARD)
+ 
+2788 Network Services Monitoring MIB. N. Freed, S. Kille. March 2000.
+     (Format: TXT=43906 bytes) (Obsoletes RFC2248) (Status: PROPOSED
+     STANDARD)
+ 
+2789 Mail Monitoring MIB. N. Freed, S. Kille. March 2000. (Format:
+     TXT=65671 bytes) (Obsoletes RFC2249, RFC1566) (Status: PROPOSED
+     STANDARD)
+ 
+2790 Host Resources MIB. S. Waldbusser, P. Grillo. March 2000.
+     (Format: TXT=95807 bytes) (Obsoletes RFC1514) (Status: DRAFT
+     STANDARD)
+ 
+2819 Remote Network Monitoring Management Information Base. S.
+     Waldbusser. May 2000. (Format: TXT=198676 bytes) (Obsoletes RFC1757)
+     (Also STD0059) (Status: STANDARD)
+ 
+2851 Textual Conventions for Internet Network Addresses. M. Daniele,
+     B. Haberman, S. Routhier, J. Schoenwaelder. June 2000. (Format:
+     TXT=32587 bytes) (Obsoleted by RFC3291) (Status: PROPOSED STANDARD)
+ 
+2856 Textual Conventions for Additional High Capacity Data Types. A.
+     Bierman, K. McCloghrie, R. Presuhn. June 2000. (Format: TXT=20954
+     bytes) (Status: PROPOSED STANDARD)
+ 
+2863 The Interfaces Group MIB. K. McCloghrie, F. Kastenholz. June
+     2000. (Format: TXT=155014 bytes) (Obsoletes RFC2233) (Status: DRAFT
+     STANDARD) 
+     
+2864 The Inverted Stack Table Extension to the Interfaces Group MIB.
+     K. McCloghrie, G. Hanson. June 2000. (Format: TXT=21445 bytes)
+     (Status: PROPOSED STANDARD)
+ 
+2873 TCP Processing of the IPv4 Precedence Field. X. Xiao, A. Hannan,
+     V. Paxson, E. Crabbe. June 2000. (Format: TXT=15565 bytes) (Status:
+     PROPOSED STANDARD)
+ 
+2895 Remote Network Monitoring MIB Protocol Identifier Reference. A.
+     Bierman, C. Bucci, R. Iddon. August 2000. (Format: TXT=88094 bytes)
+     (Obsoletes RFC2074) (Updated by RFC3395) (Status: PROPOSED STANDARD)
+ 
+2896 Remote Network Monitoring MIB Protocol Identifier Macros. A.
+     Bierman, C. Bucci, R. Iddon. August 2000. (Format: TXT=135768 bytes)
+     (Status: INFORMATIONAL)
+ 
+2922 Physical Topology MIB. A. Bierman, K. Jones. September 2000.
+     (Format: TXT=66830 bytes) (Status: INFORMATIONAL)
+ 
+2925 Definitions of Managed Objects for Remote Ping, Traceroute, and
+     Lookup Operations. K. White. September 2000. (Format: TXT=150691
+     bytes) (Status: PROPOSED STANDARD)
+ 
+2932 IPv4 Multicast Routing MIB. K. McCloghrie, D. Farinacci, D.
+     Thaler. October 2000. (Format: TXT=50430 bytes) (Status: PROPOSED
+     STANDARD)
+
+2933 Internet Group Management Protocol MIB. K. McCloghrie, D.
+     Farinacci, D. Thaler. October 2000. (Format: TXT=33406 bytes)
+     (Status: PROPOSED STANDARD)
+ 
+2934 Protocol Independent Multicast MIB for IPv4. K. McCloghrie, D.
+     Farinacci, D. Thaler, B. Fenner. October 2000. (Format: TXT=48379
+     bytes) (Status: EXPERIMENTAL)
+ 
+2940 Definitions of Managed Objects for Common Open Policy Service
+     (COPS) Protocol Clients. A. Smith, D. Partain, J. Seligson. October
+     2000. (Format: TXT=52427 bytes) (Status: PROPOSED STANDARD)
+ 
+2954 Definitions of Managed Objects for Frame Relay Service. K.
+     Rehbehn, D. Fowler. October 2000. (Format: TXT=164217 bytes)
+     (Obsoletes RFC1604) (Status: PROPOSED STANDARD)
+ 
+2955 Definitions of Managed Objects for Monitoring and Controlling the
+     Frame Relay/ATM PVC Service Interworking Function. K. Rehbehn, O.
+     Nicklass, G. Mouradian. October 2000. (Format: TXT=83281 bytes)
+     (Status: PROPOSED STANDARD)
+ 
+2959 Real-Time Transport Protocol Management Information Base. M.
+     Baugher, B. Strahm, I. Suconick. October 2000. (Format: TXT=62063
+     bytes) (Status: PROPOSED STANDARD)
+ 
+2981 Event MIB. R. Kavasseri (Ed. of this version). October 2000.
+     (Format: TXT=98248 bytes) (Status: PROPOSED STANDARD)
+ 
+2982 Distributed Management Expression MIB. R. Kavasseri (Ed. of this
+     version). October 2000. (Format: TXT=81371 bytes) (Status: PROPOSED
+     STANDARD)
+ 
+2981 Event MIB. R. Kavasseri (Ed. of this version). October 2000.
+     (Format: TXT=98248 bytes) (Status: PROPOSED STANDARD)
+ 
+2982 Distributed Management Expression MIB. R. Kavasseri (Ed. of this
+     version). October 2000. (Format: TXT=81371 bytes) (Status: PROPOSED
+     STANDARD)
+ 
+3014 Notification Log MIB. R. Kavasseri. November 2000. (Format:
+     TXT=48287 bytes) (Status: PROPOSED STANDARD)
+ 
+3019 IP Version 6 Management Information Base for The Multicast
+     Listener Discovery Protocol. B. Haberman, R. Worzella. January 2001.
+     (Format: TXT=28293 bytes) (Status: PROPOSED STANDARD)
+ 
+3020 Definitions of Managed Objects for Monitoring and Controlling the
+     UNI/NNI Multilink Frame Relay Function. P. Pate, B. Lynch, K.
+     Rehbehn. December 2000. (Format: TXT=67736 bytes) (Status: PROPOSED
+     STANDARD)
+ 
+3055 Management Information Base for the PINT Services Architecture.
+     M. Krishnaswamy, D. Romascanu. February 2001. (Format: TXT=39315
+     bytes) (Status: PROPOSED STANDARD)
+ 
+3083 Baseline Privacy Interface Management Information Base for DOCSIS
+     Compliant Cable Modems and Cable Modem Termination Systems. R.
+     Woundy. March 2001. (Format: TXT=88318 bytes) (Status: INFORMATIONAL)
+ 
+3144 Remote Monitoring MIB Extensions for Interface Parameters
+     Monitoring. D. Romascanu. August 2001. (Format: TXT=62491 bytes)
+     (Status: PROPOSED STANDARD)
+ 
+3165 Definitions of Managed Objects for the Delegation of Management
+     Scripts. D. Levi, J. Schoenwaelder. August 2001. (Format: TXT=134479
+     bytes) (Obsoletes RFC2592) (Status: PROPOSED STANDARD)
+ 
+2578 Structure of Management Information Version 2 (SMIv2). K. 
+     McCloghrie, D. Perkins, J. Schoenwaelder. April 1999. (Format:
+     TXT=89712 bytes) (Obsoletes RFC1902) (Also STD0058) (Status:
+     STANDARD)
+     
+3201 Definitions of Managed Objects for Circuit to Interface
+     Translation. R. Steinberger, O. Nicklass. January 2002. (Format:
+     TXT=45583 bytes) (Status: PROPOSED STANDARD) 
+ 
+3202 Definitions of Managed Objects for Frame Relay Service Level
+     Definitions. R. Steinberger, O. Nicklass. January 2002. (Format:
+     TXT=130816 bytes) (Status: PROPOSED STANDARD)
+ 
+3231 Definitions of Managed Objects for Scheduling Management
+     Operations. D. Levi, J. Schoenwaelder. January 2002. (Format:
+     TXT=61308 bytes) (Obsoletes RFC2591) (Status: PROPOSED STANDARD)
+ 
+3273 Remote Network Monitoring Management Information Base for High 
+     Capacity Networks. S. Waldbusser. July 2002. (Format: TXT=150924
+     bytes) (Status: PROPOSED STANDARD)
+     
+3276 Definitions of Managed Objects for High Bit-Rate DSL - 2nd
+     generation (HDSL2) and Single-Pair High-Speed Digital Subscriber Line
+     (SHDSL) Lines Processing. B. Ray, R. Abbi. May 2002. (Format:
+     TXT=122991 bytes) (Status: PROPOSED STANDARD)
+ 
+3287 Remote Monitoring MIB Extensions for Differentiated Services. A.
+     Bierman. July 2002. (Format: TXT=249622 bytes) (Status: PROPOSED
+     STANDARD)
+ 
+3289 Management Information Base for the Differentiated Services
+     Architecture. F. Baker, K. Chan, A. Smith. May 2002. (Format:
+     TXT=239041 bytes) (Status: PROPOSED STANDARD)
+     
+3291 Textual Conventions for Internet Network Addresses. M. Daniele,
+     B. Haberman, S. Routhier, J. Schoenwaelder. May 2002. (Format:
+     TXT=43564 bytes) (Obsoletes RFC2851) (Status: PROPOSED STANDARD) 
+
+3295 Definitions of Managed Objects for the General Switch Management
+     Protocol (GSMP). H. Sjostrand, J. Buerkle, B. Srinivasan. June 2002. 
+     (Format: TXT=95516 bytes) (Status: PROPOSED STANDARD)
+
+3371 Layer Two Tunneling Protocol "L2TP" Management Information Base.
+     E. Caves, P. Calhoun, R. Wheeler. August 2002. (Format: TXT=139974
+     bytes) (Status: PROPOSED STANDARD)
+     
+3395 Remote Network Monitoring MIB Protocol Identifier Reference
+     Extensions. A. Bierman, C. Bucci, R. Dietz, A. Warth. September 2002.
+     (Format: TXT=43862 bytes) (Updates RFC2895) (Status: PROPOSED
+     STANDARD)
+ 
+3410 Introduction and Applicability Statements for Internet-Standard
+     Management Framework. J. Case, R. Mundy, D. Partain, B. Stewart.
+     December 2002. (Format: TXT=61461 bytes) (Obsoletes RFC2570) (Status:
+     INFORMATIONAL)
+     
+3411 An Architecture for Describing Simple Network Management Protocol
+     (SNMP) Management Frameworks. D. Harrington, R. Presuhn, B. Wijnen.
+     December 2002. (Format: TXT=140096 bytes) (Obsoletes RFC2571) (Also
+     STD0062) (Status: STANDARD)
+     
+3412 Message Processing and Dispatching for the Simple Network
+     Management Protocol (SNMP). J. Case, D. Harrington, R. Presuhn, B.
+     Wijnen. December 2002. (Format: TXT=95710 bytes) (Obsoletes RFC2572)
+     (Also STD0062) (Status: STANDARD)
+ 
+3413 Simple Network Management Protocol (SNMP) Applications. D. Levi,
+     P. Meyer, B. Stewart. December 2002. (Format: TXT=153719 bytes)
+     (Obsoletes RFC2573) (Also STD0062) (Status: STANDARD)
+ 
+3414 User-based Security Model (USM) for version 3 of the Simple
+     Network Management Protocol (SNMPv3). U. Blumenthal, B. Wijnen.
+     December 2002. (Format: TXT=193558 bytes) (Obsoletes RFC2574) (Also
+     STD0062) (Status: STANDARD)
+     
+3415 View-based Access Control Model (VACM) for the Simple Network
+     Management Protocol (SNMP). B. Wijnen, R. Presuhn, K. McCloghrie.
+     December 2002. (Format: TXT=82046 bytes) (Obsoletes RFC2575) (Also
+     STD0062) (Status: STANDARD)
+     
+3416 Version 2 of the Protocol Operations for the Simple Network
+     Management Protocol (SNMP). R. Presuhn, Ed.. December 2002. (Format:
+     TXT=70043 bytes) (Obsoletes RFC1905) (Also STD0062) (Status:
+     STANDARD)
+ 
+3417 Transport Mappings for the Simple Network Management Protocol
+     (SNMP). R. Presuhn, Ed.. December 2002. (Format: TXT=38650 bytes)
+     (Obsoletes RFC1906) (Also STD0062) (Status: STANDARD)
+     
+3418 Management Information Base (MIB) for the Simple Network
+     Management Protocol (SNMP). R. Presuhn, Ed.. December 2002. (Format:
+     TXT=49096 bytes) (Obsoletes RFC1907) (Also STD0062) (Status:
+     STANDARD)
+ 
+3419 Textual Conventions for Transport Addresses. M. Daniele, J.
+     Schoenwaelder. December 2002. (Format: TXT=37466 bytes) (Status:
+     PROPOSED STANDARD)
+
+3433 Entity Sensor Management Information Base. A. Bierman, D.
+     Romascanu, K.C. Norseth. December 2002. (Format: TXT=31857 bytes)
+     (Status: PROPOSED STANDARD)
+ 
+3434 Remote Monitoring MIB Extensions for High Capacity Alarms. A.
+     Bierman, K. McCloghrie. December 2002. (Format: TXT=51072 bytes)  
+     (Status: PROPOSED STANDARD)
+     
+3440 Definitions of Extension Managed Objects for Asymmetric Digital 
+     Subscriber Lines. F. Ly, G. Bathrick. December 2002. (Format:
+     TXT=76058 bytes) (Status: PROPOSED STANDARD)
+ 
+3498 Definitions of Managed Objects for Synchronous Optical Network  
+     (SONET) Linear Automatic Protection Switching (APS) Architectures. J.
+     Kuhfeld, J. Johnson, M. Thatcher. March 2003. (Format: TXT=78701
+     bytes) (Status: PROPOSED STANDARD)
+
+3559 Multicast Address Allocation MIB. D. Thaler. June 2003. (Format:
+     TXT=68239 bytes) (Status: PROPOSED STANDARD)
+ 
+

@@ -1,0 +1,256 @@
+README
+
+WELCOME to the SNMP Agent and Utilities, version 16.1
+distribution from SNMP Research, Inc.
+
+How to Contact SNMP Research
+
+Worldwide Headquarters 
+SNMP Research International
+3001 Kimberlin Heights Road
+Knoxville, TN 37920
+U.S.A.
+Phone: +1 (865) 579-3311
+Fax: +1 (865) 579-6565
+E-mail: info@snmp.com, support@snmp.com
+WWW: http://www.snmp.com
+
+Note: (os) refers to the given operating system and the SNMP version.
+For Instance, (os).obj might refer to sunos.obj, sunosv1.obj, sunosv1c.obj
+or sunosv1c3.obj.
+
+STRUCTURE OF THE DISTRIBUTION
+
+  Makefile:
+    The top level makefile.
+    The default makefiles are Makefile, Makefile.1, and Makefile.1c.
+    Note, that if there is more than one operating system, then each
+    operating system has its own set of makefiles in addition to the default
+    makefiles(Makefile.(os), Makev1.(os), and Makev1c.(os)).
+
+  README:
+    This file.
+
+  config: 
+    The system configuration files needed for running the agents.
+    They should reside in the /etc directory.
+
+  doc: Manpages, release notes, and other online documentation
+    can be found in subdirectories under the doc directory.  This documentation
+    is divided into two subsections: doc/devel is a subdirectory containing
+    developer documentation, the release of which to third parties is
+    restricted; doc/user contains user documentation which is suitable for
+    use in the development of documentation for third parties.
+
+  (os).bin:
+    Directory for binaries.
+
+
+  get*,setany,trap:
+    SNMP command-line manager utilities for use with the agent.
+
+  (os).lib:
+    Directory for libraries.
+
+  mibtools:
+    SNMP MIB compiler along with a selection of MIBs for your 
+    compiling enjoyment.
+
+  snmpd:
+    SNMP agent source directory.
+
+BEFORE YOU BEGIN
+
+  There are some things you should know before you begin:
+
+  Format of the Distribution
+
+  Privileges
+
+    Installing the configuration files may require root privileges.
+    If you do not have root privileges, arrange for them before you
+    continue.
+ 
+    Running the agent requires root privileges since the agent needs
+    exclusive access to a privileged port (161, 162 if traps are sent).
+
+
+  Configuration Files
+
+    There is a set of configuration files (in directory
+    config).  By default, these will be placed in the
+    /etc/srconf directory of your system in a "make install".  You can
+    install them separately if necessary.
+
+    Also, in config/agt/snmpd.cnf, the transportAddress
+    and the transportReceiveMask in the transportEntry section need to
+    be changed to the correct values for the current network.
+
+
+
+  System Requirements
+
+    Make sure the SNMP ports are defined in your system services.
+    I.e., check the /etc/services file on your system for the entries
+
+	snmp            161/udp
+	snmp-trap       162/udp
+
+    If they are not there, add these services.
+
+    Only one agent may have access to port 161 at a time, therefore
+    only one agent may be running at any time.  
+
+
+DOCUMENTATION
+
+  Documentation on the use of the utilities can be found in the man
+  subdirectory doc/user/manpages/commands; library manual
+  pages can be found in the doc/devel/manpages/libs
+  subdirectory; configuration file-format manual pages can be found in
+  the doc/user/manpages/formats subdirectory.  If you do not
+  wish to install the man pages on your system, you may use nroff to view
+  them; e.g.,
+
+	nroff -man manfilename | more
+
+  will display the man page "manfilename" (say, getbulk.man) as
+  a properly formatted manual page.  Alternatively, you may generate
+  text files for manpages using the Maketxt makefile provided in the
+  doc/tools subdirectory.
+
+
+COMPILE WARNINGS
+  Below is a list of warnings that we were unable to resolve at release time.
+  These warnings can be safely ignored.
+
+
+
+
+
+TECHNICAL SUPPORT
+
+  As always, the engineering staff of SNMP Research is happy to answer
+  your questions.  The U.S. Corporate Headquarters for SNMP Research is
+  located in Knoxville, Tennessee.   Our hours of staffing are from 9 a.m.
+  to 5 p.m., Eastern time.  You can send electronic mail to 
+
+	support@snmp.com
+
+  for assistance.  If you prefer to speak with an engineer, you may call
+  us at
+
+	+1 865 573 1434
+
+  or send a fax to
+
+	+1 865 573 9197.
+
+
+CHANGES
+
+  Version 16.1.0.0 - Major release.
+
+  Version 16.1.0.1 - Fixed config file problem for BRASS and EMANATE.
+
+LEGAL STUFF
+
+  The following is a list of copyrights and permissions associated
+  with this distribution.  This does not claim to be full and
+  complete list and may change without notice.
+
+SNMP RESEARCH COPYRIGHTS
+
+/*
+ *
+ * Copyright (C) 1992-2003 by SNMP Research, Incorporated.
+ *
+ * This software is furnished under a license and may be used and copied
+ * only in accordance with the terms of such license and with the
+ * inclusion of the above copyright notice. This software or any other
+ * copies thereof may not be provided or otherwise made available to any
+ * other person. No title to and ownership of the software is hereby
+ * transferred.
+ *
+ * The information in this software is subject to change without notice
+ * and should not be construed as a commitment by SNMP Research, Incorporated.
+ *
+ * Restricted Rights Legend:
+ *  Use, duplication, or disclosure by the Government is subject to
+ *  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+ *  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+ *  subparagraphs (c)(4) and (d) of the Commercial Computer
+ *  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+ *  clauses in the NASA FAR Supplement and other corresponding
+ *  governmental regulations.
+ *
+ */
+
+/*
+ *                PROPRIETARY NOTICE
+ *
+ * This software is an unpublished work subject to a confidentiality agreement
+ * and is protected by copyright and trade secret law.  Unauthorized copying,
+ * redistribution or other use of this work is prohibited.
+ *
+ * The above notice of copyright on this source code product does not indicate
+ * any actual or intended publication of such source code.
+ *
+ */
+
+DES:
+ 
+/* Software DES functions
+ * written 12 Dec 1986 by Phil Karn, KA9Q; large sections adapted from
+ * the 1977 public-domain program by Jim Gillogly
+ */
+ 
+MD5:
+ 
+Duplicated with permission.  Customers should consult competent legal
+counsel before shipping derivative works of this software internationally.
+
+/*
+ ***********************************************************************
+ ** Copyright (C) 1990, RSA Data Security, Inc. All rights reserved.  **
+ **                                                                   **
+ ** License to copy and use this software is granted provided that    **
+ ** it is identified as the "RSA Data Security, Inc. MD5 Message-     **
+ ** Digest Algorithm" in all material mentioning or referencing this  **
+ ** software or this function.                                        **
+ **                                                                   **
+ ** License is also granted to make and use derivative works          **
+ ** provided that such works are identified as "derived from the RSA  **
+ ** Data Security, Inc. MD5 Message-Digest Algorithm" in all          **
+ ** material mentioning or referencing the derived work.              **
+ **                                                                   **
+ ** RSA Data Security, Inc. makes no representations concerning       **
+ ** either the merchantability of this software or the suitability    **
+ ** of this software for any particular purpose.  It is provided "as  **
+ ** is" without express or implied warranty of any kind.              **
+ **                                                                   **
+ ** These notices must be retained in any copies of any part of this  **
+ ** documentation and/or software.                                    **
+ ***********************************************************************
+ */
+
+ISODE:
+/*
+ *			  ISODE 8.0 NOTICE
+ *
+ *   Acquisition, use, and distribution of this module and related
+ *   materials are subject to the restrictions of a license agreement.
+ *   Consult the Preface in the User's Manual for the full terms of
+ *   this agreement.
+ *
+ *
+ *			4BSD/ISODE SMP NOTICE
+ *
+ *    Acquisition, use, and distribution of this module and related
+ *    materials are subject to the restrictions given in the file
+ *    SMP-READ-ME.
+ *
+ */
+
+UNIX is a registered trademark in the US and other countries, licensed exclusively through X/Open Company Ltd.
+

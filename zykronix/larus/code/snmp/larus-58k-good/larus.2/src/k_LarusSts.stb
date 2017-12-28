@@ -1,0 +1,2737 @@
+/*
+ *
+ * Copyright (C) 1992-2003 by SNMP Research, Incorporated.
+ *
+ * This software is furnished under a license and may be used and copied
+ * only in accordance with the terms of such license and with the
+ * inclusion of the above copyright notice. This software or any other
+ * copies thereof may not be provided or otherwise made available to any
+ * other person. No title to and ownership of the software is hereby
+ * transferred.
+ *
+ * The information in this software is subject to change without notice
+ * and should not be construed as a commitment by SNMP Research, Incorporated.
+ *
+ * Restricted Rights Legend:
+ *  Use, duplication, or disclosure by the Government is subject to
+ *  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+ *  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+ *  subparagraphs (c)(4) and (d) of the Commercial Computer
+ *  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+ *  clauses in the NASA FAR Supplement and other corresponding
+ *  governmental regulations.
+ *
+ */
+
+/*
+ *                PROPRIETARY NOTICE
+ *
+ * This software is an unpublished work subject to a confidentiality agreement
+ * and is protected by copyright and trade secret law.  Unauthorized copying,
+ * redistribution or other use of this work is prohibited.
+ *
+ * The above notice of copyright on this source code product does not indicate
+ * any actual or intended publication of such source code.
+ */
+
+
+/*
+ * Arguments used to create this file:
+ * -search_table (implies -row_status) -c LarusSts larusMib -agent -per_file_init 
+ * 
+ */
+
+#include "sr_conf.h"
+
+#ifdef HAVE_STDIO_H
+#include <stdio.h>
+#endif /* HAVE_STDIO_H */
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif /* HAVE_STDLIB_H */
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif /* HAVE_STRING_H */
+#ifdef HAVE_MEMORY_H
+#include <memory.h>
+#endif /* HAVE_MEMORY_H */
+#ifdef HAVE_STDDEF_H
+#include <stddef.h>
+#endif /* HAVE_STDDEF_H */
+#include "sr_snmp.h"
+#include "sr_trans.h"
+#include "context.h"
+#include "method.h"
+#include "makevb.h"
+#include "lookup.h"
+#include "v2table.h"
+#include "min_v.h"
+#include "mibout.h"
+
+
+/* global data describing the stsSystem family */
+stsSystem_t *stsSystemData;
+
+/* global data describing the stsClockInput family */
+stsClockInput_t *stsClockInputData;
+
+/* global data describing the stsClockInputSSM family */
+stsClockInputSSM_t *stsClockInputSSMData;
+
+/* global data describing the stsTop family */
+stsTop_t *stsTopData;
+
+/* global data describing the stsClockInputStatusTable entries */
+Index_t stsClockInputStatusEntryIndex[] = {
+    { offsetof(stsClockInputStatusEntry_t, stsClockInputStatusIndex),  T_uint}
+};
+
+SnmpV2Table stsClockInputStatusTable = {
+    NULL,
+    stsClockInputStatusEntryIndex,
+    0,
+    1,
+    sizeof(stsClockInputStatusEntry_t)
+};
+
+const SnmpType stsClockInputStatusEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsClockInputStatusEntry_t, stsClockInputStatusIndex), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsClockInputStatusEntry_t, stsClockInputState), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsClockInputStatusEntry
+    SR_PROTOTYPE((int index));
+extern void stsClockInputStatusEntry_free
+    SR_PROTOTYPE((stsClockInputStatusEntry_t *data));
+
+/* global data describing the stsClockInputSSMTable entries */
+Index_t stsClockInputSSMEntryIndex[] = {
+    { offsetof(stsClockInputSSMEntry_t, stsClockInputSSMIndex),  T_uint},
+    { offsetof(stsClockInputSSMEntry_t, stsClockInputSSMType),  T_uint}
+};
+
+SnmpV2Table stsClockInputSSMTable = {
+    NULL,
+    stsClockInputSSMEntryIndex,
+    0,
+    2,
+    sizeof(stsClockInputSSMEntry_t)
+};
+
+const SnmpType stsClockInputSSMEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsClockInputSSMEntry_t, stsClockInputSSMIndex), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsClockInputSSMEntry_t, stsClockInputSSMType), 1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsClockInputSSMEntry_t, stsClockInputSSMValue), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsClockInputSSMEntry
+    SR_PROTOTYPE((int index));
+extern void stsClockInputSSMEntry_free
+    SR_PROTOTYPE((stsClockInputSSMEntry_t *data));
+
+/* global data describing the stsCardTable entries */
+Index_t stsCardEntryIndex[] = {
+    { offsetof(stsCardEntry_t, stsCardShelf),  T_uint},
+    { offsetof(stsCardEntry_t, stsCardIndex),  T_uint}
+};
+
+SnmpV2Table stsCardTable = {
+    NULL,
+    stsCardEntryIndex,
+    0,
+    2,
+    sizeof(stsCardEntry_t)
+};
+
+const SnmpType stsCardEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsCardEntry_t, stsCardShelf), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsCardEntry_t, stsCardIndex), 1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsCardEntry_t, stsCardType), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsCardEntry_t, stsCardDescr), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsCardEntry_t, stsCardSerial), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsCardEntry_t, stsCardHwVersion), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsCardEntry_t, stsCardCLEICode), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsCardEntry_t, stsCardOperStatus), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsCardEntry_t, stsCardReset), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsCardEntry
+    SR_PROTOTYPE((int index));
+extern void stsCardEntry_free
+    SR_PROTOTYPE((stsCardEntry_t *data));
+
+/* global data describing the stsOscillatorTable entries */
+Index_t stsOscillatorEntryIndex[] = {
+    { offsetof(stsOscillatorEntry_t, stsOscillatorIndex),  T_uint}
+};
+
+SnmpV2Table stsOscillatorTable = {
+    NULL,
+    stsOscillatorEntryIndex,
+    0,
+    1,
+    sizeof(stsOscillatorEntry_t)
+};
+
+const SnmpType stsOscillatorEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOscillatorEntry_t, stsOscillatorIndex), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOscillatorEntry_t, stsOscillatorModuleType), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsOscillatorEntry_t, stsOscillatorEFER), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsOscillatorEntry_t, stsOscillatorESSD), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsOscillatorEntry_t, stsOscillatorESSN), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsOscillatorEntry_t, stsOscillatorFAGE), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsOscillatorEntry_t, stsOscillatorTIMD), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsOscillatorEntry_t, stsOscillatorSetActive), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOscillatorEntry_t, stsOscillatorStatus), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsOscillatorEntry
+    SR_PROTOTYPE((int index));
+extern void stsOscillatorEntry_free
+    SR_PROTOTYPE((stsOscillatorEntry_t *data));
+
+/* global data describing the stsGpsTable entries */
+Index_t stsGpsEntryIndex[] = {
+    { offsetof(stsGpsEntry_t, stsGpsIndex),  T_uint}
+};
+
+SnmpV2Table stsGpsTable = {
+    NULL,
+    stsGpsEntryIndex,
+    0,
+    1,
+    sizeof(stsGpsEntry_t)
+};
+
+const SnmpType stsGpsEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsIndex), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsStatus), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsANTD), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsAZEL), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsRSTG), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsBITS), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsPAVG), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsSIGQ), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_WRITE, offsetof(stsGpsEntry_t, stsGpsSPOS), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_WRITE, offsetof(stsGpsEntry_t, stsGpsTRMO), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsUTCT), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsVERS), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsDETF), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsEFER), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsESSD), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsESSN), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsFAGE), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsGpsEntry_t, stsGpsTIMD), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsGpsEntry_t, stsGpsReset), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsGpsEntry
+    SR_PROTOTYPE((int index));
+extern void stsGpsEntry_free
+    SR_PROTOTYPE((stsGpsEntry_t *data));
+
+/* global data describing the stsLinkTable entries */
+Index_t stsLinkEntryIndex[] = {
+    { offsetof(stsLinkEntry_t, stsLinkIndex),  T_uint}
+};
+
+SnmpV2Table stsLinkTable = {
+    NULL,
+    stsLinkEntryIndex,
+    0,
+    1,
+    sizeof(stsLinkEntry_t)
+};
+
+const SnmpType stsLinkEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsLinkEntry_t, stsLinkIndex), 0 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsLinkEntry_t, stsLinkType), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsLinkEntry_t, stsLinkEnable), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsLinkEntry_t, stsLinkLineCode), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsLinkEntry_t, stsLinkFMT), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsLinkEntry_t, stsLinkTermination), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsLinkEntry_t, stsLinkMFCHK), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_WRITE, offsetof(stsLinkEntry_t, stsLinkId), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsLinkEntry
+    SR_PROTOTYPE((int index));
+extern void stsLinkEntry_free
+    SR_PROTOTYPE((stsLinkEntry_t *data));
+
+/* global data describing the stsShelfTable entries */
+Index_t stsShelfEntryIndex[] = {
+    { offsetof(stsShelfEntry_t, stsShelfIndex),  T_uint}
+};
+
+SnmpV2Table stsShelfTable = {
+    NULL,
+    stsShelfEntryIndex,
+    0,
+    1,
+    sizeof(stsShelfEntry_t)
+};
+
+const SnmpType stsShelfEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsShelfEntry_t, stsShelfIndex), 0 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsShelfEntry_t, stsShelfSerial), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsShelfEntry_t, stsShelfCLEICode), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsShelfEntry_t, stsShelfReset), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsShelfEntry
+    SR_PROTOTYPE((int index));
+extern void stsShelfEntry_free
+    SR_PROTOTYPE((stsShelfEntry_t *data));
+
+/* global data describing the stsAlarmThresholdTable entries */
+Index_t stsAlarmThresholdEntryIndex[] = {
+    { offsetof(stsAlarmThresholdEntry_t, stsAlarmThresholdCurrentMon),  T_uint},
+    { offsetof(stsAlarmThresholdEntry_t, stsAlarmThresholdType),  T_uint}
+};
+
+SnmpV2Table stsAlarmThresholdTable = {
+    NULL,
+    stsAlarmThresholdEntryIndex,
+    0,
+    2,
+    sizeof(stsAlarmThresholdEntry_t)
+};
+
+const SnmpType stsAlarmThresholdEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsAlarmThresholdEntry_t, stsAlarmThresholdCurrentMon), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsAlarmThresholdEntry_t, stsAlarmThresholdType), 1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsAlarmThresholdEntry_t, stsAlarmThresholdValue), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsAlarmThresholdEntry_t, stsAlarmThresholdTimeInterval), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsAlarmThresholdEntry
+    SR_PROTOTYPE((int index));
+extern void stsAlarmThresholdEntry_free
+    SR_PROTOTYPE((stsAlarmThresholdEntry_t *data));
+
+/* global data describing the stsLinkAlarmTable entries */
+Index_t stsLinkAlarmEntryIndex[] = {
+    { offsetof(stsLinkAlarmEntry_t, stsLinkAlarmSettingLinkType),  T_uint},
+    { offsetof(stsLinkAlarmEntry_t, stsLinkAlarmSettingType),  T_uint}
+};
+
+SnmpV2Table stsLinkAlarmTable = {
+    NULL,
+    stsLinkAlarmEntryIndex,
+    0,
+    2,
+    sizeof(stsLinkAlarmEntry_t)
+};
+
+const SnmpType stsLinkAlarmEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsLinkAlarmEntry_t, stsLinkAlarmSettingLinkType), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsLinkAlarmEntry_t, stsLinkAlarmSettingType), 1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsLinkAlarmEntry_t, stsLinkAlarmSettingSevirity), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsLinkAlarmEntry_t, stsLinkAlarmSevirity), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsLinkAlarmEntry
+    SR_PROTOTYPE((int index));
+extern void stsLinkAlarmEntry_free
+    SR_PROTOTYPE((stsLinkAlarmEntry_t *data));
+
+/* global data describing the stsOscillatorAlarmTable entries */
+Index_t stsOscillatorAlarmEntryIndex[] = {
+    { offsetof(stsOscillatorAlarmEntry_t, stsOscillatorAlarmSettingClock),  T_uint},
+    { offsetof(stsOscillatorAlarmEntry_t, stsOscillatorAlarmSettingType),  T_uint}
+};
+
+SnmpV2Table stsOscillatorAlarmTable = {
+    NULL,
+    stsOscillatorAlarmEntryIndex,
+    0,
+    2,
+    sizeof(stsOscillatorAlarmEntry_t)
+};
+
+const SnmpType stsOscillatorAlarmEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOscillatorAlarmEntry_t, stsOscillatorAlarmSettingClock), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOscillatorAlarmEntry_t, stsOscillatorAlarmSettingType), 1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsOscillatorAlarmEntry_t, stsOscillatorAlarmSettingSeverity), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOscillatorAlarmEntry_t, stsOscillatorAlarmSeverity), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsOscillatorAlarmEntry
+    SR_PROTOTYPE((int index));
+extern void stsOscillatorAlarmEntry_free
+    SR_PROTOTYPE((stsOscillatorAlarmEntry_t *data));
+
+/* global data describing the stsOsPwrAlarmTable entries */
+Index_t stsOsPwrAlarmEntryIndex[] = {
+    { offsetof(stsOsPwrAlarmEntry_t, stssPwrAlarmSettingShelf),  T_uint},
+    { offsetof(stsOsPwrAlarmEntry_t, stsOsPwrAlarmSettingOsPwr),  T_uint}
+};
+
+SnmpV2Table stsOsPwrAlarmTable = {
+    NULL,
+    stsOsPwrAlarmEntryIndex,
+    0,
+    2,
+    sizeof(stsOsPwrAlarmEntry_t)
+};
+
+const SnmpType stsOsPwrAlarmEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOsPwrAlarmEntry_t, stssPwrAlarmSettingShelf), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOsPwrAlarmEntry_t, stsOsPwrAlarmSettingOsPwr), 1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsOsPwrAlarmEntry_t, stsOsPwrAlarmSettingSeverity), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOsPwrAlarmEntry_t, stsOsPwrAlarmSeverity), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsOsPwrAlarmEntry
+    SR_PROTOTYPE((int index));
+extern void stsOsPwrAlarmEntry_free
+    SR_PROTOTYPE((stsOsPwrAlarmEntry_t *data));
+
+/* global data describing the stsOutputAlarmTable entries */
+Index_t stsOutputAlarmEntryIndex[] = {
+    { offsetof(stsOutputAlarmEntry_t, stsOutputAlarmSettingShelf),  T_uint},
+    { offsetof(stsOutputAlarmEntry_t, stsOutputAlarmSettingSlot),  T_uint},
+    { offsetof(stsOutputAlarmEntry_t, stsOutputAlarmSettingPort),  T_uint},
+    { offsetof(stsOutputAlarmEntry_t, stsOutputAlarmSettingType),  T_uint}
+};
+
+SnmpV2Table stsOutputAlarmTable = {
+    NULL,
+    stsOutputAlarmEntryIndex,
+    0,
+    4,
+    sizeof(stsOutputAlarmEntry_t)
+};
+
+const SnmpType stsOutputAlarmEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOutputAlarmEntry_t, stsOutputAlarmSettingShelf), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOutputAlarmEntry_t, stsOutputAlarmSettingSlot), 1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOutputAlarmEntry_t, stsOutputAlarmSettingPort), 2 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsOutputAlarmEntry_t, stsOutputAlarmSettingType), 3 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsOutputAlarmEntry_t, stsOutputAlarmSettingSeverity), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOutputAlarmEntry_t, stsOutputAlarmSeverity), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsOutputAlarmEntry
+    SR_PROTOTYPE((int index));
+extern void stsOutputAlarmEntry_free
+    SR_PROTOTYPE((stsOutputAlarmEntry_t *data));
+
+/* global data describing the stsOutputTiuSettingTable entries */
+Index_t stsOutputTiuSettingEntryIndex[] = {
+    { offsetof(stsOutputTiuSettingEntry_t, stsOutputTiuSettingShelf),  T_uint},
+    { offsetof(stsOutputTiuSettingEntry_t, stsOutputTiuSettingSlot),  T_uint},
+    { offsetof(stsOutputTiuSettingEntry_t, stsOutputTiuSettingPort),  T_uint}
+};
+
+SnmpV2Table stsOutputTiuSettingTable = {
+    NULL,
+    stsOutputTiuSettingEntryIndex,
+    0,
+    3,
+    sizeof(stsOutputTiuSettingEntry_t)
+};
+
+const SnmpType stsOutputTiuSettingEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOutputTiuSettingEntry_t, stsOutputTiuSettingShelf), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOutputTiuSettingEntry_t, stsOutputTiuSettingSlot), 1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOutputTiuSettingEntry_t, stsOutputTiuSettingPort), 2 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsOutputTiuSettingEntry_t, stsOutputTiuSettingLineCoding), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsOutputTiuSettingEntry_t, stsOutputTiuSettingFMT), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsOutputTiuSettingEntry_t, stsOutputTiuSettingTermination), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsOutputTiuSettingEntry
+    SR_PROTOTYPE((int index));
+extern void stsOutputTiuSettingEntry_free
+    SR_PROTOTYPE((stsOutputTiuSettingEntry_t *data));
+
+/* global data describing the stsPerfMonTable entries */
+Index_t stsPerfMonEntryIndex[] = {
+    { offsetof(stsPerfMonEntry_t, stsPerfMonInputCurrentMon),  T_uint},
+    { offsetof(stsPerfMonEntry_t, stsPerfMonInputMonPeriod),  T_uint},
+    { offsetof(stsPerfMonEntry_t, stsPerfMonInputMonBucket),  T_uint}
+};
+
+SnmpV2Table stsPerfMonTable = {
+    NULL,
+    stsPerfMonEntryIndex,
+    0,
+    3,
+    sizeof(stsPerfMonEntry_t)
+};
+
+const SnmpType stsPerfMonEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonInputCurrentMon), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonInputMonPeriod), 1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonInputMonBucket), 2 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonInputClockType), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonPerfCVL), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonPerfCVP), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonPerfCS), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonPerfESP), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonPerfJitter), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonPerfPhaseData), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonPerfSESP), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonPerfTIE), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonPerfMTIE), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonPerfWDR5M), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsPerfMonEntry_t, stsPerfMonPerfWDR24H), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsPerfMonEntry
+    SR_PROTOTYPE((int index));
+extern void stsPerfMonEntry_free
+    SR_PROTOTYPE((stsPerfMonEntry_t *data));
+
+/* global data describing the stsAlarmStatusTable entries */
+Index_t stsAlarmStatusEntryIndex[] = {
+    { offsetof(stsAlarmStatusEntry_t, stsAlarmSource),  T_uint}
+};
+
+SnmpV2Table stsAlarmStatusTable = {
+    NULL,
+    stsAlarmStatusEntryIndex,
+    0,
+    1,
+    sizeof(stsAlarmStatusEntry_t)
+};
+
+const SnmpType stsAlarmStatusEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsAlarmStatusEntry_t, stsAlarmSource), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsAlarmStatusEntry_t, stsAlarmSourceType), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsAlarmStatusEntry_t, stsAlarmSeverity), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsAlarmStatusEntry_t, stsAlarmSrvEff), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsAlarmStatusEntry
+    SR_PROTOTYPE((int index));
+extern void stsAlarmStatusEntry_free
+    SR_PROTOTYPE((stsAlarmStatusEntry_t *data));
+
+/* global data describing the stsOutputCardTable entries */
+Index_t stsOutputCardEntryIndex[] = {
+    { offsetof(stsOutputCardEntry_t, stsOutputShelf),  T_uint},
+    { offsetof(stsOutputCardEntry_t, stsOutputSlot),  T_uint}
+};
+
+SnmpV2Table stsOutputCardTable = {
+    NULL,
+    stsOutputCardEntryIndex,
+    0,
+    2,
+    sizeof(stsOutputCardEntry_t)
+};
+
+const SnmpType stsOutputCardEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOutputCardEntry_t, stsOutputShelf), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOutputCardEntry_t, stsOutputSlot), 1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsOutputCardEntry_t, stsOutputRedState), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsOutputCardEntry_t, stsOutputRedSwitchState), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsOutputCardEntry_t, stsOutputCRCCHK), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsOutputCardEntry_t, stsOutputCAS), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsOutputCardEntry_t, stsOutputSSM), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsOutputCardEntry_t, stsOutputSSMValue), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_WRITE, offsetof(stsOutputCardEntry_t, stsOutputTimingFormat), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsOutputCardEntry
+    SR_PROTOTYPE((int index));
+extern void stsOutputCardEntry_free
+    SR_PROTOTYPE((stsOutputCardEntry_t *data));
+
+/* global data describing the stsEmmStatusTable entries */
+Index_t stsEmmStatusEntryIndex[] = {
+    { offsetof(stsEmmStatusEntry_t, stsEmmShelf),  T_uint},
+    { offsetof(stsEmmStatusEntry_t, stsEmmUnitId),  T_uint}
+};
+
+SnmpV2Table stsEmmStatusTable = {
+    NULL,
+    stsEmmStatusEntryIndex,
+    0,
+    2,
+    sizeof(stsEmmStatusEntry_t)
+};
+
+const SnmpType stsEmmStatusEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsEmmStatusEntry_t, stsEmmShelf), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsEmmStatusEntry_t, stsEmmUnitId), 1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsEmmStatusEntry_t, stsEmmSensorType), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsEmmStatusEntry_t, stsEmmAlarmStatus), -1 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsEmmStatusEntry_t, stsEmmSensorReading), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsEmmStatusEntry_t, stsEmmMajorAlmHiThresh), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsEmmStatusEntry_t, stsEmmMajorAlmLoThresh), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsEmmStatusEntry_t, stsEmmMinorAlmHiThresh), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsEmmStatusEntry_t, stsEmmMinorAlmLoThresh), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsEmmStatusEntry
+    SR_PROTOTYPE((int index));
+extern void stsEmmStatusEntry_free
+    SR_PROTOTYPE((stsEmmStatusEntry_t *data));
+
+/* global data describing the stsAntTable entries */
+Index_t stsAntEntryIndex[] = {
+    { offsetof(stsAntEntry_t, stsAntIndex),  T_uint}
+};
+
+SnmpV2Table stsAntTable = {
+    NULL,
+    stsAntEntryIndex,
+    0,
+    1,
+    sizeof(stsAntEntry_t)
+};
+
+const SnmpType stsAntEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsAntEntry_t, stsAntIndex), 0 },
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsAntEntry_t, stsAntStatus), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsAntEntry_t, stsAntSwitchState), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsAntEntry
+    SR_PROTOTYPE((int index));
+extern void stsAntEntry_free
+    SR_PROTOTYPE((stsAntEntry_t *data));
+
+/* global data describing the stsTopDestTable entries */
+Index_t stsTopDestEntryIndex[] = {
+    { offsetof(stsTopDestEntry_t, stsTopDestNumber),  T_uint}
+};
+
+SnmpV2Table stsTopDestTable = {
+    NULL,
+    stsTopDestEntryIndex,
+    0,
+    1,
+    sizeof(stsTopDestEntry_t)
+};
+
+const SnmpType stsTopDestEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsTopDestEntry_t, stsTopDestNumber), 0 },
+    { IP_ADDR_PRIM_TYPE, SR_READ_WRITE, offsetof(stsTopDestEntry_t, stsTopDestIp), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsTopDestEntry_t, stsTopDestUdpPort), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsTopDestEntry_t, stsTopDestVlanId), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsTopDestEntry
+    SR_PROTOTYPE((int index));
+extern void stsTopDestEntry_free
+    SR_PROTOTYPE((stsTopDestEntry_t *data));
+
+/* global data describing the stsTrapRegTable entries */
+Index_t stsTrapRegEntryIndex[] = {
+    { offsetof(stsTrapRegEntry_t, stsTrapRegMgrNumber),  T_uint}
+};
+
+SnmpV2Table stsTrapRegTable = {
+    NULL,
+    stsTrapRegEntryIndex,
+    0,
+    1,
+    sizeof(stsTrapRegEntry_t)
+};
+
+const SnmpType stsTrapRegEntryTypeTable[] = {
+    { INTEGER_TYPE, SR_READ_ONLY, offsetof(stsTrapRegEntry_t, stsTrapRegMgrNumber), 0 },
+    { IP_ADDR_PRIM_TYPE, SR_READ_WRITE, offsetof(stsTrapRegEntry_t, stsTrapRegMgrIp), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsTrapRegEntry_t, stsTrapRegMgrUdpPort), -1 },
+    { OCTET_PRIM_TYPE, SR_READ_WRITE, offsetof(stsTrapRegEntry_t, stsTrapRegCommunityStr), -1 },
+    { INTEGER_TYPE, SR_READ_WRITE, offsetof(stsTrapRegEntry_t, stsTrapRegState), -1 },
+    { -1, -1, (unsigned short) -1, -1 }
+};
+
+
+void DeletestsTrapRegEntry
+    SR_PROTOTYPE((int index));
+extern void stsTrapRegEntry_free
+    SR_PROTOTYPE((stsTrapRegEntry_t *data));
+
+int
+k_LarusSts_initialize(void)
+{
+    return 1;
+}
+
+int
+k_LarusSts_terminate(void)
+{
+    return 1;
+}
+
+stsSystem_t *
+k_stsSystem_get(int serialNum, ContextInfo *contextInfo,
+                int nominator)
+{
+   return stsSystemData;
+}
+
+#ifdef SETS
+int
+k_stsSystem_test(ObjectInfo *object, ObjectSyntax *value,
+                 doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsSystem_ready(ObjectInfo *object, ObjectSyntax *value, 
+                  doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsSystem_set(stsSystem_t *data,
+                ContextInfo *contextInfo, int function)
+{
+
+   stsSystem_free(stsSystemData);
+   stsSystemData = Clone_stsSystem(data);
+   return NO_ERROR;
+}
+
+#ifdef SR_stsSystem_UNDO
+/* add #define SR_stsSystem_UNDO in sitedefs.h to
+ * include the undo routine for the stsSystem family.
+ */
+int
+stsSystem_undo(doList_t *doHead, doList_t *doCur,
+               ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsSystem_UNDO */
+
+#endif /* SETS */
+
+stsClockInput_t *
+k_stsClockInput_get(int serialNum, ContextInfo *contextInfo,
+                    int nominator)
+{
+   return stsClockInputData;
+}
+
+#ifdef SETS
+int
+k_stsClockInput_test(ObjectInfo *object, ObjectSyntax *value,
+                     doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsClockInput_ready(ObjectInfo *object, ObjectSyntax *value, 
+                      doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsClockInput_set(stsClockInput_t *data,
+                    ContextInfo *contextInfo, int function)
+{
+
+   stsClockInput_free(stsClockInputData);
+   stsClockInputData = Clone_stsClockInput(data);
+   return NO_ERROR;
+}
+
+#ifdef SR_stsClockInput_UNDO
+/* add #define SR_stsClockInput_UNDO in sitedefs.h to
+ * include the undo routine for the stsClockInput family.
+ */
+int
+stsClockInput_undo(doList_t *doHead, doList_t *doCur,
+                   ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsClockInput_UNDO */
+
+#endif /* SETS */
+
+stsClockInputSSM_t *
+k_stsClockInputSSM_get(int serialNum, ContextInfo *contextInfo,
+                       int nominator)
+{
+   return stsClockInputSSMData;
+}
+
+#ifdef SETS
+int
+k_stsClockInputSSM_test(ObjectInfo *object, ObjectSyntax *value,
+                        doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsClockInputSSM_ready(ObjectInfo *object, ObjectSyntax *value, 
+                         doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsClockInputSSM_set(stsClockInputSSM_t *data,
+                       ContextInfo *contextInfo, int function)
+{
+
+   stsClockInputSSM_free(stsClockInputSSMData);
+   stsClockInputSSMData = Clone_stsClockInputSSM(data);
+   return NO_ERROR;
+}
+
+#ifdef SR_stsClockInputSSM_UNDO
+/* add #define SR_stsClockInputSSM_UNDO in sitedefs.h to
+ * include the undo routine for the stsClockInputSSM family.
+ */
+int
+stsClockInputSSM_undo(doList_t *doHead, doList_t *doCur,
+                      ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsClockInputSSM_UNDO */
+
+#endif /* SETS */
+
+stsTop_t *
+k_stsTop_get(int serialNum, ContextInfo *contextInfo,
+             int nominator)
+{
+   return stsTopData;
+}
+
+#ifdef SETS
+int
+k_stsTop_test(ObjectInfo *object, ObjectSyntax *value,
+              doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsTop_ready(ObjectInfo *object, ObjectSyntax *value, 
+               doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsTop_set(stsTop_t *data,
+             ContextInfo *contextInfo, int function)
+{
+
+   stsTop_free(stsTopData);
+   stsTopData = Clone_stsTop(data);
+   return NO_ERROR;
+}
+
+#ifdef SR_stsTop_UNDO
+/* add #define SR_stsTop_UNDO in sitedefs.h to
+ * include the undo routine for the stsTop family.
+ */
+int
+stsTop_undo(doList_t *doHead, doList_t *doCur,
+            ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsTop_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsClockInputStatusTable */
+void
+DeletestsClockInputStatusEntry (int index)
+{
+    stsClockInputStatusEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsClockInputStatusEntry_t *) stsClockInputStatusTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsClockInputStatusEntry_free(data);
+    RemoveTableEntry(&stsClockInputStatusTable, index);
+}
+
+stsClockInputStatusEntry_t *
+k_stsClockInputStatusEntry_get(int serialNum, ContextInfo *contextInfo,
+                               int nominator,
+                               int searchType,
+                               SR_INT32 stsClockInputStatusIndex)
+{
+    int index;
+
+    stsClockInputStatusTable.tip[0].value.uint_val = stsClockInputStatusIndex;
+    if ((index = SearchTable(&stsClockInputStatusTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsClockInputStatusEntry_t *) stsClockInputStatusTable.tp[index];
+
+}
+
+/* This routine deletes an entry from the stsClockInputSSMTable */
+void
+DeletestsClockInputSSMEntry (int index)
+{
+    stsClockInputSSMEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsClockInputSSMEntry_t *) stsClockInputSSMTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsClockInputSSMEntry_free(data);
+    RemoveTableEntry(&stsClockInputSSMTable, index);
+}
+
+stsClockInputSSMEntry_t *
+k_stsClockInputSSMEntry_get(int serialNum, ContextInfo *contextInfo,
+                            int nominator,
+                            int searchType,
+                            SR_INT32 stsClockInputSSMIndex,
+                            SR_INT32 stsClockInputSSMType)
+{
+    int index;
+
+    stsClockInputSSMTable.tip[0].value.uint_val = stsClockInputSSMIndex;
+    stsClockInputSSMTable.tip[1].value.uint_val = stsClockInputSSMType;
+    if ((index = SearchTable(&stsClockInputSSMTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsClockInputSSMEntry_t *) stsClockInputSSMTable.tp[index];
+
+}
+
+/* This routine deletes an entry from the stsCardTable */
+void
+DeletestsCardEntry (int index)
+{
+    stsCardEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsCardEntry_t *) stsCardTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsCardEntry_free(data);
+    RemoveTableEntry(&stsCardTable, index);
+}
+
+stsCardEntry_t *
+k_stsCardEntry_get(int serialNum, ContextInfo *contextInfo,
+                   int nominator,
+                   int searchType,
+                   SR_INT32 stsCardShelf,
+                   SR_INT32 stsCardIndex)
+{
+    int index;
+
+    stsCardTable.tip[0].value.uint_val = stsCardShelf;
+    stsCardTable.tip[1].value.uint_val = stsCardIndex;
+    if ((index = SearchTable(&stsCardTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsCardEntry_t *) stsCardTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsCardEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                    doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsCardEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                     doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsCardEntry_set_defaults(doList_t *dp)
+{
+    stsCardEntry_t *data = (stsCardEntry_t *) (dp->data);
+
+    if ((data->stsCardDescr = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsCardSerial = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsCardHwVersion = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsCardCLEICode = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsCardEntry_set(stsCardEntry_t *data,
+                   ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsCardEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsCardTable.tip[0].value.uint_val = data->stsCardShelf;
+    stsCardTable.tip[1].value.uint_val = data->stsCardIndex;
+    if ((index = SearchTable(&stsCardTable, EXACT)) != -1) {
+        newrow = (stsCardEntry_t *) stsCardTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsCardReset, stsCardEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsCardEntry_UNDO
+/* add #define SR_stsCardEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsCardEntry family.
+ */
+int
+stsCardEntry_undo(doList_t *doHead, doList_t *doCur,
+                  ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsCardEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsOscillatorTable */
+void
+DeletestsOscillatorEntry (int index)
+{
+    stsOscillatorEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsOscillatorEntry_t *) stsOscillatorTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsOscillatorEntry_free(data);
+    RemoveTableEntry(&stsOscillatorTable, index);
+}
+
+stsOscillatorEntry_t *
+k_stsOscillatorEntry_get(int serialNum, ContextInfo *contextInfo,
+                         int nominator,
+                         int searchType,
+                         SR_INT32 stsOscillatorIndex)
+{
+    int index;
+
+    stsOscillatorTable.tip[0].value.uint_val = stsOscillatorIndex;
+    if ((index = SearchTable(&stsOscillatorTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsOscillatorEntry_t *) stsOscillatorTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsOscillatorEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                          doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsOscillatorEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                           doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsOscillatorEntry_set_defaults(doList_t *dp)
+{
+    stsOscillatorEntry_t *data = (stsOscillatorEntry_t *) (dp->data);
+
+    if ((data->stsOscillatorEFER = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsOscillatorESSD = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsOscillatorESSN = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsOscillatorFAGE = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsOscillatorTIMD = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsOscillatorEntry_set(stsOscillatorEntry_t *data,
+                         ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsOscillatorEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsOscillatorTable.tip[0].value.uint_val = data->stsOscillatorIndex;
+    if ((index = SearchTable(&stsOscillatorTable, EXACT)) != -1) {
+        newrow = (stsOscillatorEntry_t *) stsOscillatorTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsOscillatorStatus, stsOscillatorEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsOscillatorEntry_UNDO
+/* add #define SR_stsOscillatorEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsOscillatorEntry family.
+ */
+int
+stsOscillatorEntry_undo(doList_t *doHead, doList_t *doCur,
+                        ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsOscillatorEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsGpsTable */
+void
+DeletestsGpsEntry (int index)
+{
+    stsGpsEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsGpsEntry_t *) stsGpsTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsGpsEntry_free(data);
+    RemoveTableEntry(&stsGpsTable, index);
+}
+
+stsGpsEntry_t *
+k_stsGpsEntry_get(int serialNum, ContextInfo *contextInfo,
+                  int nominator,
+                  int searchType,
+                  SR_INT32 stsGpsIndex)
+{
+    int index;
+
+    stsGpsTable.tip[0].value.uint_val = stsGpsIndex;
+    if ((index = SearchTable(&stsGpsTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsGpsEntry_t *) stsGpsTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsGpsEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                   doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsGpsEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                    doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsGpsEntry_set_defaults(doList_t *dp)
+{
+    stsGpsEntry_t *data = (stsGpsEntry_t *) (dp->data);
+
+    if ((data->stsGpsANTD = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsAZEL = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsRSTG = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsBITS = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsPAVG = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsSIGQ = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsSPOS = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsTRMO = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsUTCT = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsVERS = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsDETF = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsEFER = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsESSD = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsESSN = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsFAGE = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsGpsTIMD = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsGpsEntry_set(stsGpsEntry_t *data,
+                  ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsGpsEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsGpsTable.tip[0].value.uint_val = data->stsGpsIndex;
+    if ((index = SearchTable(&stsGpsTable, EXACT)) != -1) {
+        newrow = (stsGpsEntry_t *) stsGpsTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsGpsReset, stsGpsEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsGpsEntry_UNDO
+/* add #define SR_stsGpsEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsGpsEntry family.
+ */
+int
+stsGpsEntry_undo(doList_t *doHead, doList_t *doCur,
+                 ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsGpsEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsLinkTable */
+void
+DeletestsLinkEntry (int index)
+{
+    stsLinkEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsLinkEntry_t *) stsLinkTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsLinkEntry_free(data);
+    RemoveTableEntry(&stsLinkTable, index);
+}
+
+stsLinkEntry_t *
+k_stsLinkEntry_get(int serialNum, ContextInfo *contextInfo,
+                   int nominator,
+                   int searchType,
+                   SR_INT32 stsLinkIndex)
+{
+    int index;
+
+    stsLinkTable.tip[0].value.uint_val = stsLinkIndex;
+    if ((index = SearchTable(&stsLinkTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsLinkEntry_t *) stsLinkTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsLinkEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                    doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsLinkEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                     doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsLinkEntry_set_defaults(doList_t *dp)
+{
+    stsLinkEntry_t *data = (stsLinkEntry_t *) (dp->data);
+
+    if ((data->stsLinkId = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsLinkEntry_set(stsLinkEntry_t *data,
+                   ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsLinkEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsLinkTable.tip[0].value.uint_val = data->stsLinkIndex;
+    if ((index = SearchTable(&stsLinkTable, EXACT)) != -1) {
+        newrow = (stsLinkEntry_t *) stsLinkTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsLinkId, stsLinkEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsLinkEntry_UNDO
+/* add #define SR_stsLinkEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsLinkEntry family.
+ */
+int
+stsLinkEntry_undo(doList_t *doHead, doList_t *doCur,
+                  ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsLinkEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsShelfTable */
+void
+DeletestsShelfEntry (int index)
+{
+    stsShelfEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsShelfEntry_t *) stsShelfTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsShelfEntry_free(data);
+    RemoveTableEntry(&stsShelfTable, index);
+}
+
+stsShelfEntry_t *
+k_stsShelfEntry_get(int serialNum, ContextInfo *contextInfo,
+                    int nominator,
+                    int searchType,
+                    SR_INT32 stsShelfIndex)
+{
+    int index;
+
+    stsShelfTable.tip[0].value.uint_val = stsShelfIndex;
+    if ((index = SearchTable(&stsShelfTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsShelfEntry_t *) stsShelfTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsShelfEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                     doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsShelfEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                      doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsShelfEntry_set_defaults(doList_t *dp)
+{
+    stsShelfEntry_t *data = (stsShelfEntry_t *) (dp->data);
+
+    if ((data->stsShelfSerial = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+    if ((data->stsShelfCLEICode = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsShelfEntry_set(stsShelfEntry_t *data,
+                    ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsShelfEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsShelfTable.tip[0].value.uint_val = data->stsShelfIndex;
+    if ((index = SearchTable(&stsShelfTable, EXACT)) != -1) {
+        newrow = (stsShelfEntry_t *) stsShelfTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsShelfReset, stsShelfEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsShelfEntry_UNDO
+/* add #define SR_stsShelfEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsShelfEntry family.
+ */
+int
+stsShelfEntry_undo(doList_t *doHead, doList_t *doCur,
+                   ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsShelfEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsAlarmThresholdTable */
+void
+DeletestsAlarmThresholdEntry (int index)
+{
+    stsAlarmThresholdEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsAlarmThresholdEntry_t *) stsAlarmThresholdTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsAlarmThresholdEntry_free(data);
+    RemoveTableEntry(&stsAlarmThresholdTable, index);
+}
+
+stsAlarmThresholdEntry_t *
+k_stsAlarmThresholdEntry_get(int serialNum, ContextInfo *contextInfo,
+                             int nominator,
+                             int searchType,
+                             SR_INT32 stsAlarmThresholdCurrentMon,
+                             SR_INT32 stsAlarmThresholdType)
+{
+    int index;
+
+    stsAlarmThresholdTable.tip[0].value.uint_val = stsAlarmThresholdCurrentMon;
+    stsAlarmThresholdTable.tip[1].value.uint_val = stsAlarmThresholdType;
+    if ((index = SearchTable(&stsAlarmThresholdTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsAlarmThresholdEntry_t *) stsAlarmThresholdTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsAlarmThresholdEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                              doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsAlarmThresholdEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                               doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsAlarmThresholdEntry_set_defaults(doList_t *dp)
+{
+    stsAlarmThresholdEntry_t *data = (stsAlarmThresholdEntry_t *) (dp->data);
+
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsAlarmThresholdEntry_set(stsAlarmThresholdEntry_t *data,
+                             ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsAlarmThresholdEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsAlarmThresholdTable.tip[0].value.uint_val = data->stsAlarmThresholdCurrentMon;
+    stsAlarmThresholdTable.tip[1].value.uint_val = data->stsAlarmThresholdType;
+    if ((index = SearchTable(&stsAlarmThresholdTable, EXACT)) != -1) {
+        newrow = (stsAlarmThresholdEntry_t *) stsAlarmThresholdTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsAlarmThresholdTimeInterval, stsAlarmThresholdEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsAlarmThresholdEntry_UNDO
+/* add #define SR_stsAlarmThresholdEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsAlarmThresholdEntry family.
+ */
+int
+stsAlarmThresholdEntry_undo(doList_t *doHead, doList_t *doCur,
+                            ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsAlarmThresholdEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsLinkAlarmTable */
+void
+DeletestsLinkAlarmEntry (int index)
+{
+    stsLinkAlarmEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsLinkAlarmEntry_t *) stsLinkAlarmTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsLinkAlarmEntry_free(data);
+    RemoveTableEntry(&stsLinkAlarmTable, index);
+}
+
+stsLinkAlarmEntry_t *
+k_stsLinkAlarmEntry_get(int serialNum, ContextInfo *contextInfo,
+                        int nominator,
+                        int searchType,
+                        SR_INT32 stsLinkAlarmSettingLinkType,
+                        SR_INT32 stsLinkAlarmSettingType)
+{
+    int index;
+
+    stsLinkAlarmTable.tip[0].value.uint_val = stsLinkAlarmSettingLinkType;
+    stsLinkAlarmTable.tip[1].value.uint_val = stsLinkAlarmSettingType;
+    if ((index = SearchTable(&stsLinkAlarmTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsLinkAlarmEntry_t *) stsLinkAlarmTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsLinkAlarmEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                         doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsLinkAlarmEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                          doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsLinkAlarmEntry_set_defaults(doList_t *dp)
+{
+    stsLinkAlarmEntry_t *data = (stsLinkAlarmEntry_t *) (dp->data);
+
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsLinkAlarmEntry_set(stsLinkAlarmEntry_t *data,
+                        ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsLinkAlarmEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsLinkAlarmTable.tip[0].value.uint_val = data->stsLinkAlarmSettingLinkType;
+    stsLinkAlarmTable.tip[1].value.uint_val = data->stsLinkAlarmSettingType;
+    if ((index = SearchTable(&stsLinkAlarmTable, EXACT)) != -1) {
+        newrow = (stsLinkAlarmEntry_t *) stsLinkAlarmTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsLinkAlarmSevirity, stsLinkAlarmEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsLinkAlarmEntry_UNDO
+/* add #define SR_stsLinkAlarmEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsLinkAlarmEntry family.
+ */
+int
+stsLinkAlarmEntry_undo(doList_t *doHead, doList_t *doCur,
+                       ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsLinkAlarmEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsOscillatorAlarmTable */
+void
+DeletestsOscillatorAlarmEntry (int index)
+{
+    stsOscillatorAlarmEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsOscillatorAlarmEntry_t *) stsOscillatorAlarmTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsOscillatorAlarmEntry_free(data);
+    RemoveTableEntry(&stsOscillatorAlarmTable, index);
+}
+
+stsOscillatorAlarmEntry_t *
+k_stsOscillatorAlarmEntry_get(int serialNum, ContextInfo *contextInfo,
+                              int nominator,
+                              int searchType,
+                              SR_INT32 stsOscillatorAlarmSettingClock,
+                              SR_INT32 stsOscillatorAlarmSettingType)
+{
+    int index;
+
+    stsOscillatorAlarmTable.tip[0].value.uint_val = stsOscillatorAlarmSettingClock;
+    stsOscillatorAlarmTable.tip[1].value.uint_val = stsOscillatorAlarmSettingType;
+    if ((index = SearchTable(&stsOscillatorAlarmTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsOscillatorAlarmEntry_t *) stsOscillatorAlarmTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsOscillatorAlarmEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                               doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsOscillatorAlarmEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                                doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsOscillatorAlarmEntry_set_defaults(doList_t *dp)
+{
+    stsOscillatorAlarmEntry_t *data = (stsOscillatorAlarmEntry_t *) (dp->data);
+
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsOscillatorAlarmEntry_set(stsOscillatorAlarmEntry_t *data,
+                              ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsOscillatorAlarmEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsOscillatorAlarmTable.tip[0].value.uint_val = data->stsOscillatorAlarmSettingClock;
+    stsOscillatorAlarmTable.tip[1].value.uint_val = data->stsOscillatorAlarmSettingType;
+    if ((index = SearchTable(&stsOscillatorAlarmTable, EXACT)) != -1) {
+        newrow = (stsOscillatorAlarmEntry_t *) stsOscillatorAlarmTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsOscillatorAlarmSeverity, stsOscillatorAlarmEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsOscillatorAlarmEntry_UNDO
+/* add #define SR_stsOscillatorAlarmEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsOscillatorAlarmEntry family.
+ */
+int
+stsOscillatorAlarmEntry_undo(doList_t *doHead, doList_t *doCur,
+                             ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsOscillatorAlarmEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsOsPwrAlarmTable */
+void
+DeletestsOsPwrAlarmEntry (int index)
+{
+    stsOsPwrAlarmEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsOsPwrAlarmEntry_t *) stsOsPwrAlarmTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsOsPwrAlarmEntry_free(data);
+    RemoveTableEntry(&stsOsPwrAlarmTable, index);
+}
+
+stsOsPwrAlarmEntry_t *
+k_stsOsPwrAlarmEntry_get(int serialNum, ContextInfo *contextInfo,
+                         int nominator,
+                         int searchType,
+                         SR_INT32 stssPwrAlarmSettingShelf,
+                         SR_INT32 stsOsPwrAlarmSettingOsPwr)
+{
+    int index;
+
+    stsOsPwrAlarmTable.tip[0].value.uint_val = stssPwrAlarmSettingShelf;
+    stsOsPwrAlarmTable.tip[1].value.uint_val = stsOsPwrAlarmSettingOsPwr;
+    if ((index = SearchTable(&stsOsPwrAlarmTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsOsPwrAlarmEntry_t *) stsOsPwrAlarmTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsOsPwrAlarmEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                          doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsOsPwrAlarmEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                           doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsOsPwrAlarmEntry_set_defaults(doList_t *dp)
+{
+    stsOsPwrAlarmEntry_t *data = (stsOsPwrAlarmEntry_t *) (dp->data);
+
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsOsPwrAlarmEntry_set(stsOsPwrAlarmEntry_t *data,
+                         ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsOsPwrAlarmEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsOsPwrAlarmTable.tip[0].value.uint_val = data->stssPwrAlarmSettingShelf;
+    stsOsPwrAlarmTable.tip[1].value.uint_val = data->stsOsPwrAlarmSettingOsPwr;
+    if ((index = SearchTable(&stsOsPwrAlarmTable, EXACT)) != -1) {
+        newrow = (stsOsPwrAlarmEntry_t *) stsOsPwrAlarmTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsOsPwrAlarmSeverity, stsOsPwrAlarmEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsOsPwrAlarmEntry_UNDO
+/* add #define SR_stsOsPwrAlarmEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsOsPwrAlarmEntry family.
+ */
+int
+stsOsPwrAlarmEntry_undo(doList_t *doHead, doList_t *doCur,
+                        ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsOsPwrAlarmEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsOutputAlarmTable */
+void
+DeletestsOutputAlarmEntry (int index)
+{
+    stsOutputAlarmEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsOutputAlarmEntry_t *) stsOutputAlarmTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsOutputAlarmEntry_free(data);
+    RemoveTableEntry(&stsOutputAlarmTable, index);
+}
+
+stsOutputAlarmEntry_t *
+k_stsOutputAlarmEntry_get(int serialNum, ContextInfo *contextInfo,
+                          int nominator,
+                          int searchType,
+                          SR_INT32 stsOutputAlarmSettingShelf,
+                          SR_INT32 stsOutputAlarmSettingSlot,
+                          SR_INT32 stsOutputAlarmSettingPort,
+                          SR_INT32 stsOutputAlarmSettingType)
+{
+    int index;
+
+    stsOutputAlarmTable.tip[0].value.uint_val = stsOutputAlarmSettingShelf;
+    stsOutputAlarmTable.tip[1].value.uint_val = stsOutputAlarmSettingSlot;
+    stsOutputAlarmTable.tip[2].value.uint_val = stsOutputAlarmSettingPort;
+    stsOutputAlarmTable.tip[3].value.uint_val = stsOutputAlarmSettingType;
+    if ((index = SearchTable(&stsOutputAlarmTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsOutputAlarmEntry_t *) stsOutputAlarmTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsOutputAlarmEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                           doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsOutputAlarmEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                            doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsOutputAlarmEntry_set_defaults(doList_t *dp)
+{
+    stsOutputAlarmEntry_t *data = (stsOutputAlarmEntry_t *) (dp->data);
+
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsOutputAlarmEntry_set(stsOutputAlarmEntry_t *data,
+                          ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsOutputAlarmEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsOutputAlarmTable.tip[0].value.uint_val = data->stsOutputAlarmSettingShelf;
+    stsOutputAlarmTable.tip[1].value.uint_val = data->stsOutputAlarmSettingSlot;
+    stsOutputAlarmTable.tip[2].value.uint_val = data->stsOutputAlarmSettingPort;
+    stsOutputAlarmTable.tip[3].value.uint_val = data->stsOutputAlarmSettingType;
+    if ((index = SearchTable(&stsOutputAlarmTable, EXACT)) != -1) {
+        newrow = (stsOutputAlarmEntry_t *) stsOutputAlarmTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsOutputAlarmSeverity, stsOutputAlarmEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsOutputAlarmEntry_UNDO
+/* add #define SR_stsOutputAlarmEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsOutputAlarmEntry family.
+ */
+int
+stsOutputAlarmEntry_undo(doList_t *doHead, doList_t *doCur,
+                         ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsOutputAlarmEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsOutputTiuSettingTable */
+void
+DeletestsOutputTiuSettingEntry (int index)
+{
+    stsOutputTiuSettingEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsOutputTiuSettingEntry_t *) stsOutputTiuSettingTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsOutputTiuSettingEntry_free(data);
+    RemoveTableEntry(&stsOutputTiuSettingTable, index);
+}
+
+stsOutputTiuSettingEntry_t *
+k_stsOutputTiuSettingEntry_get(int serialNum, ContextInfo *contextInfo,
+                               int nominator,
+                               int searchType,
+                               SR_INT32 stsOutputTiuSettingShelf,
+                               SR_INT32 stsOutputTiuSettingSlot,
+                               SR_INT32 stsOutputTiuSettingPort)
+{
+    int index;
+
+    stsOutputTiuSettingTable.tip[0].value.uint_val = stsOutputTiuSettingShelf;
+    stsOutputTiuSettingTable.tip[1].value.uint_val = stsOutputTiuSettingSlot;
+    stsOutputTiuSettingTable.tip[2].value.uint_val = stsOutputTiuSettingPort;
+    if ((index = SearchTable(&stsOutputTiuSettingTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsOutputTiuSettingEntry_t *) stsOutputTiuSettingTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsOutputTiuSettingEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                                doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsOutputTiuSettingEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                                 doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsOutputTiuSettingEntry_set_defaults(doList_t *dp)
+{
+    stsOutputTiuSettingEntry_t *data = (stsOutputTiuSettingEntry_t *) (dp->data);
+
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsOutputTiuSettingEntry_set(stsOutputTiuSettingEntry_t *data,
+                               ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsOutputTiuSettingEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsOutputTiuSettingTable.tip[0].value.uint_val = data->stsOutputTiuSettingShelf;
+    stsOutputTiuSettingTable.tip[1].value.uint_val = data->stsOutputTiuSettingSlot;
+    stsOutputTiuSettingTable.tip[2].value.uint_val = data->stsOutputTiuSettingPort;
+    if ((index = SearchTable(&stsOutputTiuSettingTable, EXACT)) != -1) {
+        newrow = (stsOutputTiuSettingEntry_t *) stsOutputTiuSettingTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsOutputTiuSettingTermination, stsOutputTiuSettingEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsOutputTiuSettingEntry_UNDO
+/* add #define SR_stsOutputTiuSettingEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsOutputTiuSettingEntry family.
+ */
+int
+stsOutputTiuSettingEntry_undo(doList_t *doHead, doList_t *doCur,
+                              ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsOutputTiuSettingEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsPerfMonTable */
+void
+DeletestsPerfMonEntry (int index)
+{
+    stsPerfMonEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsPerfMonEntry_t *) stsPerfMonTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsPerfMonEntry_free(data);
+    RemoveTableEntry(&stsPerfMonTable, index);
+}
+
+stsPerfMonEntry_t *
+k_stsPerfMonEntry_get(int serialNum, ContextInfo *contextInfo,
+                      int nominator,
+                      int searchType,
+                      SR_INT32 stsPerfMonInputCurrentMon,
+                      SR_INT32 stsPerfMonInputMonPeriod,
+                      SR_INT32 stsPerfMonInputMonBucket)
+{
+    int index;
+
+    stsPerfMonTable.tip[0].value.uint_val = stsPerfMonInputCurrentMon;
+    stsPerfMonTable.tip[1].value.uint_val = stsPerfMonInputMonPeriod;
+    stsPerfMonTable.tip[2].value.uint_val = stsPerfMonInputMonBucket;
+    if ((index = SearchTable(&stsPerfMonTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsPerfMonEntry_t *) stsPerfMonTable.tp[index];
+
+}
+
+/* This routine deletes an entry from the stsAlarmStatusTable */
+void
+DeletestsAlarmStatusEntry (int index)
+{
+    stsAlarmStatusEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsAlarmStatusEntry_t *) stsAlarmStatusTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsAlarmStatusEntry_free(data);
+    RemoveTableEntry(&stsAlarmStatusTable, index);
+}
+
+stsAlarmStatusEntry_t *
+k_stsAlarmStatusEntry_get(int serialNum, ContextInfo *contextInfo,
+                          int nominator,
+                          int searchType,
+                          SR_INT32 stsAlarmSource)
+{
+    int index;
+
+    stsAlarmStatusTable.tip[0].value.uint_val = stsAlarmSource;
+    if ((index = SearchTable(&stsAlarmStatusTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsAlarmStatusEntry_t *) stsAlarmStatusTable.tp[index];
+
+}
+
+/* This routine deletes an entry from the stsOutputCardTable */
+void
+DeletestsOutputCardEntry (int index)
+{
+    stsOutputCardEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsOutputCardEntry_t *) stsOutputCardTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsOutputCardEntry_free(data);
+    RemoveTableEntry(&stsOutputCardTable, index);
+}
+
+stsOutputCardEntry_t *
+k_stsOutputCardEntry_get(int serialNum, ContextInfo *contextInfo,
+                         int nominator,
+                         int searchType,
+                         SR_INT32 stsOutputShelf,
+                         SR_INT32 stsOutputSlot)
+{
+    int index;
+
+    stsOutputCardTable.tip[0].value.uint_val = stsOutputShelf;
+    stsOutputCardTable.tip[1].value.uint_val = stsOutputSlot;
+    if ((index = SearchTable(&stsOutputCardTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsOutputCardEntry_t *) stsOutputCardTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsOutputCardEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                          doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsOutputCardEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                           doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsOutputCardEntry_set_defaults(doList_t *dp)
+{
+    stsOutputCardEntry_t *data = (stsOutputCardEntry_t *) (dp->data);
+
+    if ((data->stsOutputTimingFormat = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsOutputCardEntry_set(stsOutputCardEntry_t *data,
+                         ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsOutputCardEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsOutputCardTable.tip[0].value.uint_val = data->stsOutputShelf;
+    stsOutputCardTable.tip[1].value.uint_val = data->stsOutputSlot;
+    if ((index = SearchTable(&stsOutputCardTable, EXACT)) != -1) {
+        newrow = (stsOutputCardEntry_t *) stsOutputCardTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsOutputTimingFormat, stsOutputCardEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsOutputCardEntry_UNDO
+/* add #define SR_stsOutputCardEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsOutputCardEntry family.
+ */
+int
+stsOutputCardEntry_undo(doList_t *doHead, doList_t *doCur,
+                        ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsOutputCardEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsEmmStatusTable */
+void
+DeletestsEmmStatusEntry (int index)
+{
+    stsEmmStatusEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsEmmStatusEntry_t *) stsEmmStatusTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsEmmStatusEntry_free(data);
+    RemoveTableEntry(&stsEmmStatusTable, index);
+}
+
+stsEmmStatusEntry_t *
+k_stsEmmStatusEntry_get(int serialNum, ContextInfo *contextInfo,
+                        int nominator,
+                        int searchType,
+                        SR_INT32 stsEmmShelf,
+                        SR_INT32 stsEmmUnitId)
+{
+    int index;
+
+    stsEmmStatusTable.tip[0].value.uint_val = stsEmmShelf;
+    stsEmmStatusTable.tip[1].value.uint_val = stsEmmUnitId;
+    if ((index = SearchTable(&stsEmmStatusTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsEmmStatusEntry_t *) stsEmmStatusTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsEmmStatusEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                         doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsEmmStatusEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                          doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsEmmStatusEntry_set_defaults(doList_t *dp)
+{
+    stsEmmStatusEntry_t *data = (stsEmmStatusEntry_t *) (dp->data);
+
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsEmmStatusEntry_set(stsEmmStatusEntry_t *data,
+                        ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsEmmStatusEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsEmmStatusTable.tip[0].value.uint_val = data->stsEmmShelf;
+    stsEmmStatusTable.tip[1].value.uint_val = data->stsEmmUnitId;
+    if ((index = SearchTable(&stsEmmStatusTable, EXACT)) != -1) {
+        newrow = (stsEmmStatusEntry_t *) stsEmmStatusTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsEmmMinorAlmLoThresh, stsEmmStatusEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsEmmStatusEntry_UNDO
+/* add #define SR_stsEmmStatusEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsEmmStatusEntry family.
+ */
+int
+stsEmmStatusEntry_undo(doList_t *doHead, doList_t *doCur,
+                       ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsEmmStatusEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsAntTable */
+void
+DeletestsAntEntry (int index)
+{
+    stsAntEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsAntEntry_t *) stsAntTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsAntEntry_free(data);
+    RemoveTableEntry(&stsAntTable, index);
+}
+
+stsAntEntry_t *
+k_stsAntEntry_get(int serialNum, ContextInfo *contextInfo,
+                  int nominator,
+                  int searchType,
+                  SR_INT32 stsAntIndex)
+{
+    int index;
+
+    stsAntTable.tip[0].value.uint_val = stsAntIndex;
+    if ((index = SearchTable(&stsAntTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsAntEntry_t *) stsAntTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsAntEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                   doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsAntEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                    doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsAntEntry_set_defaults(doList_t *dp)
+{
+    stsAntEntry_t *data = (stsAntEntry_t *) (dp->data);
+
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsAntEntry_set(stsAntEntry_t *data,
+                  ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsAntEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsAntTable.tip[0].value.uint_val = data->stsAntIndex;
+    if ((index = SearchTable(&stsAntTable, EXACT)) != -1) {
+        newrow = (stsAntEntry_t *) stsAntTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsAntSwitchState, stsAntEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsAntEntry_UNDO
+/* add #define SR_stsAntEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsAntEntry family.
+ */
+int
+stsAntEntry_undo(doList_t *doHead, doList_t *doCur,
+                 ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsAntEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsTopDestTable */
+void
+DeletestsTopDestEntry (int index)
+{
+    stsTopDestEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsTopDestEntry_t *) stsTopDestTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsTopDestEntry_free(data);
+    RemoveTableEntry(&stsTopDestTable, index);
+}
+
+stsTopDestEntry_t *
+k_stsTopDestEntry_get(int serialNum, ContextInfo *contextInfo,
+                      int nominator,
+                      int searchType,
+                      SR_INT32 stsTopDestNumber)
+{
+    int index;
+
+    stsTopDestTable.tip[0].value.uint_val = stsTopDestNumber;
+    if ((index = SearchTable(&stsTopDestTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsTopDestEntry_t *) stsTopDestTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsTopDestEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                       doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsTopDestEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                        doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsTopDestEntry_set_defaults(doList_t *dp)
+{
+    stsTopDestEntry_t *data = (stsTopDestEntry_t *) (dp->data);
+
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsTopDestEntry_set(stsTopDestEntry_t *data,
+                      ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsTopDestEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsTopDestTable.tip[0].value.uint_val = data->stsTopDestNumber;
+    if ((index = SearchTable(&stsTopDestTable, EXACT)) != -1) {
+        newrow = (stsTopDestEntry_t *) stsTopDestTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsTopDestVlanId, stsTopDestEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsTopDestEntry_UNDO
+/* add #define SR_stsTopDestEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsTopDestEntry family.
+ */
+int
+stsTopDestEntry_undo(doList_t *doHead, doList_t *doCur,
+                     ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsTopDestEntry_UNDO */
+
+#endif /* SETS */
+
+/* This routine deletes an entry from the stsTrapRegTable */
+void
+DeletestsTrapRegEntry (int index)
+{
+    stsTrapRegEntry_t *data;
+
+    /* get a pointer to the old entry */
+    data = (stsTrapRegEntry_t *) stsTrapRegTable.tp[index];
+
+    /* free the old entry and remove it from the table */
+    stsTrapRegEntry_free(data);
+    RemoveTableEntry(&stsTrapRegTable, index);
+}
+
+stsTrapRegEntry_t *
+k_stsTrapRegEntry_get(int serialNum, ContextInfo *contextInfo,
+                      int nominator,
+                      int searchType,
+                      SR_INT32 stsTrapRegMgrNumber)
+{
+    int index;
+
+    stsTrapRegTable.tip[0].value.uint_val = stsTrapRegMgrNumber;
+    if ((index = SearchTable(&stsTrapRegTable, searchType)) == -1) {
+        return NULL;
+    }
+
+    return (stsTrapRegEntry_t *) stsTrapRegTable.tp[index];
+
+}
+
+#ifdef SETS
+int
+k_stsTrapRegEntry_test(ObjectInfo *object, ObjectSyntax *value,
+                       doList_t *dp, ContextInfo *contextInfo)
+{
+
+    return NO_ERROR;
+}
+
+int
+k_stsTrapRegEntry_ready(ObjectInfo *object, ObjectSyntax *value, 
+                        doList_t *doHead, doList_t *dp)
+{
+
+    dp->state = SR_ADD_MODIFY;
+    return NO_ERROR;
+}
+
+int
+k_stsTrapRegEntry_set_defaults(doList_t *dp)
+{
+    stsTrapRegEntry_t *data = (stsTrapRegEntry_t *) (dp->data);
+
+    if ((data->stsTrapRegCommunityStr = MakeOctetStringFromText("")) == 0) {
+        return RESOURCE_UNAVAILABLE_ERROR;
+    }
+
+    SET_ALL_VALID(data->valid);
+    return NO_ERROR;
+}
+
+int
+k_stsTrapRegEntry_set(stsTrapRegEntry_t *data,
+                      ContextInfo *contextInfo, int function)
+{
+
+    int index;
+    stsTrapRegEntry_t *newrow = NULL;
+
+    /* find this entry in the table */
+    stsTrapRegTable.tip[0].value.uint_val = data->stsTrapRegMgrNumber;
+    if ((index = SearchTable(&stsTrapRegTable, EXACT)) != -1) {
+        newrow = (stsTrapRegEntry_t *) stsTrapRegTable.tp[index];
+    }
+    else {
+        return COMMIT_FAILED_ERROR;
+    }
+
+    /* copy values from the scratch copy to live data */
+    TransferEntries(I_stsTrapRegState, stsTrapRegEntryTypeTable, (void *) newrow, (void *) data);
+    SET_ALL_VALID(newrow->valid);
+
+
+    return NO_ERROR;
+
+}
+
+#ifdef SR_stsTrapRegEntry_UNDO
+/* add #define SR_stsTrapRegEntry_UNDO in sitedefs.h to
+ * include the undo routine for the stsTrapRegEntry family.
+ */
+int
+stsTrapRegEntry_undo(doList_t *doHead, doList_t *doCur,
+                     ContextInfo *contextInfo)
+{
+   return UNDO_FAILED_ERROR;
+}
+#endif /* SR_stsTrapRegEntry_UNDO */
+
+#endif /* SETS */
+

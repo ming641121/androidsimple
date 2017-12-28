@@ -1,0 +1,382 @@
+
+
+TOPDIR = $(TOP_DIR)
+SNMPDTOPDIR = $(TOP_DIR)\code\snmp
+#EMANATE_SNMPD_DIR = $(SNMPDTOPDIR)\emanate\src\snmpd\unix
+EMANATE_SNMPD_DIR = $(SNMPDTOPDIR)\snmp16.1.0.1\src\snmpd\unix
+
+# 
+# Operating System Information
+#
+
+MOVE = move
+RMDIR = rmdir
+RM = del
+CP = copy
+CAT = type
+
+ VX_VW_BASE = $(WIND_BASE)\target
+VX_HSP_BASE = $(WIND_BASE)\host\$(WIND_HOST_TYPE)
+
+         OS = -DSR_VXWORKS
+         os = vxworks_nt
+
+     OSTYPE = -DCPU=97
+    OSFLAGS =
+    HOST_OS = w32
+ EXTRA_DEFS =
+
+         CC = $(VX_HSP_BASE)\bin\ccppc
+ DEBUGFLAGS = -g
+         LD = $(VX_HSP_BASE)\bin\ldppc -r
+         AR = $(VX_HSP_BASE)\bin\arppc
+     AROPTS = clr
+     RANLIB = $(VX_HSP_BASE)\bin\ranlibppc
+
+    ARC_INC_DIRS = -I$(VX_VW_BASE)\h
+IPC_DEFAULT = -DSR_TCP_IPC
+IPC_DEFAULT_LIB = tcp
+
+EMANATE_MIBS_DIR =  $(SNMPDTOPDIR)\snmp16.1.0.1\src\mibs\common
+EXTEND_MIBS_DIR =  
+MIBCOMP_DIR = $(TOP_DIR)\code\snmp\snmp16.1.0.1\basic\$(HOST_OS).bin
+
+LARUS_MIB_DIR = $(TOP_DIR)\code\snmp\larus
+LARUS_SNMP_SRC_DIR = $(LARUS_MIB_DIR)\src
+LARUS_SNMP_INC_DIR = $(LARUS_MIB_DIR)\inc
+
+CARD_MIB_DIR = $(LARUS_MIB_DIR)\CARD
+
+# Subordinant Makefile
+#
+
+
+BMFN_V1 = 1
+
+BMFN_V2c = c
+
+BMFN_V2 =
+
+BMFN_V3 =
+
+BASEMAKEFILENAME = Makev$(BMFN_V1)$(BMFN_V2c)$(BMFN_V2)$(BMFN_V3)
+
+
+SUBMAKEFILE = $(BASEMAKEFILENAME).$(os)
+
+#
+# Compile Options
+#
+
+LIGHT = -DNOTICE
+DEBUG = -DSR_DEBUG
+SR_MIB_TABLE_HASHING = -DSR_MIB_TABLE_HASHING
+SR_CONFIG_FP = -DSR_CONFIG_FP
+PROXY =
+SETS = -DSETS
+WEB_AGT =
+WEB_MGR =
+
+CUSTOMER_DEFINES =
+
+EPIC =
+EPICTEST =
+
+EXPORT = -DSR_UNSECURABLE -DSR_NO_PRIVACY
+
+SNMP_V1_PACKET = -DSR_SNMPv1_PACKET -DSR_SNMPv1_WRAPPER
+
+SNMP_V2C_PACKET = -DSR_SNMPv2c_PACKET -DSR_SNMPv1_WRAPPER -DSR_SNMPv2_PDU
+
+SNMP_V1_PACKET_MIB = -DSR_SNMPv1_PACKET_MIB
+
+SNMP_V2_PACKET =
+SNMP_V2_PACKET_MIB =
+
+SNMP_V3_PACKET =
+SNMP_V3_PACKET_MIB =
+
+SYS_OR_TABLE =
+
+TRANSPORT_TABLE = -DSR_TRANSPORT_TABLE
+
+
+NOTIFY_COMPLIANCE_LEVEL = \
+	-DSR_NOTIFY_FULL_COMPLIANCE
+
+PROXY_COMPLIANCE_LEVEL =
+
+SNMPV3_COMPLIANCE_OPTIONS = \
+	$(NOTIFY_COMPLIANCE_LEVEL) \
+	$(PROXY_COMPLIANCE_LEVEL)
+
+USER_SEC_MODEL = -DSR_USER_SEC_MODEL
+
+SUPPORTED_SECURITY_MODELS = \
+	$(USER_SEC_MODEL)
+
+MD5_HASH_ALGORITHM = -DSR_MD5_HASH_ALGORITHM
+
+SHA_HASH_ALGORITHM = -DSR_SHA_HASH_ALGORITHM
+
+SUPPORTED_HASHING_ALGORITHMS = \
+	$(SHA_HASH_ALGORITHM) \
+	$(MD5_HASH_ALGORITHM)
+
+SNMP_ADMINISTRATIVE_FRAMEWORK_VERSION = -DSR_SNMPv1_ADMIN
+
+SNMP_ADMINISTRATIVE_MIB_SUPPORT = -DSR_SNMP_ADMIN_MIB
+
+SUPPORTED_PACKET_VERSIONS = \
+	$(SNMP_V1_PACKET) \
+	$(SNMP_V2C_PACKET) \
+	$(SNMP_V2_PACKET) \
+	$(SNMP_V3_PACKET)
+
+SUPPORTED_PACKET_MIBS = \
+	$(SNMP_V1_PACKET_MIB) \
+	$(SNMP_V2_PACKET_MIB) \
+	$(SNMP_V3_PACKET_MIB)
+
+GENERATE_CONFIGURATION = \
+	-DSR_GENERATE_CONFIGURATION \
+	-DSR_GENERATE_SNMPV3_CONFIGURATION
+#	-DSR_GENERATE_OLD_STYLE_CONFIGURATION
+
+SNMP_OPTIONS = \
+	$(CUSTOMER_DEFINES) \
+	$(EXPORT) \
+	$(SYS_OR_TABLE) \
+	$(TRANSPORT_TABLE) \
+	$(SUPPORTED_PACKET_VERSIONS) \
+	$(SUPPORTED_PACKET_MIBS) \
+	$(SUPPORTED_SECURITY_MODELS) \
+	$(SUPPORTED_HASHING_ALGORITHMS) \
+	$(SNMPV3_COMPLIANCE_OPTIONS) \
+	$(SNMP_ADMINISTRATIVE_FRAMEWORK_VERSION) \
+	$(SNMP_ADMINISTRATIVE_MIB_SUPPORT) \
+	$(EPIC) $(EPICTEST) \
+	$(GENERATE_CONFIGURATION)
+
+
+#
+# Transports
+#
+
+IP_TRANSPORT = -DSR_IP
+
+IPX_TRANSPORT =
+
+TRANSPORTS = $(IP_TRANSPORT) $(IPX_TRANSPORT)
+
+
+#
+# What to build
+#
+
+TARGET = 
+
+#
+# MIB information
+#
+
+WEB_EXCL =
+
+MIB_EXCL =
+
+
+PASS_1_MIBCOMP_FLAGS = \
+		-snmpmibh \
+		-userpart \
+		-snmpoid_only \
+		-c "snmp 1 $(WEB_EXCL) $(MIB_EXCL)"
+
+
+EXTEND_BASE = larus
+
+CORE_MIB_DEF_FILES = \
+	mib-2.def \
+	SNMPv2-tc.def \
+	v2-smi.def \
+	SNMPv2-mib.def
+
+#	v2-adm.def \
+#	$(EMANATE_MIBS_DIR)\common\vxworks_ntv1c.obj\mib-2.def \
+#	$(EMANATE_MIBS_DIR)\common\vxworks_ntv1c.obj\v2-tc.def \
+#	$(EMANATE_MIBS_DIR)\common\vxworks_ntv1c.obj\v2-adm.def \
+#	$(EMANATE_MIBS_DIR)\common\vxworks_ntv1c.obj\v2-smi.def \
+#	ifmib.def \
+#	$(EMANATE_MIBS_DIR)\common\vxworks_ntv1c.obj\snmp-res.def \
+#	$(EMANATE_MIBS_DIR)\common\vxworks_ntv1c.obj\smi.def \
+
+EXTEND_MIB_DEF_FILES = LARUS-SMI.def			 \
+					   LARUS-STS.def					   	
+
+#						$(EXTEND_MIBS_DIR)\ifmib.def					 \
+#						$(EXTEND_MIBS_DIR)\ifType.def					 \
+#						$(EXTEND_MIBS_DIR)\mib-2.def					 \
+#						$(EXTEND_MIBS_DIR)\v2-mib.def					 \
+#						$(EXTEND_MIBS_DIR)\v2-smi.def					 \
+#						$(EXTEND_MIBS_DIR)\v2-tc.def
+
+
+PASS_2_MIBCOMP_FLAGS = \
+		-o $(EXTEND_BASE) \
+		-per_file_init \
+		-stubs_only
+
+EXTEND_MIBOUT = \
+		$(OSOBJDIR)\v_$(EXTEND_BASE).stb \
+		$(OSOBJDIR)\k_$(EXTEND_BASE).stb
+
+EXTEND_OBJS =
+
+EXTEND_LIBS =
+
+EXTEND_DEFS =
+
+
+#
+# Directories relative to $(TOPDIR)
+#
+
+REMOTEDIR = $(SNMPDTOPDIR)\unix
+MOSY = $(MIBCOMP_DIR)\mosy
+POSTMOSY = $(MIBCOMP_DIR)\postmosy
+PREMOSY = $(MIBCOMP_DIR)\premosy
+MGRTOOL = $(MIBCOMP_DIR)\mgrtool
+LINTLIBDIR = $(TOPDIR)\seclib
+
+#
+# Sources, Objects, and Libraries
+#
+
+SRCS = 
+
+OBJS = 
+
+SNMPD_MIB_OUT = snmptype.h
+LARUS58K_MIB_OUT = larustype.h
+DCC_MIB_OUT = DCCtype.h
+
+#
+# Agent Targets
+#
+
+all:: 	$(SNMPD_MIB_OUT) $(LARUS58K_MIB_OUT)
+
+$(LARUS58K_MIB_OUT) : $(LARUS_MIB_DIR)\LARUS-SMI.my $(LARUS_MIB_DIR)\LARUS-STS.my $(LARUS_MIB_DIR)\LARUS-STS-TRAPS.my
+	$(MOSY) $(LARUS_MIB_DIR)\LARUS-SMI.my
+	$(MOSY) $(LARUS_MIB_DIR)\LARUS-STS.my
+	$(MOSY) $(LARUS_MIB_DIR)\LARUS-STS-TRAPS.my
+	$(POSTMOSY) -search_table -c "LarusSts larusMib" -agent -per_file_init SNMPv2-mib.def SNMPv2-tc.def v2-smi.def LARUS-SMI.def LARUS-STS.def LARUS-STS-TRAPS.def 
+	$(MGRTOOL) -c "LarusSts larusMib" SNMPv2-mib.def SNMPv2-tc.def v2-smi.def LARUS-SMI.def LARUS-STS.def LARUS-STS-TRAPS.def
+	$(CP) LarusSts*.h $(LARUS_SNMP_SRC_DIR) /y /v
+	$(CP) *LarusSts.stb $(LARUS_SNMP_SRC_DIR) /y /v
+
+
+$(DCC_MIB_OUT) : LARUS-SMI.my LARUS-DCC.MIB
+	$(MOSY)	v2-mib.my
+	$(MOSY)	v2-tc.my
+	$(MOSY)	v2-smi.my
+	$(MOSY)	ifType.my
+	$(MOSY)	mib-2.my
+	$(MOSY)	ifmib.my
+	$(MOSY) LARUS-SMI.my
+	$(MOSY) LARUS-DCC.MIB
+	$(MOSY) SNMP-FRAMEWORK.MIB
+	$(POSTMOSY) -search_table -c "DCC larusDCC" -agent -per_file_init v2-mib.def v2-tc.def v2-smi.def ifType.def mib-2.def ifmib.def LARUS-SMI.my.def LARUS-DCC.MIB.def
+	$(MGRTOOL) -c "TOPO larusDCC" SNMPv2-mib.def SNMPv2-tc.def v2-smi.def ifType.def mib-2.def ifmib.def LARUS-SMI.my.def LARUS-DCC.MIB.def
+	$(CP) DCC*.h $(DCC_MIB_DIR) /y /v
+	$(CP) *DCC.stb $(DCC_MIB_DIR) /y /v
+
+clean::
+	-$(RM) *.stb
+	-$(RM) *.def
+	-$(RM) *.dat
+	-$(RM) *.h
+	-$(RM) *.c
+
+$(TARGET): $(MIBOUT) $(EXTEND_MIBOUT) $(OBJS) $(EXTEND_LIBS) $(LIBS)
+	$(LD) -o $(TARGET)  $(LDFLAGS) $(OBJS) $(EXTEND_LIBS) $(LIBS) $(SOCKETLIBS)
+
+
+$(OSOBJDIR):
+	-mkdir $(OSOBJDIR)
+
+#
+# *** Generate snmp*.h files for Emanate SNMPD 
+# NOTE the snmp*.h in the \unix directory will be updated!
+
+$(SNMPD_MIB_OUT): $(CORE_MIB_DEF_FILES) $(EXTEND_MIB_DEF_FILES)
+	$(POSTMOSY) -o snmp  -separate_type_file $(CORE_MIB_DEF_FILES) $(EXTEND_MIB_DEF_FILES)
+	-attrib -r $(EMANATE_SNMPD_DIR)\snmpdefs.h
+	-attrib -r $(EMANATE_SNMPD_DIR)\snmppart.h
+	-attrib -r $(EMANATE_SNMPD_DIR)\snmpprot.h
+	-attrib -r $(EMANATE_SNMPD_DIR)\snmpsupp.h
+	-attrib -r $(EMANATE_SNMPD_DIR)\snmptype.h
+	-$(CP) snmpdefs.h $(EMANATE_SNMPD_DIR)\snmpdefs.h
+	-$(CP) snmppart.h $(EMANATE_SNMPD_DIR)\snmppart.h
+	-$(CP) snmpprot.h $(EMANATE_SNMPD_DIR)\snmpprot.h
+	-$(CP) snmpsupp.h $(EMANATE_SNMPD_DIR)\snmpsupp.h
+	-$(CP) snmptype.h $(EMANATE_SNMPD_DIR)\snmptype.h
+	-$(CP) snmpdefs.h $(LARUS_SNMP_INC_DIR)\snmpdefs.h
+	-$(CP) snmppart.h $(LARUS_SNMP_INC_DIR)\snmppart.h
+	-$(CP) snmpprot.h $(LARUS_SNMP_INC_DIR)\snmpprot.h
+	-$(CP) snmpsupp.h $(LARUS_SNMP_INC_DIR)\snmpsupp.h
+	-$(CP) snmptype.h $(LARUS_SNMP_INC_DIR)\snmptype.h
+
+
+#	$(MGRTOOL) -o snmp $(CORE_MIB_DEF_FILES) $(EXTEND_MIB_DEF_FILES)
+
+mib-2.def : $(LARUS_MIB_DIR)\mib-2.my
+	$(MOSY) $(LARUS_MIB_DIR)\mib-2.my
+
+ifmib.def : $(EMANATE_MIBS_DIR)\ifmib.my
+	$(MOSY) $(EMANATE_MIBS_DIR)\ifmib.my
+
+SNMPv2-tc.def : $(LARUS_MIB_DIR)\SNMPv2-tc.my
+	$(MOSY) $(LARUS_MIB_DIR)\SNMPv2-tc.my
+
+SNMPv2-mib.def : $(LARUS_MIB_DIR)\SNMPv2-mib.my
+	$(MOSY) $(LARUS_MIB_DIR)\SNMPv2-mib.my
+
+v2-smi.def : $(EMANATE_MIBS_DIR)\v2-smi.my
+	$(MOSY) $(EMANATE_MIBS_DIR)\v2-smi.my
+
+ifType.def : $(EMANATE_MIBS_DIR)\ifType.my
+	$(MOSY) $(EMANATE_MIBS_DIR)\ifType.my
+
+SNMP-FRAMEWORK.MIB.def : SNMP-FRAMEWORK.MIB
+	$(MOSY) SNMP-FRAMEWORK.MIB
+
+LARUS-SMI.def : $(LARUS_MIB_DIR)\LARUS-SMI.my
+	$(MOSY) $(LARUS_MIB_DIR)\LARUS-SMI.my
+
+LARUS-STS.def : $(LARUS_MIB_DIR)\LARUS-STS.my
+	$(MOSY) $(LARUS_MIB_DIR)\LARUS-STS.my
+
+LARUS-STS-TRAPS.def : $(LARUS_MIB_DIR)\LARUS-STS-TRAPS.my
+	$(MOSY) $(LARUS_MIB_DIR)\LARUS-STS-TRAPS.my
+
+LARUS-DCC.MIB.def :  LARUS-DCC.MIB
+	$(MOSY) LARUS-DCC.MIB
+
+#
+#$(EXTEND_MIBOUT): $(EXTEND_MIB_DEF_FILES)
+#	$(POSTMOSY) $(PASS_2_MIBCOMP_FLAGS) $(EXTEND_MIB_DEF_FILES)
+#	-$(MOVE) v_$(EXTEND_BASE).stb $(OSOBJDIR)
+#	-$(MOVE) k_$(EXTEND_BASE).stb $(OSOBJDIR)
+#	-$(MOVE) $(EXTEND_BASE)defs.h $(OSOBJDIR)
+#	-$(MOVE) $(EXTEND_BASE)part.h $(OSOBJDIR)
+#	-$(MOVE) $(EXTEND_BASE)info.dat $(OSOBJDIR)
+#	-$(MOVE) $(EXTEND_BASE)supp.h $(OSOBJDIR)
+#	-$(MOVE) $(EXTEND_BASE)oid.c $(OSOBJDIR)
+#	-$(MOVE) $(EXTEND_BASE)type.h $(OSOBJDIR)
+#	-$(MOVE) $(EXTEND_BASE)prot.h $(OSOBJDIR)
+
+
+
+
+
+                                             

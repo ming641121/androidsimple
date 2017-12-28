@@ -1,0 +1,8 @@
+/makefile////*///
+/serial.c////*///
+/smc8260Sio.c////*///
+/smc8260Sio.h////*///
+/sysSmcSerial.c////*///
+/uartSerial.c////*///
+/uartio.c////*///
+/uartdrv.h////*///

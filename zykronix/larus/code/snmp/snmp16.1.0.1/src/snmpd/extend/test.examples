@@ -1,0 +1,87 @@
+#! /bin/csh
+
+if ($#argv < 1) then
+  echo 'usage: ' $0 ' OS'
+  exit
+endif
+
+if ($1 == vrtx) then
+    source /usr/mri/spectra_env
+endif
+
+if ($1 == vxworks) then
+    source ../../vxworks.env
+endif
+
+if ($1 == psos) then
+    source /nobackup/psos/spectra_env
+    source /nobackup/psos/psos_env
+endif
+
+if ($1 == chorus) then
+    source ../../chorus.env
+endif
+
+if ($1 == solaris) then
+    set osDirName = solaris_`arch`
+else
+    set osDirName = $1
+endif
+
+set MAKEFILE = Makefile.${1}
+
+cd examples
+echo examples
+  foreach dir(log mirror note thrm thst tmon type)
+    cd ${dir}
+    echo ${dir}
+    make -f $MAKEFILE >& make.$osDirName.out
+    if (${dir} == log)  cp k_logo.fin $osDirName.obj/k_logo.c
+    if (${dir} == mirror) cp k_mirr.fin $osDirName.obj/k_mirr.c
+    if (${dir} == note) cp k_note.fin $osDirName.obj/k_note.c
+    if (${dir} == thrm) cp k_thrm.fin $osDirName.obj/k_thrm.c
+    if (${dir} == thst) cp k_thst.fin $osDirName.obj/k_thst.c
+    if (${dir} == tmon) cp k_tmon.fin $osDirName.obj/k_tmon.c
+    if (${dir} == type) cp k_type.fin $osDirName.obj/k_type.c
+    make -f $MAKEFILE >& make2.$osDirName.out
+    cd ..
+  end
+if (($osDirName != vrtx) && ($osDirName != vxworks) && ($osDirName != psos) && ($osDirName != chorus) && ($osDirName != ose)) then
+  foreach dir(chro)
+    cd ${dir}
+    echo ${dir}
+    make -f $MAKEFILE >& make.$osDirName.out
+    if (${dir} == chro) cp k_chro.fin $osDirName.obj/k_chro.c
+    make -f $MAKEFILE >& make2.$osDirName.out
+    cd ..
+  end
+endif # !vrtx && !vxworks && !psos && !chorus && !ose
+  foreach dir(vcr)
+    cd ${dir}
+    echo ${dir}
+    foreach sub(auto byhand)
+      if (($dir == surg) && ($sub == auto)) continue
+      cd ${sub}
+      echo ${sub}
+      make -f $MAKEFILE >& make.$osDirName.out
+      if (${dir} == vcr) cp k_vcr.fin $osDirName.obj/k_vcr.c
+      if (${dir} == surg) cp k_surg.fin $osDirName.obj/k_surg.c
+      make -f $MAKEFILE >& make2.$osDirName.out
+      cd ..
+    end
+    cd ..
+  end
+cd ..
+
+cd combo
+echo combo
+  foreach dir(thrmthst)
+    cd ${dir}
+    echo ${dir}
+    make -f $MAKEFILE >& make.$osDirName.out
+    if (${dir} == thrmthst) cp k_cmbo.fin $osDirName.obj/k_cmbo.c
+    make -f $MAKEFILE >& make2.$osDirName.out
+    cd ..
+  end
+cd ..
+

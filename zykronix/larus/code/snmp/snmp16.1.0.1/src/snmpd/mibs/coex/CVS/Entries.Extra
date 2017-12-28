@@ -1,0 +1,17 @@
+/Makefile.vxworks_nt////*///
+/Makev1.vxworks_nt////*///
+/Makev1c.vxworks_nt////*///
+/coexdefs.h////*///
+/coexoid.c////*///
+/coexpart.h////*///
+/coexprot.h////*///
+/coexsupp.h////*///
+/coextype.h////*///
+/findcom.c////*///
+/findcom.h////*///
+/i_comm.c////*///
+/i_comm.h////*///
+/k_comm.c////*///
+/undefs.h////*///
+/userpart.h////*///
+/v_comm.c////*///

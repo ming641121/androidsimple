@@ -1,0 +1,261 @@
+/*
+ *
+ * Copyright (C) 1992-2003 by SNMP Research, Incorporated.
+ *
+ * This software is furnished under a license and may be used and copied
+ * only in accordance with the terms of such license and with the
+ * inclusion of the above copyright notice. This software or any other
+ * copies thereof may not be provided or otherwise made available to any
+ * other person. No title to and ownership of the software is hereby
+ * transferred.
+ *
+ * The information in this software is subject to change without notice
+ * and should not be construed as a commitment by SNMP Research, Incorporated.
+ *
+ * Restricted Rights Legend:
+ *  Use, duplication, or disclosure by the Government is subject to
+ *  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+ *  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+ *  subparagraphs (c)(4) and (d) of the Commercial Computer
+ *  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+ *  clauses in the NASA FAR Supplement and other corresponding
+ *  governmental regulations.
+ *
+ */
+
+/*
+ *                PROPRIETARY NOTICE
+ *
+ * This software is an unpublished work subject to a confidentiality agreement
+ * and is protected by copyright and trade secret law.  Unauthorized copying,
+ * redistribution or other use of this work is prohibited.
+ *
+ * The above notice of copyright on this source code product does not indicate
+ * any actual or intended publication of such source code.
+ *
+ */
+
+
+#include "sr_conf.h"
+
+#include <stdio.h>
+
+#include <stdlib.h>
+
+
+#include <sys/types.h>
+
+#include <sys/socket.h>
+
+
+
+
+#ifdef NOTICE
+#undef NOTICE   /* DO NOT REMOVE */
+#endif  /* NOTICE */
+#include "sr_snmp.h"
+#include "comunity.h"
+#include "v2clssc.h"
+#include "sr_trans.h"
+#include "context.h"
+#include "method.h"
+#include "diag.h"
+#include "subagent.h"
+#include "agentsoc.h"
+#include "tmq.h"	/* for SetOneshotTimeout, etc. */
+
+SR_FILENAME
+
+IPCFunctionP IPCfp;  /* IPC functions pointer  */
+
+extern void process_subagent_command_line
+    SR_PROTOTYPE((int argc,
+                  char **argv));
+
+#define SNMPPART_DECL
+#define N_surgeProtector
+#include "surgpart.h"
+#undef N_surgeProtector
+#undef SNMPPART_DECL
+
+#undef SR_SURGPART_H
+#define I_surgeBreakerStatus
+#include "surgpart.h"
+#undef I_surgeBreakerStatus
+
+#include "surgdefs.h"
+
+#define RANDOM_NUMBER_UP_TO(x) ((rand() % (x)) + 1)
+
+SR_UINT32 spikeCount = 0;
+SR_INT32 spikeVoltageLast = 0;
+SR_INT32 breakerStatus = 1;
+SR_INT32 breakerStatusLast = 1;
+const OID enterpriseOID = { LNsurgeProtector,
+			    (SR_UINT32 *) IDsurgeProtector };
+const OID surgeBreakerStatusOID = { LNsurgeBreakerStatus,
+				    (SR_UINT32 *) IDsurgeBreakerStatus };
+int ptid;  /* periodic timer id */
+int siminprog = 0;  /* simulation in progress */
+
+/*
+ * new_style timer callback routine
+ */
+void Periodic_Timer_callback(SR_UINT32 TimeOutType, 
+		    int       TimerId,
+                    SR_INT32  userData1,
+                    void     *userData2)
+{                
+    DPRINTF((APWARN, "The %s timer just fired.\n",
+                                   (char *) userData2));
+    if (TimerId == ptid) {
+        printf("Maintenance routine:\n");
+        if (breakerStatus == D_surgeBreakerStatus_open) {
+            printf("\tResetting the surge protector.\n");
+            breakerStatus = D_surgeBreakerStatus_closed;
+            printf("\tThe breaker is now closed.\n");
+            printf("\tSending surgeBreakerAlarm trap.\n");
+            do_trap(6,
+                    5,
+                    MakeVarBindWithValue(&surgeBreakerStatusOID,
+                    (OID *) NULL,
+                    INTEGER_TYPE,
+                    (void *) &breakerStatus),
+                    &enterpriseOID,
+                    "1.3.6.1.4.1.99.12.19.1.3.1.5");
+        } else {
+            printf("\tThe breaker continues to be closed.\n");
+        }
+
+        if (siminprog == 0) {
+            SetOneshotTimeout(TimerCurTime() + 900 +
+			    RANDOM_NUMBER_UP_TO(900), (void *)"oneshot");
+            siminprog = 1;
+        }
+    }
+    else {
+        printf("Unknown preriodic timeout\n");
+    }
+    return;
+}
+
+
+
+exmp_main(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10)
+{
+    char *argv[10];
+    int argc = 0;
+
+    argv[argc++] = "exmpagt";
+    if(a1) argv[argc++] = (char *)a1;
+    if(a2) argv[argc++] = (char *)a2;
+    if(a3) argv[argc++] = (char *)a3;
+    if(a4) argv[argc++] = (char *)a4;
+    if(a5) argv[argc++] = (char *)a5;
+    if(a6) argv[argc++] = (char *)a6;
+    if(a7) argv[argc++] = (char *)a7;
+    if(a8) argv[argc++] = (char *)a8;
+    if(a8) argv[argc++] = (char *)a9;
+    if(a10) argv[argc++] = (char *)a10;
+    exmp__main(argc, argv);
+}
+
+#define main exmp__main
+
+
+
+int
+main(int argc, char **argv)
+{ 
+    SubagentEvent  *ev;
+
+
+    process_subagent_command_line(argc, argv);
+
+    InitIPCArrayTCP(&IPCfp);
+
+    if(InitSubagent() == -1) {
+        DPRINTF((APERROR, "InitSubagent failed\n"));
+        exit(1);
+    }
+    /*
+     * SrSetPeriodicTimeout() schedules a maintenance routine in the surge
+     * protector to run every five seconds.  If a spike has occurred,
+     * the breaker is reset. : New API
+     *
+     * SetOneshotTimeout() schedules a simulated voltage spike event.
+     * In a real implementation of the SURGE-PROTECTOR MIB, the
+     * voltage spike event would not be simulated, and the values for
+     * spikeCount, spikeVoltageLast, and breakerStatus would probably
+     * be set in a dedicated handler function. : Old API
+     *
+     * By retaining the timer id of the periodic timeout, the Subagent
+     * is able to determine which timer has fired.  This determination
+     * could also be made by examining the user-defined info field in
+     * the TimeOut event.
+     */
+
+    ptid = SrSetPeriodicTimeout(TimerCurTime(), 500,
+                                0, (void *)Periodic_Timer_callback, 
+                                10, "periodic" );
+
+    while (1) {
+	ev = GetSubagentEvent();
+        switch(ev->type) {
+            case Ev_Time_Out:
+                if (ev->Event.TimeOut.invoke == CALL_CALLBACK) {
+                    /* 
+                     * this timeout event is invoked from old Timer
+                     * API (SetOneshotTimeout). need to handle this
+                     * timeout event explicitly.
+                     */
+                    DPRINTF((APWARN, "The %s timer just fired.\n",
+                                      (char *) ev->Event.TimeOut.info));
+                    printf("Simulated voltage spike:\n");
+                    spikeCount++;
+                    spikeVoltageLast = RANDOM_NUMBER_UP_TO(2147483647);
+
+                    /*
+                     * A spike occured, so send a surgeSpikeAlarm trap.
+                     */
+
+                    printf("\tSending surgeSpikeAlarm trap.\n");
+                    do_trap(6, 4, (VarBind *) NULL, &enterpriseOID,
+                    /* surgeProtector.4 */
+	            "1.3.6.1.4.1.99.12.19.1.3.1.4");
+
+                    /*
+                     * If the breaker status changed because of this
+                     * spike, send a surgeBreakerAlarm.
+                     */
+
+                    if (breakerStatus == D_surgeBreakerStatus_closed) {
+                        breakerStatus = D_surgeBreakerStatus_open;
+                        printf("\tThe breaker is now open.\n");
+                        printf("\tSending surgeBreakerAlarm trap.\n");
+                        do_trap(6,
+                                5,
+                                MakeVarBindWithValue(&surgeBreakerStatusOID,
+                                                     (OID *) NULL,
+                                                     INTEGER_TYPE,
+                                                     (void *) &breakerStatus),
+                                &enterpriseOID,
+                                "1.3.6.1.4.1.99.12.19.1.3.1.5");
+                    } else {
+                        printf("\tThe breaker continues to be open.\n");
+                    }
+                    siminprog = 0;
+                    FreeSubagentEvent(ev);
+                    break;
+                }
+                else {
+                    DefaultAction(ev);
+                    break;
+                }
+            default:
+                DefaultAction(ev);
+                break;
+        }
+    }
+}
+

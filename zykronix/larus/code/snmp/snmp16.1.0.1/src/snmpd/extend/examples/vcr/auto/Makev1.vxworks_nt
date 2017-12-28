@@ -1,0 +1,651 @@
+
+
+TOPDIR = ..\..\..\..\..
+SNMPDTOPDIR = ..\..\..\..
+
+
+#
+#
+# Copyright (C) 1992-2003 by SNMP Research, Incorporated.
+#
+# This software is furnished under a license and may be used and copied
+# only in accordance with the terms of such license and with the
+# inclusion of the above copyright notice. This software or any other
+# copies thereof may not be provided or otherwise made available to any
+# other person. No title to and ownership of the software is hereby
+# transferred.
+#
+# The information in this software is subject to change without notice
+# and should not be construed as a commitment by SNMP Research, Incorporated.
+#
+# Restricted Rights Legend:
+#  Use, duplication, or disclosure by the Government is subject to
+#  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+#  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+#  subparagraphs (c)(4) and (d) of the Commercial Computer
+#  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+#  clauses in the NASA FAR Supplement and other corresponding
+#  governmental regulations.
+#
+#
+
+#
+#                PROPRIETARY NOTICE
+#
+# This software is an unpublished work subject to a confidentiality agreement
+# and is protected by copyright and trade secret law.  Unauthorized copying,
+# redistribution or other use of this work is prohibited.
+#
+# The above notice of copyright on this source code product does not indicate
+# any actual or intended publication of such source code.
+#
+#
+
+# 
+# Operating System Information
+#
+
+MOVE = move
+RMDIR = rmdir
+RM = del
+CP = copy
+CAT = type
+# PRESERVE is the flag to $(CP) to duplicate the modification time and
+# permission modes of the original file or directory.
+PRESERVE =
+
+# Extensions to certain kinds of files are set here.
+LIBEXT = a
+BINEXT =
+OBJEXT = o
+
+
+LIBPRF = lib
+
+
+ VX_VW_BASE = $(WIND_BASE)\target
+VX_HSP_BASE = $(WIND_BASE)\host\$(WIND_HOST_TYPE)
+
+         OS = -DSR_VXWORKS
+         os = vxworks_nt
+
+  SR_OSTYPE = -DCPU=4
+    OSFLAGS =
+    HOST_OS = w32
+ EXTRA_DEFS =
+
+         CC = $(VX_HSP_BASE)\bin\ccppc
+ DEBUGFLAGS = -g
+         LD = $(VX_HSP_BASE)\bin\ldppc -r
+         AR = $(VX_HSP_BASE)\bin\arppc
+     AROPTS = clr
+     RANLIB = $(VX_HSP_BASE)\bin\ranlibppc
+
+    ARC_INC_DIRS = -I$(VX_VW_BASE)\h
+IPC_DEFAULT = -DSR_TCP_IPC
+IPC_DEFAULT_LIB = tcp
+
+
+#
+# Directories
+#
+
+
+OBD_V1 = 1
+
+OBD_V2c =
+
+OBD_V3 =
+
+OSBASEDIR = v$(OBD_V1)$(OBD_V2c)$(OBD_V3)
+
+
+OSLIBDIR = $(os)$(OSBASEDIR).lib
+OSOBJDIR = $(os)$(OSBASEDIR).obj
+OSBINDIR = $(os)$(OSBASEDIR).bin
+
+SECUR_DIR = $(TOPDIR)\..\basic
+
+LIBDIR      = $(SECUR_DIR)\$(OSLIBDIR)
+BINDIR      = $(SECUR_DIR)\$(OSBINDIR)
+INSTALLDIR  = $(SECUR_DIR)\$(OSBINDIR)
+MIBS_DIR    = $(TOPDIR)\mibs
+RFCS_DIR    = $(TOPDIR)\mibs\rfcs
+IANA_DIR    = $(TOPDIR)\mibs\iana
+MIBCOMP_DIR = $(SECUR_DIR)\$(HOST_OS).bin
+
+#
+# Subordinant Makefile
+#
+
+
+BMFN_V1 = 1
+
+BMFN_V2c =
+
+BMFN_V3 =
+
+BASEMAKEFILENAME = Makev$(BMFN_V1)$(BMFN_V2c)$(BMFN_V3)
+
+
+SUBMAKEFILE = $(BASEMAKEFILENAME).$(os)
+#
+# Compile Options
+#
+
+LIGHT = -DNOTICE
+DEBUG = -DSR_DEBUG
+SR_MIB_TABLE_HASHING = -DSR_MIB_TABLE_HASHING
+SR_CONFIG_FP = -DSR_CONFIG_FP
+PROXY =
+SETS = -DSETS
+WEB_AGT =
+WEB_MGR =
+
+CUSTOMER_DEFINES =
+
+EPIC =
+EPICTEST =
+
+EXPORT = -DSR_UNSECURABLE
+
+SNMP_V1_PACKET = -DSR_SNMPv1_PACKET -DSR_SNMPv1_WRAPPER
+
+SNMP_V2C_PACKET =
+
+SNMP_V1_PACKET_MIB = -DSR_SNMPv1_PACKET_MIB
+
+SNMP_V3_PACKET =
+SNMP_V3_PACKET_MIB =
+
+SYS_OR_TABLE =
+
+TRANSPORT_TABLE = -DSR_TRANSPORT_TABLE
+
+
+NOTIFY_COMPLIANCE_LEVEL = \
+	-DSR_NOTIFY_FULL_COMPLIANCE
+
+PROXY_COMPLIANCE_LEVEL =
+
+SNMPV3_COMPLIANCE_OPTIONS = \
+	$(NOTIFY_COMPLIANCE_LEVEL) \
+	$(PROXY_COMPLIANCE_LEVEL)
+
+USER_SEC_MODEL = -DSR_USER_SEC_MODEL
+
+SUPPORTED_SECURITY_MODELS = \
+	$(USER_SEC_MODEL)
+
+3DES_PRIVACY_PROTOCOL =
+AES_PRIVACY_PROTOCOL =
+
+SUPPORTED_PRIVACY_PROTOCOLS = \
+	$(3DES_PRIVACY_PROTOCOL) \
+	$(AES_PRIVACY_PROTOCOL)
+
+
+MD5_HASH_ALGORITHM = -DSR_MD5_HASH_ALGORITHM
+SHA_HASH_ALGORITHM = -DSR_SHA_HASH_ALGORITHM
+
+SUPPORTED_HASHING_ALGORITHMS = \
+	$(SHA_HASH_ALGORITHM) \
+	$(MD5_HASH_ALGORITHM)
+
+SNMP_ADMINISTRATIVE_FRAMEWORK_VERSION = -DSR_SNMPv1_ADMIN
+
+SNMP_ADMINISTRATIVE_MIB_SUPPORT = -DSR_SNMP_ADMIN_MIB
+
+SUPPORTED_PACKET_VERSIONS = \
+	$(SNMP_V1_PACKET) \
+	$(SNMP_V2C_PACKET) \
+	$(SNMP_V3_PACKET)
+
+SUPPORTED_PACKET_MIBS = \
+	$(SNMP_V1_PACKET_MIB) \
+	$(SNMP_V3_PACKET_MIB)
+
+SUPPORTED_APO_LEVEL =
+
+GENERATE_CONFIGURATION = \
+	-DSR_GENERATE_CONFIGURATION \
+	-DSR_GENERATE_SNMPV3_CONFIGURATION
+#	-DSR_GENERATE_OLD_STYLE_CONFIGURATION
+
+SNMP_OPTIONS = \
+	$(CUSTOMER_DEFINES)  \
+	$(EXPORT) \
+	$(SYS_OR_TABLE) \
+	$(TRANSPORT_TABLE) \
+	$(SUPPORTED_PACKET_VERSIONS) \
+	$(SUPPORTED_PACKET_MIBS) \
+	$(SUPPORTED_APO_LEVEL) \
+	$(SUPPORTED_SECURITY_MODELS) \
+	$(SUPPORTED_PRIVACY_PROTOCOLS) \
+	$(SUPPORTED_HASHING_ALGORITHMS) \
+	$(SNMPV3_COMPLIANCE_OPTIONS) \
+	$(SNMP_ADMINISTRATIVE_FRAMEWORK_VERSION) \
+	$(SNMP_ADMINISTRATIVE_MIB_SUPPORT) \
+	$(EPIC) $(EPICTEST) \
+	$(GENERATE_CONFIGURATION)
+
+
+#
+# Transports
+#
+
+IP_TRANSPORT = -DSR_IP
+
+IPX_TRANSPORT =
+
+TRANSPORTS = $(IP_TRANSPORT) $(IPX_TRANSPORT)
+
+
+#
+# What to build
+#
+
+TARGET = $(OSOBJDIR)\snmpd$(BINEXT)
+
+#
+# MIB information
+#
+
+WEB_EXCL =
+
+MIB_EXCL = -1.3.6.1.2.1.1.8 -1.3.6.1.2.1.1.9 -1.3.6.1.6.3.1.1.6
+
+
+PASS_1_MIBCOMP_FLAGS = \
+		-snmpmibh \
+		-row_status \
+		-userpart \
+		-snmpoid_only \
+		-c "snmp 1 $(WEB_EXCL) $(MIB_EXCL)"
+
+
+EXAMPLE_DIR = $(MIBS_DIR)\examples\basics\tables\rowcreat\vcr
+EXTEND_BASE = vcr
+EXTEND_MIB_DEF_FILES = $(OSOBJDIR)\vcr.def \
+                       $(MIBS_DIR)\common\$(OSOBJDIR)\v2-tc.def
+PASS_2_MIBCOMP_FLAGS = \
+                -o $(EXTEND_BASE) \
+                -per_file_init \
+                -row_status \
+                -separate_type_file \
+                -agent
+EXTEND_MIBOUT = $(OSOBJDIR)\v_$(EXTEND_BASE).stb \
+		$(OSOBJDIR)\k_$(EXTEND_BASE).stb
+EXTEND_OBJS = \
+		$(OSOBJDIR)\v_$(EXTEND_BASE).o \
+		$(OSOBJDIR)\k_$(EXTEND_BASE).o
+
+EXTEND_DEFS = -DPER_FILE_INIT \
+		-DEXTEND_INIT=k_$(EXTEND_BASE)_initialize \
+		-DEXTEND_TERM=k_$(EXTEND_BASE)_terminate \
+                -DEXTEND_BASE_DEFS=\\\"$(EXTEND_BASE)defs.h\\\" \
+                -DEXTEND_BASE_PART=\\\"$(EXTEND_BASE)part.h\\\" \
+                -DEXTEND_BASE_SUPP=\\\"$(EXTEND_BASE)supp.h\\\" \
+		-DEXTEND_BASE_TYPE=\\\"$(EXTEND_BASE)type.h\\\" \
+		-DEXTEND_BASE_PROT=\\\"$(EXTEND_BASE)prot.h\\\"
+
+#
+# Directories relative to $(TOPDIR)
+#
+
+REMOTEDIR = $(SNMPDTOPDIR)\unix
+MOSY = $(MIBCOMP_DIR)\mosy
+POSTMOSY = $(MIBCOMP_DIR)\postmosy
+PREMOSY = $(MIBCOMP_DIR)\premosy
+MGRTOOL = $(MIBCOMP_DIR)\mgrtool
+LINTLIBDIR = $(TOPDIR)\seclib
+
+#
+# Sources, Objects, and Libraries
+#
+
+
+CORE_MIB_DEF_FILES = \
+	$(MIBS_DIR)\common\$(OSOBJDIR)\smi.def \
+	$(MIBS_DIR)\common\$(OSOBJDIR)\mib-2.def \
+	$(MIBS_DIR)\common\$(OSOBJDIR)\srAgentInfo.def \
+	$(MIBS_DIR)\common\$(OSOBJDIR)\v2-tc.def \
+	$(MIBS_DIR)\common\$(OSOBJDIR)\v2-smi.def \
+	$(MIBS_DIR)\common\$(OSOBJDIR)\snmp-res.def
+
+
+SRCS = \
+	$(REMOTEDIR)\main.c \
+	$(REMOTEDIR)\dosnmp.c \
+	$(REMOTEDIR)\notify.c \
+	$(REMOTEDIR)\trap_bc.c \
+	$(REMOTEDIR)\agtctx.c \
+	$(REMOTEDIR)\agtinit.c \
+	$(REMOTEDIR)\geninit.c \
+	$(REMOTEDIR)\fnames.c \
+	$(REMOTEDIR)\mgmt.c \
+	$(REMOTEDIR)\pclo.c \
+	$(REMOTEDIR)\snmpresp.c \
+	$(REMOTEDIR)\sets.c \
+	$(REMOTEDIR)\objectdb.c \
+	$(REMOTEDIR)\comunity.c \
+	$(REMOTEDIR)\v_at.c \
+	$(REMOTEDIR)\k_at.c \
+	$(REMOTEDIR)\v_if.c \
+	$(REMOTEDIR)\v_ip.c \
+	$(REMOTEDIR)\v_icmp.c \
+	$(REMOTEDIR)\v_snmpv1.c \
+	$(REMOTEDIR)\v_srAgentInfo.c \
+	$(REMOTEDIR)\k_srAgentInfo.c \
+	$(REMOTEDIR)\k_snmpv1.c \
+	$(REMOTEDIR)\v_system.c \
+	$(REMOTEDIR)\k_system.c \
+	$(REMOTEDIR)\v_tcp.c \
+	$(EXTRA_SRCS) \
+	$(REMOTEDIR)\k_vxworks.c \
+	$(REMOTEDIR)\k_shared.c \
+	$(REMOTEDIR)\v_udp.c
+
+OBJS = \
+        $(OSOBJDIR)\main.$(OBJEXT) \
+        $(OSOBJDIR)\dosnmp.$(OBJEXT) \
+        $(OSOBJDIR)\notify.$(OBJEXT) \
+        $(OSOBJDIR)\trap_bc.$(OBJEXT) \
+	$(OSOBJDIR)\agtctx.$(OBJEXT) \
+	$(OSOBJDIR)\agtinit.$(OBJEXT) \
+	$(OSOBJDIR)\geninit.$(OBJEXT) \
+	$(OSOBJDIR)\fnames.$(OBJEXT) \
+	$(OSOBJDIR)\mgmt.$(OBJEXT) \
+	$(OSOBJDIR)\pclo.$(OBJEXT) \
+	$(OSOBJDIR)\snmpresp.$(OBJEXT) \
+	$(OSOBJDIR)\sets.$(OBJEXT) \
+	$(OSOBJDIR)\objectdb.$(OBJEXT) \
+	$(OSOBJDIR)\comunity.$(OBJEXT) \
+	$(OSOBJDIR)\v_at.$(OBJEXT) \
+	$(OSOBJDIR)\k_at.$(OBJEXT) \
+	$(OSOBJDIR)\v_if.$(OBJEXT) \
+	$(OSOBJDIR)\v_ip.$(OBJEXT) \
+	$(OSOBJDIR)\v_icmp.$(OBJEXT) \
+	$(OSOBJDIR)\v_snmpv1.$(OBJEXT) \
+	$(OSOBJDIR)\v_srAgentInfo.$(OBJEXT) \
+	$(OSOBJDIR)\k_srAgentInfo.$(OBJEXT) \
+	$(OSOBJDIR)\k_snmpv1.$(OBJEXT) \
+	$(OSOBJDIR)\v_system.$(OBJEXT) \
+	$(OSOBJDIR)\k_system.$(OBJEXT) \
+        $(OSOBJDIR)\v_tcp.$(OBJEXT) \
+	$(EXTRA_OBJS) \
+	$(OSOBJDIR)\k_vxworks.$(OBJEXT) \
+	$(EXTEND_OBJS) \
+	$(OSOBJDIR)\k_shared.$(OBJEXT) \
+	$(OSOBJDIR)\v_udp.$(OBJEXT)
+
+
+LIBS = \
+        $(LIBDIR)\libagent.$(LIBEXT) \
+        $(LIBDIR)\libengine.$(LIBEXT) \
+        $(LIBDIR)\libdevkit.$(LIBEXT) \
+	$(LIBDIR)\libmibtable.$(LIBEXT) \
+        $(PKG_LIBS)
+
+
+LINTLIBS = \
+       $(LINTLIBDIR)\$(LLIB)snmpuser.ln \
+       $(LINTLIBDIR)\$(LLIB)agent.ln \
+       $(LINTLIBDIR)\$(LLIB)snmp.ln
+
+MIBOUT = \
+	$(OSOBJDIR)\snmpoid.c
+
+#
+# Flags for Make Depend, Compile, and Link
+#
+
+SR_INCDIR = $(TOPDIR)\include
+AGT_INCDIR = $(SNMPDTOPDIR)\shared
+
+
+INC_DIRS = -I. \
+           -I$(TOPDIR)\snmpd\include \
+           -I$(TOPDIR)\snmpd\mibs \
+           -I$(OSOBJDIR) \
+           -I$(SR_INCDIR) \
+           -I$(AGT_INCDIR) \
+	   -I$(REMOTEDIR) \
+           $(ARC_INC_DIRS)
+
+MIBOUTDEFS = \
+	     -DMIBDEFS=\\\"snmpdefs.h\\\" \
+             -DMIBPART=\\\"snmppart.h\\\" \
+             -DMIBSUPP=\\\"snmpsupp.h\\\" \
+             -DMIBTYPE=\\\"snmptype.h\\\" \
+             -DMIBPROT=\\\"snmpprot.h\\\" \
+             -DMIBOID=\\\"snmpoid.c\\\"
+
+SR_CONFIG_FP = -DSR_CONFIG_FP
+
+DEFS = \
+	$(OS) \
+	$(SR_OSTYPE) \
+	$(NETTYPE) \
+	$(DEBUG) \
+	$(LIGHT) \
+	$(SETS) \
+	$(MIBOUTDEFS) \
+	$(SR_MIB_TABLE_HASHING) \
+	$(SR_CONFIG_FP) \
+	$(SNMP_OPTIONS) \
+	$(PROXY) \
+	$(TRANSPORTS) \
+	$(EXTEND_DEFS) \
+	$(EXTRA_DEFS) \
+	$(SYSOPTS)
+
+LINTFLAGS = $(DEFS) $(COPTIONS)
+COPTIONS = $(DEFS) $(INC_DIRS)
+CFLAGS = $(DEBUGFLAGS) $(COPTIONS) $(INC_DIRS)
+
+
+#
+# Compile Commands
+#
+
+
+CORULE = $(CC) -c $(OSFLAGS) $(CFLAGS) -o $@ $<
+REMOTERULE = $(CC) -c $(OSFLAGS) $(CFLAGS) -o $@ $<
+YACCRULE = $(CC) -c $(OSFLAGS) $(CFLAGS) -o $@ $(@F:.o=.c)
+
+
+#
+# Agent Targets
+#
+
+all:: $(OSOBJDIR) $(SOURCELINKS) $(EXTRA_SRCS) $(TARGET)
+
+install::
+	$(CP) $(TARGET) $(INSTALLDIR)
+
+LINTLIBNAME = snmp
+LINTLIBNAMEEXT = .ln
+
+lint: $(LIBDIR)\$(LLIB)snmp.ln
+
+$(LIBDIR)\$(LLIB)snmp.ln: $(SRCS)
+	$(LINT) $(LINTOPTS) $(LINTLIBOPT)$(LINTLIBNAME) $(LINTFLAGS) $(SRCS)
+	$(MOVE) $(LLIB)$(LINTLIBNAME)$(LINTLIBNAMEEXT) $(LIBDIR)
+
+
+clean::
+	-$(RM) $(OSOBJDIR)\*.$(OBJEXT)
+	-$(RM) $(OSOBJDIR)\*.stb
+	-$(RM) $(OSOBJDIR)\*.def
+	-$(RM) $(OSOBJDIR)\*.dat
+	-$(RM) $(OSOBJDIR)\*.h
+	-$(RM) $(OSOBJDIR)\*.c
+	-$(RM) $(TARGET)
+	-$(RMDIR) $(OSOBJDIR)
+
+$(TARGET): $(MIBOUT) $(EXTEND_MIBOUT) $(OBJS) $(EXTEND_LIBS) $(LIBS)
+	$(LD) -o $(TARGET)  $(LDFLAGS) $(OBJS) $(EXTEND_LIBS) $(LIBS) $(SOCKETLIBS)
+
+
+$(OSOBJDIR):
+	-mkdir $(OSOBJDIR)
+
+$(MIBOUT): $(CORE_MIB_DEF_FILES) $(EXTEND_MIB_DEF_FILES)
+	$(POSTMOSY) $(PASS_1_MIBCOMP_FLAGS) -o snmp $(CORE_MIB_DEF_FILES) \
+	$(EXTEND_MIB_DEF_FILES)
+	$(MGRTOOL) $(CORE_MIB_DEF_FILES) $(EXTEND_MIB_DEF_FILES)
+	-$(MOVE) snmpinfo.dat $(OSOBJDIR)
+	-$(MOVE) snmpoid.c $(OSOBJDIR)
+	-$(MOVE) snmp-mib.h $(OSOBJDIR)
+	$(EXTRA_MIBOUT_COMMAND)
+
+$(EXTEND_MIBOUT): $(EXTEND_MIB_DEF_FILES)
+	$(POSTMOSY) $(PASS_2_MIBCOMP_FLAGS) $(EXTEND_MIB_DEF_FILES)
+	-$(MOVE) v_$(EXTEND_BASE).stb $(OSOBJDIR)
+	-$(MOVE) k_$(EXTEND_BASE).stb $(OSOBJDIR)
+	-$(MOVE) $(EXTEND_BASE)defs.h $(OSOBJDIR)
+	-$(MOVE) $(EXTEND_BASE)part.h $(OSOBJDIR)
+	-$(MOVE) $(EXTEND_BASE)info.dat $(OSOBJDIR)
+	-$(MOVE) $(EXTEND_BASE)supp.h $(OSOBJDIR)
+	-$(MOVE) $(EXTEND_BASE)oid.c $(OSOBJDIR)
+	-$(MOVE) $(EXTEND_BASE)type.h $(OSOBJDIR)
+	-$(MOVE) $(EXTEND_BASE)prot.h $(OSOBJDIR)
+
+$(OSOBJDIR)\dosnmp.$(OBJEXT): $(REMOTEDIR)\dosnmp.c
+	$(REMOTERULE)
+
+
+$(OSOBJDIR)\main.$(OBJEXT): $(REMOTEDIR)\main.c
+	$(REMOTERULE)
+
+
+$(OSOBJDIR)\notify.$(OBJEXT): $(REMOTEDIR)\notify.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\trap_bc.$(OBJEXT): $(REMOTEDIR)\trap_bc.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\agtctx.$(OBJEXT): $(REMOTEDIR)\agtctx.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\agtinit.$(OBJEXT): $(REMOTEDIR)\agtinit.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\geninit.$(OBJEXT): $(REMOTEDIR)\geninit.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\fnames.$(OBJEXT): $(REMOTEDIR)\fnames.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\mgmt.$(OBJEXT): $(REMOTEDIR)\mgmt.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\pclo.$(OBJEXT): $(REMOTEDIR)\pclo.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\report.$(OBJEXT): $(REMOTEDIR)\report.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\snmpresp.$(OBJEXT): $(REMOTEDIR)\snmpresp.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\sets.$(OBJEXT): $(REMOTEDIR)\sets.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\objectdb.$(OBJEXT): $(REMOTEDIR)\objectdb.c $(OSOBJDIR)\snmpoid.c
+	$(REMOTERULE)
+
+
+$(OSOBJDIR)\comunity.$(OBJEXT): $(REMOTEDIR)\comunity.c
+	$(REMOTERULE)
+
+
+$(OSOBJDIR)\v_at.$(OBJEXT): $(REMOTEDIR)\v_at.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\k_at.$(OBJEXT): $(REMOTEDIR)\k_at.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\v_if.$(OBJEXT): $(REMOTEDIR)\v_if.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\v_ip.$(OBJEXT): $(REMOTEDIR)\v_ip.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\v_icmp.$(OBJEXT): $(REMOTEDIR)\v_icmp.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\v_snmpv1.$(OBJEXT): $(REMOTEDIR)\v_snmpv1.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\v_srAgentInfo.$(OBJEXT): $(REMOTEDIR)\v_srAgentInfo.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\k_srAgentInfo.$(OBJEXT): $(REMOTEDIR)\k_srAgentInfo.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\k_snmpv1.$(OBJEXT): $(REMOTEDIR)\k_snmpv1.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\v_system.$(OBJEXT): $(REMOTEDIR)\v_system.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\k_system.$(OBJEXT): $(REMOTEDIR)\k_system.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\v_tcp.$(OBJEXT): $(REMOTEDIR)\v_tcp.c
+	$(REMOTERULE)
+
+
+$(OSOBJDIR)\v_udp.$(OBJEXT): $(REMOTEDIR)\v_udp.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\k_shared.$(OBJEXT): $(REMOTEDIR)\k_shared.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\k_vxworks.$(OBJEXT): $(REMOTEDIR)\k_vxworks.c
+	$(REMOTERULE)
+
+$(OSOBJDIR)\k_$(EXTEND_BASE).c:  $(OSOBJDIR)\k_$(EXTEND_BASE).stb
+	@IF EXIST $(OSOBJDIR)\k_$(EXTEND_BASE).c ECHO \
+	  $(OSOBJDIR)\k_$(EXTEND_BASE).c ALREADY  EXISTS!! REMOVE \
+	  $(OSOBJDIR)\k_$(EXTEND_BASE).c TO USE THE NEW \
+	  $(OSOBJDIR)\k_$(EXTEND_BASE).stb
+	@IF NOT EXIST $(OSOBJDIR)\k_$(EXTEND_BASE).c $(CP) \
+	                                      $(OSOBJDIR)\k_$(EXTEND_BASE).stb \
+	                                      $(OSOBJDIR)\k_$(EXTEND_BASE).c
+
+$(OSOBJDIR)\v_$(EXTEND_BASE).c: $(OSOBJDIR)\v_$(EXTEND_BASE).stb
+	@IF EXIST $(OSOBJDIR)\v_$(EXTEND_BASE).c ECHO \
+	  $(OSOBJDIR)\v_$(EXTEND_BASE).c ALREADY  EXISTS!! REMOVE \
+	  $(OSOBJDIR)\v_$(EXTEND_BASE).c TO USE THE NEW \
+	  $(OSOBJDIR)\v_$(EXTEND_BASE).stb
+	@IF NOT EXIST $(OSOBJDIR)\v_$(EXTEND_BASE).c $(CP) \
+	                                      $(OSOBJDIR)\v_$(EXTEND_BASE).stb \
+	                                      $(OSOBJDIR)\v_$(EXTEND_BASE).c
+
+$(OSOBJDIR)\k_$(EXTEND_BASE).$(OBJEXT): $(OSOBJDIR)\k_$(EXTEND_BASE).c
+	$(YACCRULE)
+
+$(OSOBJDIR)\v_$(EXTEND_BASE).$(OBJEXT): $(OSOBJDIR)\v_$(EXTEND_BASE).c
+	$(YACCRULE)
+
+
+all:: $(BINDIR) $(BINDIR)\snmpd$(BINEXT)
+
+# should put rules for extension MIBs and miscellany here
+
+vcr.my:
+	$(CP) ..\vcr.my .
+
+$(OSOBJDIR)\vcr.def: vcr.my
+	$(MOSY) -o $(OSOBJDIR)\vcr.def -s vcr.my
+
+
+startover: clean
+	-$(RM) vcr.my
+	-$(RM) k_vcr.fin
+	$(CP) $(EXAMPLE_DIR)\vcr.my vcr.my
+	$(CP) $(EXAMPLE_DIR)\auto\k_vcr.fin k_vcr.fin
+

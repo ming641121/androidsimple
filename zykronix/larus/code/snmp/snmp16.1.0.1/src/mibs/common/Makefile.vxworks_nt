@@ -1,0 +1,202 @@
+
+#
+#
+# Copyright (C) 1992-2003 by SNMP Research, Incorporated.
+#
+# This software is furnished under a license and may be used and copied
+# only in accordance with the terms of such license and with the
+# inclusion of the above copyright notice. This software or any other
+# copies thereof may not be provided or otherwise made available to any
+# other person. No title to and ownership of the software is hereby
+# transferred.
+#
+# The information in this software is subject to change without notice
+# and should not be construed as a commitment by SNMP Research, Incorporated.
+#
+# Restricted Rights Legend:
+#  Use, duplication, or disclosure by the Government is subject to
+#  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+#  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+#  subparagraphs (c)(4) and (d) of the Commercial Computer
+#  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+#  clauses in the NASA FAR Supplement and other corresponding
+#  governmental regulations.
+#
+#
+
+#
+#                PROPRIETARY NOTICE
+#
+# This software is an unpublished work subject to a confidentiality agreement
+# and is protected by copyright and trade secret law.  Unauthorized copying,
+# redistribution or other use of this work is prohibited.
+#
+# The above notice of copyright on this source code product does not indicate
+# any actual or intended publication of such source code.
+#
+#
+
+
+TOPDIR     =    ..\..
+
+# 
+# Operating System Information
+#
+
+MOVE = move
+RMDIR = rmdir
+RM = del
+CP = copy
+CAT = type
+# PRESERVE is the flag to $(CP) to duplicate the modification time and
+# permission modes of the original file or directory.
+PRESERVE =
+
+# Extensions to certain kinds of files are set here.
+LIBEXT = a
+BINEXT =
+OBJEXT = o
+
+
+LIBPRF = lib
+
+
+ VX_VW_BASE = $(WIND_BASE)\target
+VX_HSP_BASE = $(WIND_BASE)\host\$(WIND_HOST_TYPE)
+
+         OS = -DSR_VXWORKS
+         os = vxworks_nt
+
+  SR_OSTYPE = -DCPU=4
+    OSFLAGS =
+    HOST_OS = w32
+ EXTRA_DEFS =
+
+         CC = $(VX_HSP_BASE)\bin\ccppc
+ DEBUGFLAGS = -g
+         LD = $(VX_HSP_BASE)\bin\ldppc -r
+         AR = $(VX_HSP_BASE)\bin\arppc
+     AROPTS = clr
+     RANLIB = $(VX_HSP_BASE)\bin\ranlibppc
+
+    ARC_INC_DIRS = -I$(VX_VW_BASE)\h
+IPC_DEFAULT = -DSR_TCP_IPC
+IPC_DEFAULT_LIB = tcp
+
+
+#
+# Directories
+#
+
+
+OSBASEDIR =
+
+
+OSLIBDIR = $(os)$(OSBASEDIR).lib
+OSOBJDIR = $(os)$(OSBASEDIR).obj
+OSBINDIR = $(os)$(OSBASEDIR).bin
+
+SECUR_DIR = $(TOPDIR)\..\basic
+
+LIBDIR      = $(SECUR_DIR)\$(OSLIBDIR)
+BINDIR      = $(SECUR_DIR)\$(OSBINDIR)
+INSTALLDIR  = $(SECUR_DIR)\$(OSBINDIR)
+MIBS_DIR    = $(TOPDIR)\mibs
+RFCS_DIR    = $(TOPDIR)\mibs\rfcs
+IANA_DIR    = $(TOPDIR)\mibs\iana
+MIBCOMP_DIR = $(SECUR_DIR)\$(HOST_OS).bin
+
+
+SNMPINCDIR =    $(TOPDIR)\include
+CFGDIR     =    $(SECUR_DIR)\config
+MGRDIR     =    $(CFGDIR)\mgr
+MGRTOOL    =    $(SECUR_DIR)\$(HOST_OS).bin\mgrtool.exe
+
+
+IANA_MIBS = \
+	iana-addr-fam.my \
+	iana-iftype.my   \
+	iana-language.my
+
+IANA_DEFS = \
+	$(OSOBJDIR)\iana-addr-fam.def \
+	$(OSOBJDIR)\iana-iftype.def   \
+	$(OSOBJDIR)\iana-language.def
+
+
+RFC_MIBS =
+
+
+RFC_DEFS = 
+
+
+DEFS = \
+	$(OSOBJDIR)\smi.def \
+	$(OSOBJDIR)\mib-2.def \
+        $(OSOBJDIR)\srAgentInfo.def \
+	$(OSOBJDIR)\yourmib.def \
+	$(OSOBJDIR)\sr-tc.def \
+	$(OSOBJDIR)\v2-tc.def \
+	$(OSOBJDIR)\v2-mib.def \
+	$(OSOBJDIR)\v2-smi.def \
+	$(OSOBJDIR)\v2-tm.def \
+	$(OSOBJDIR)\coex.def \
+	$(OSOBJDIR)\v3-acm.def \
+	$(OSOBJDIR)\v3-mpd.def \
+	$(OSOBJDIR)\v3-proxy.def \
+	$(OSOBJDIR)\v3-usm.def \
+	$(OSOBJDIR)\v3-arch.def \
+	$(OSOBJDIR)\v3-notif.def \
+	$(OSOBJDIR)\v3-tgt.def \
+	$(OSOBJDIR)\usm-tran.def \
+	$(OSOBJDIR)\tgt-tran.def \
+	$(OSOBJDIR)\snmp-res.def \
+	$(OSOBJDIR)\dprintf.def \
+	$(IANA_DEFS) \
+	$(RFC_DEFS)
+
+
+all: $(MGRDIR) $(MIBS_TO_COPY) $(OSOBJDIR) $(OSOBJDIR)\snmp-mib.h $(OSOBJDIR)\snmpinfo.dat
+
+$(OSOBJDIR):
+	-mkdir $(OSOBJDIR)
+
+$(MGRDIR): $(CFGDIR)
+	-mkdir $(MGRDIR)
+
+$(CFGDIR):
+	-mkdir $(CFGDIR)
+
+
+$(DEFS):  $(IANA_MIBS) $(RFC_MIBS)
+	$(SECUR_DIR)\$(HOST_OS).bin\mosy -s -S $(patsubst %.def,%.my,$(subst $(OSOBJDIR)\,,$@))
+	$(MOVE) $(subst $(OSOBJDIR)\,,$@) $(OSOBJDIR)
+
+
+$(IANA_MIBS):
+	-$(SECUR_DIR)\$(HOST_OS).bin\premosy $(IANA_DIR)\$(@F:my=txt) $(@F)
+
+
+$(OSOBJDIR)\objects.mib: $(DEFS)
+	$(CAT) $(DEFS) > $(OSOBJDIR)\objects.mib
+
+$(OSOBJDIR)\snmp-mib.h $(OSOBJDIR)\snmpinfo.dat: $(OSOBJDIR)\objects.mib
+	$(MGRTOOL) $(OSOBJDIR)\objects.mib
+	$(MOVE) snmp-mib.h   $(OSOBJDIR)
+	$(MOVE) snmpinfo.dat $(OSOBJDIR)
+	$(CP) $(OSOBJDIR)\snmp-mib.h   $(SNMPINCDIR)\snmp-mib.h
+	$(CP) $(OSOBJDIR)\snmpinfo.dat $(MGRDIR)\snmpinfo.dat
+
+clean:
+	-$(RM) $(SNMPINCDIR)\snmp-mib.h
+	-$(RM) $(MGRDIR)\snmpinfo.dat
+	-$(RM) $(OSOBJDIR)\snmpinfo.dat
+	-$(RM) $(OSOBJDIR)\snmp-mib.h
+	-$(RM) $(OSOBJDIR)\objects.mib
+	-$(RM) $(OSOBJDIR)\snmpinfo.c
+	-$(RM) $(OSOBJDIR)\*.def
+	-$(RMDIR) $(OSOBJDIR)
+	-$(RM) iana-addr-fam.my
+	-$(RM) iana-iftype.my
+	-$(RM) iana-language.my
+

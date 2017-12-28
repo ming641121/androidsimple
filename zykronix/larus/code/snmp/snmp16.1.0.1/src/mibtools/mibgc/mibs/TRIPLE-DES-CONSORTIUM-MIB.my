@@ -1,0 +1,29 @@
+TRIPLE-DES-CONSORTIUM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises
+        FROM SNMPv2-SMI;
+
+-- The top node
+tripleDESConsortium      OBJECT IDENTIFIER ::= { enterprises 14832 } 
+
+--
+-- tripleDESConsortium.1: Privacy Protocols 
+--
+tripleDESConsortiumPrivProtocols OBJECT IDENTIFIER ::= { tripleDESConsortium 1 }
+
+--
+-- 3DES Privacy Protocol for SNMPv3 USM security model 
+--
+usm3DESPrivProtocol OBJECT IDENTIFIER ::= { tripleDESConsortiumPrivProtocols 1 }
+
+--
+-- AES Privacy Protocol for SNMPv3 USM security model 
+--
+usmAESCfb128PrivProtocol OBJECT IDENTIFIER ::= { tripleDESConsortiumPrivProtocols 2 }
+
+usmAESCfb192PrivProtocol OBJECT IDENTIFIER ::= { tripleDESConsortiumPrivProtocols 3 }
+
+usmAESCfb256PrivProtocol OBJECT IDENTIFIER ::= { tripleDESConsortiumPrivProtocols 4 }
+
+END

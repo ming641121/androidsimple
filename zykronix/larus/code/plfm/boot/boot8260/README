@@ -1,0 +1,48 @@
+
+                 README: Motorola MPC827X ADS (ads8272)
+
+This file contains board-specific information for the Motorola MPC8272
+ADS target board.  Specifically, this file contains information on any BSP
+interface changes from previous software or hardware versions, and
+contains caveats that the user must be aware of before using this BSP.
+Additionally, the target board's reference entry (i.e., 'man ads8260')
+provides board-specific information necessary to run VxWorks, and
+should be read before this BSP is used.
+
+
+PLEASE NOTE
+-----------
+
+When used with Tornado 2.2.1, this BSP requires modified versions of 
+several driver files.  The relevant SPRs are SPR #94578 and SPR #94579.
+The files are included in patch_SPR94578.zip, which is included in the
+distribution for this BSP.  Unzip and install this patch to obtain
+the modified driver files.
+
+The modified driver files should be included in a future Tornado 2.2.X
+release and/or in a cumulative driver patch.  If this BSP is used with
+version of Tornado subsequent to 2.2.1 or with cumulative driver patch
+number 2 or later, check whether the SPR modifications have already been
+included before installing the patch included with this BSP.
+
+-------------------------------------------------------------------------------
+RELEASE 1.2/1
+
+Added BSP support for the Security Engine interrupt.
+
+Fixed SPRs 
+99953 : FCC Clk settings were causing some performance issues
+98762 : bootrom has a problem with serial and configuring the boot parameters 
+
+RELEASE 1.2/0
+
+SPR 93050 : Machine check for offboard address error
+SPR 93051 : FCC transmit is very slow using blasterTCP
+SPR 93052 : PCI Errata workaround doesn't work. IDMA done bit not being set, waiting for confirmation from Motorola.
+
+
+
+
+
+
+
